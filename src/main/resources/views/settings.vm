@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cloud IDE Settings</title>
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
+    <link rel="stylesheet" href="/static/css/btt.settings.css"/>
+    <link rel="stylesheet" href="/static/ui-lib/ui-lib.min.css"/>
+    <script src="/static/ui-lib/ui-lib.min.js"></script>
+</head>
+
+<body>
+
+<!-- This part holds the settings panel -->
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="hero-unit" id="mainTitle"> BLA BLA
+            <ol>
+                <li>Item 1</li>
+                <li>Item 2</li>
+                <li>Item 3</li>
+            </ol>
+        </div>
+    </div>
+
+
+    <button class="btn pull-right" name="refreshComp" onclick="saveChanges(document.getElementById('title').value, getColorCheckedValue())">Save Changes</button>
+
+</div>
+
+<script type="text/javascript">
+    var settings = ${settings};
+    $(document).ready(function() {
+        Wix.UI.initialize();
+        init();
+    })
+
+
+    function saveChanges(appSettings) {
+        updateApp(appSettings);
+    }
+
+    function updateApp(appSettings) {
+
+        settings.appSettings = appSettings;
+
+        var compId = Wix.Utils.getOrigCompId();
+
+        jQuery.ajax({
+            'type': 'post',
+            'url': "/app/settingsupdate",
+            'dataType': "json",
+            'contentType': 'application/json; chatset=UTF-8',
+            'data': JSON.stringify({compId: Wix.Utils.getOrigCompId(), settings: settings}),
+            'cache': false,
+            'success': function(res) {
+                console.log("update setting completed");
+                setTimeout( function() {
+                    Wix.Settings.refreshAppByCompIds(compId);
+                }, 250);
+            },
+            'error': function(res) {
+                console.log('error updating data with message ' + res.responseText);
+            }
+        });
+    }
+
+    function init() {
+        $('#instanceId').html(Wix.Utils.getInstanceId());
+        $('#uid').html(Wix.Utils.getUid());
+        $('#permissions').html(Wix.Utils.getPermissions());
+        $('#signDate').html(Wix.Utils.getSignDate());
+
+        $('.color-selector').ColorPicker({startWithColor: 'red'});
+
+        settings.appSettings.color = settings.appSettings.color || "LightBlue";
+        settings.title = settings.title || "Back To Top";
+        $('#mainTitle').html('settings.title');
+        $('#title').val(settings.title);
+        setColorCheckedValue(settings.appSettings.color);
+        return $('.btn-group button.active').text();
+    }
+</script>
+
+
+</body>
+</html>

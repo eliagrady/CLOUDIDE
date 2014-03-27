@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <!-- mandatory inclusion for Wix apps-->
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <script type="text/javascript">
+        var settings = ${settings};
+        $(document).ready(function () {
+            init();
+        });
+
+        function init() {
+            settings.title = settings.title || "Wix Cloud IDE";
+            $('#title').html(settings.title);
+        }
+    </script>
+</div>
+</body>
+</html>
