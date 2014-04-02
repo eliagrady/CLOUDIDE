@@ -5,16 +5,19 @@
 
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <!-- Unused imports:
-    <link rel="stylesheet" href="static/css/btt.widget.css"/>
-    <script src="static/js/btt.widget.js"></script>
+    <link rel="stylesheet" href="static/css/cloudide.widget.css"/>
+    <script src="static/js/cloudide.widget.js"></script>
 
      -->
+    <link rel="stylesheet" href="static/css/editor.css"/>
     <link rel="stylesheet" href="static/ui-lib/ui-lib.min.css"/>
 
     <link rel="stylesheet" href="static/js/codemirror/codemirror-4.0/lib/codemirror.css">
+    <link rel="stylesheet" href="static/css/editor.css"/>
     <script src="static/js/editor/cloudide.js"></script>
+
     <script src="static/js/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
 
 </head>
 

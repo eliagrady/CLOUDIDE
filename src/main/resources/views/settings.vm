@@ -2,89 +2,135 @@
 <html>
 <head>
     <title>Cloud IDE Settings</title>
-
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
-    <link rel="stylesheet" href="/static/css/btt.settings.css"/>
-    <link rel="stylesheet" href="/static/ui-lib/ui-lib.min.css"/>
-    <script src="/static/ui-lib/ui-lib.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
+    <link rel="stylesheet" href="../static/ui-lib/ui-lib.min.css"/>
+    <script type="text/javascript" href="../static/ui-lib/ui-lib.min.js" ></script>
 </head>
 
 <body>
+<h1>${testingVelocity}</h1>
+<h2>$!{thisvardoesntexist}</h2>
+<h2>${thisvardoesntexist}</h2>
+<div class="settingsHero">
+    <!-- This section is composed of two main parts:
+    a. Logo - the icon that describes the app, this part won't change after login
+    b. Login - this part contains two sections, which will be replaced according to the user login status - edit the loggedOut and loggedIn sections to describe the login process of your app.
 
-<!-- This part holds the settings panel -->
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="hero-unit" id="mainTitle"> BLA BLA
-            <ol>
-                <li>Item 1</li>
-                <li>Item 2</li>
-                <li>Item 3</li>
-            </ol>
+    guest - the user did not connect his app to an account yet or to a specific URL.
+    user - the user has already connected the app to an account or to a specific URL. -->
+    <header class="box">
+        <!-- part a: application logo-->
+        <div class="logo">
+            <img width="86" src="../static/ui-lib/images/wix_icon.png" alt="logo"/>
         </div>
+
+        <!--
+        <!-- part b: Connect account area
+            <div class="loggedOut">
+                <p>
+                    Sample Settings view for widgets and pages created with <a href="http://dev.wix.com" target="_blank">Wix's 3rd Party SDK</a>,
+                    compatible with Wix's product requirements.
+                </p>
+                <div class="login-panel">
+                    <p class="create-account">Don't have an<br/>account? <a href="#"><strong>Create one</strong></a></p>
+                    <button class="submit btn connect" id="connectBtn">Connect account</button>
+                </div>
+            </div>
+            <div class="loggedIn hidden">
+                <p>
+                    You are now connected to <strong class="user-name">John Doe (john@doe.com)</strong> account<br/>
+                    <a class="disconnect-account">Disconnect account</a>
+                </p>
+                <div class="premium">
+                    <p class="premium-features">Premium features</p>
+                    <button class="submit btn upgrade">Upgrade</button>
+                </div>
+            </div>
+        -->
+    </header>
+
+
+
+<!-- Part 2 - Setting controls
+Controls that can be changed to configure the Widget.
+Main control is the accordion that contains panes that will be opened and closed
+ according to your selection.
+In each pane you can add different controls from the wix-ui-lib and
+listen to events when they change, a few samples will be displayed later.
+This part holds the settings panel -->
+
+
+    <!-- Settings box -->
+    <!--
+    The accordion contains two sections:
+    a. General settings - general definitions of the Widget
+    b. Styling - colors, border, opacity of the Widget elements
+    -->
+    <div wix-ctrl="Accordion">
+
+        <!-- General Settings -->
+        <div class="acc-pane">
+            <h3>Testing Some Code</h3>
+            <div class="acc-content">
+                <p>Please insert number of feed entries you would like to be displayed</p>
+                <ul class="list">
+                    <textarea id="codeTest"></textarea>
+                </ul>
+            </div>
+        </div>
+
+
+        <!-- Styling -->
+        <div class="acc-pane">
+            <h3>Color Settings: </h3>
+            <div class="acc-content">
+                <p>Set the  widget colors</p>
+                <ul class="list">
+                    <li wix-label="Title text">
+                        <div wix-param="titleColor" wix-ctrl="ColorPicker" wix-options="{startWithColor:'color-3'}"></div>
+                    </li>
+                    <li wix-label="Background">
+                        <div wix-param="bgColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor:'white/black'}"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 
-
-    <button class="btn pull-right" name="refreshComp" onclick="saveChanges(document.getElementById('title').value, getColorCheckedValue())">Save Changes</button>
+        <!-- Save settings button -->
+        <div wix-model="imagesToSync" wix-ctrl="Radio" class="rb-radio-group">
+            <div data-radio-value="sync10" class="uilib-text rb-radio rb-radio-checked"><span class="rb-radio-check"></span>Sync 10 images</div>
+            <div data-radio-value="sync25" class="uilib-text rb-radio"><span class="rb-radio-check"></span>Sync 25 images</div>
+            <div data-radio-value="sync50" class="uilib-text rb-radio"><span class="rb-radio-check"></span>Sync 50 images</div>
+        </div>
+        <button class="submit uilib-btn connect" id="updateSettingsBtn">Update</button>
 
 </div>
 
-<script type="text/javascript">
-    var settings = ${settings};
-    $(document).ready(function() {
-        Wix.UI.initialize();
-        init();
-    })
+
+    <!-- Part 3 - Libs that are usually used while developing the settings end point -->
 
 
-    function saveChanges(appSettings) {
-        updateApp(appSettings);
-    }
 
-    function updateApp(appSettings) {
+    <!-- Wix SDK -->
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
+    <!-- jQuery Dependency -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <!-- Wix UI -->
+    <script type="text/javascript" src="../static/ui-lib/ui-lib.min.js"></script>
+    <!-- Settings View Logic -->
+    <script type="text/javascript" src="../static/js/common.js"></script>
+    <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
 
-        settings.appSettings = appSettings;
+    <script type="text/javascript">
 
-        var compId = Wix.Utils.getOrigCompId();
+        var newSettings = $!{settings};
 
-        jQuery.ajax({
-            'type': 'post',
-            'url': "/app/settingsupdate",
-            'dataType': "json",
-            'contentType': 'application/json; chatset=UTF-8',
-            'data': JSON.stringify({compId: Wix.Utils.getOrigCompId(), settings: settings}),
-            'cache': false,
-            'success': function(res) {
-                console.log("update setting completed");
-                setTimeout( function() {
-                    Wix.Settings.refreshAppByCompIds(compId);
-                }, 250);
-            },
-            'error': function(res) {
-                console.log('error updating data with message ' + res.responseText);
-            }
+        $(document).ready(function () {
+            Wix.UI.initialize({});
+          //  applySettings();
         });
-    }
-
-    function init() {
-        $('#instanceId').html(Wix.Utils.getInstanceId());
-        $('#uid').html(Wix.Utils.getUid());
-        $('#permissions').html(Wix.Utils.getPermissions());
-        $('#signDate').html(Wix.Utils.getSignDate());
-
-        $('.color-selector').ColorPicker({startWithColor: 'red'});
-
-        settings.appSettings.color = settings.appSettings.color || "LightBlue";
-        settings.title = settings.title || "Back To Top";
-        $('#mainTitle').html('settings.title');
-        $('#title').val(settings.title);
-        setColorCheckedValue(settings.appSettings.color);
-        return $('.btn-group button.active').text();
-    }
-</script>
-
-
+    </script>
 </body>
 </html>

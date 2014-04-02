@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
-    <!-- mandatory inclusion for Wix apps-->
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
-</head>
-
-<body>
-<div class="container-fluid">
-    <script type="text/javascript">
-        var settings = ${settings};
-        $(document).ready(function () {
-            init();
-        });
-
-        function init() {
-            settings.title = settings.title || "Wix Cloud IDE";
-            $('#title').html(settings.title);
+    <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
+    <link rel="stylesheet" href="../static/external_modules/flexcrollstyles.css"/>
+    <style wix-style type="text/css">
+        #widget-body{
+        background-color: {{style.bgColor}}
         }
-    </script>
-</div>
+        #feedTitle{
+    <script type="text/javascript" src="https://www.google.com/jsapi">
+        color: {{style.titleColor}}
+        }
+        </style></script>
+</head>
+<body>
+
+
+$!{settings}
+    $UtilMethods.decodeURL($settings)
+
+        <div id="main"></div>
+
+<script type="text/javascript">
+    var newSettings = $!{settings};
+    $('#main').html(decodeURI(settings.appSettings));
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
+<script type="text/javascript" src="../static/external_modules/flexcroll.js"></script>
+<script type="text/javascript" src="../static/js/common.js"></script>
+<script type="text/javascript" src="../static/js/cloudide.widget.js"></script>
 </body>
 </html>
