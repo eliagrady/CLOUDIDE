@@ -5,16 +5,19 @@
 
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <!-- Unused imports:
-    <link rel="stylesheet" href="static/css/btt.widget.css"/>
-    <script src="static/js/btt.widget.js"></script>
+    <link rel="stylesheet" href="static/css/cloudide.widget.css"/>
+    <script src="static/js/cloudide.widget.js"></script>
 
      -->
+    <link rel="stylesheet" href="static/css/editor.css"/>
     <link rel="stylesheet" href="static/ui-lib/ui-lib.min.css"/>
 
     <link rel="stylesheet" href="static/js/codemirror/codemirror-4.0/lib/codemirror.css">
+    <link rel="stylesheet" href="static/css/editor.css"/>
     <script src="static/js/editor/cloudide.js"></script>
+
     <script src="static/js/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.23.0/js/Wix.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
 
 </head>
 
@@ -38,16 +41,20 @@
     <div class="mainWindow" style="height:90%;width:100%;">
         <div class="projectExplorer"
              style="height:100%; width:20%; background: none repeat scroll 0% 0% rgb(204, 204, 255);position:relative; float:left; margin:0 auto; outline:1px solid #000000; padding: 0px 0px">
-         <span style="font-size: medium;">
-        <u>project explorer:</u>
-             <br>
-             <br>
-             + <u>project 1</u> <br>
-               &nbsp;&nbsp; - code 1 <br>
-               &nbsp;&nbsp; - code 2 <br>
-             + <u>project 2</u> <br>
-             + <u>project 3</u> <br>
-             </span>
+         <ul>
+             <h3> Project Explorer</h3>
+             <ul>
+                 <li>
+                     Project 1
+                 </li>
+                 <li>
+                     Project 2
+                 </li>
+                 <li>
+                     Project 3
+                 </li>
+             </ul>
+         </ul>
         </div>
         <div class="editorWindow"
              style="height:100%;width:80%;background: none repeat scroll 0% 0% rgb(204, 204, 255);position:relative; float:right; margin:0 auto; outline:1px solid #000000; padding: 0px 0px">

@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 
 @Controller
-//@RequestMapping(value = "/app")
+@RequestMapping(value = "/app")
 public class AppController {
     @Resource
     private AppDao appDao;
@@ -277,7 +277,7 @@ public class AppController {
         AppSettings appSettings = getSettings(instanceId, origCompId);
 
         model.addAttribute("settings", objectMapper.writeValueAsString(appSettings));
-
+        model.addAttribute("testingVelocity","Hello world!");
         return "settings";
     }
 
