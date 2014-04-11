@@ -1,106 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>$appSettings.getTitle() App</title>
-
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <!-- Unused imports:
-    <link rel="stylesheet" href="static/css/cloudide.widget.css"/>
-    <script src="static/js/cloudide.widget.js"></script>
-
-     -->
-    <link rel="stylesheet" href="static/css/editor.css"/>
-    <link rel="stylesheet" href="static/ui-lib/ui-lib.min.css"/>
-
-    <link rel="stylesheet" href="static/js/codemirror/codemirror-4.0/lib/codemirror.css">
-    <link rel="stylesheet" href="static/css/editor.css"/>
-    <script src="static/js/editor/cloudide.js"></script>
-
-    <script src="static/js/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
-
+    <title>${settings}.getTitle()} App</title>
+    <!-- Require JS (currently not supported)
+        <script data-main="../static/js/cloudide.editor" src="../static/external_modules/require.js"></script>
+        -->
+    <link rel="stylesheet" href="../static/ui-lib/ui-lib.min.css"/>
+    <link rel="stylesheet" href="../static/external_modules/codemirror/codemirror-4.0/lib/codemirror.css">
+    <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
 </head>
 
 <body>
-<div class="heroUnit"
-     style="height:600px; width:750px; background: none repeat scroll 0% 0% rgb(255, 255, 255);float:center; margin:0 auto; outline:1px solid #000000; padding: 0px 0px">
-    <div class="mainMenu"
-         style="height:5%; width:auto; background: none repeat scroll 0% 0% rgb(204, 204, 255); outline:1px solid #000000; padding: 0px 0px;">
-        <div style="text-align: left;">
-        <span style="font-size: large;">
-        <b> Main menu <img src="static/icons/option_icon.png" align="right">
-            <img src="static/icons/paste_icon.png" align="right">
-            &nbsp;
-            <img src="static/icons/copy_icon.png" align="right">
-            <img src="static/icons/undo_icon.png" align="right">
-            <img src="static/icons/redo_icon.png" align="right">
-            <img src="static/icons/save_icon.png" align="right">
+    <div id="cldHeroContainer">
+        <div id="cldMenubar"></div>
+        <div id="cldSidebar"></div>
+        <div id="cldEditor"></div>
+        <div id="cldStatusbar"></div>
+    </div>
 
-        </b></span></div>
-    </div>
-    <div class="mainWindow" style="height:90%;width:100%;">
-        <div class="projectExplorer"
-             style="height:100%; width:20%; background: none repeat scroll 0% 0% rgb(204, 204, 255);position:relative; float:left; margin:0 auto; outline:1px solid #000000; padding: 0px 0px">
-         <ul>
-             <h3> Project Explorer</h3>
-             <ul>
-                 <li>
-                     Project 1
-                 </li>
-                 <li>
-                     Project 2
-                 </li>
-                 <li>
-                     Project 3
-                 </li>
-             </ul>
-         </ul>
-        </div>
-        <div class="editorWindow"
-             style="height:100%;width:80%;background: none repeat scroll 0% 0% rgb(204, 204, 255);position:relative; float:right; margin:0 auto; outline:1px solid #000000; padding: 0px 0px">
-            <textarea id="myTextArea" style="height:100%;width:100%">
-            </textarea>
-            <script type="text/javascript">
-                //Configuration file is based on the following manual
-                //http://codemirror.net/doc/manual.html
-                var codeMirrorConfiguration =
-                {
-                    value: "function myScript() {return 100;}\n", //TODO replace with the Document module
-                    mode: "javascript",
-                    indentUnit: 2, //Integer number for indentation spaces
-                    smartIndent: true, //Indentation is context sensitive (according to the given mode)
-                    tabSize: 4, //width of tabs
-                    indentWithTabs: true, //true means indent with tabs instead of spaces
-                    lineNumbers: true
-                };
-                var cm = CodeMirror.fromTextArea(myTextArea, codeMirrorConfiguration);
-                var text = "function myScript(arg1,arg2) {return true;}\n";
-                var newDoc = CodeMirror.Doc(text, "javascript", 1);
-                var oldDoc = cm.swapDoc(newDoc);
-            </script>
-        </div>
-    </div>
-    <div class="statusBar"
-         style="height:5%; width:auto; background: none repeat scroll 0% 0% rgb(204, 204, 255); outline:1px solid #000000; padding: 0px 0px; margin-left:0px; font-size:small;">
-        <center> line 90 &nbsp;|&nbsp; UTF-8 &nbsp;|&nbsp; ENG</center>
-    </div>
-</div>
+    <!-- Imports -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../static/external_modules/codemirror/codemirror-4.0/lib/codemirror.js"></script>
+    <script src="../static/external_modules/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+    <script src="../static/external_modules/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
+    <script src="../static/js/cloudide.editor.js"></script>
+    <script src="../static/js/common.js"></script>
 
-<div class="container-fluid">
+    <!-- Initialization -->
     <script type="text/javascript">
         var settings = ${settings};
         $(document).ready(function () {
-            $('body').css('background-color', 'transparent');
-            //$('#title').addClass('backToTop');
             init();
         });
 
         function init() {
             settings.title = settings.title || "Wix Cloud IDE";
-            $('#title').html(settings.title);
+            document.cld = new CloudIde();
+            document.cld.init();
+            console.log('cld object attached to window object, and it\'s init called successfully');
         }
-
     </script>
-</div>
 </body>
 </html>

@@ -275,9 +275,7 @@ public class AppController {
     // Set setting.vm
     private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId) throws IOException {
         AppSettings appSettings = getSettings(instanceId, origCompId);
-
         model.addAttribute("settings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("testingVelocity","Hello world!");
         return "settings";
     }
 
