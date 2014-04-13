@@ -18,15 +18,13 @@ function CloudIde(timeout) {
     this.init = function () {
         //Initialize menu segment
         var menu = $('#cldMenubar').get(0);
-        menu.appendChild($('<div id="cldMenubarBttSave">Save</div>').get(0));
-        menu.appendChild($('<div id="cldMenubarBttUndo">Undo</div>').get(0));
-        menu.appendChild($('<div id="cldMenubarBttRedo">Redo</div>'));
+        $('<button id="cldMenubarBttSave">Save</button>').appendTo(menu);
 
         //Initialize project explorer segment
         var explorer = $('#cldSidebar').get(0);
-        explorer.appendChild($('<div id="cldSidbarPrj"><ul></ul></div>'));
+        ($('<div id="cldSidbarPrj"><ul></ul></div>')).appendTo(explorer).get(0);
             //Get and and list all the projects (foreach)
-        $('ul').appendChild($('<li>filename.js</li>'));
+        $('<li>filename.js</li>').appendTo($('ul'));
 
 
         //Initialize status bar segment
@@ -40,6 +38,8 @@ function CloudIde(timeout) {
         }
         var cldTextArea = $('<textarea id="cldEditorTextArea"></textarea>').appendTo('#cldEditor').get(0);
         CloudIde.cm = CodeMirror.fromTextArea(cldTextArea, this.codeMirrorConfiguration);
+
+        //Load add-ons
     };
 
     CloudIde.updateStatusBar = function (text, timeout, callback) {
@@ -51,8 +51,35 @@ function CloudIde(timeout) {
     };
 
 
+    CloudIde.save = function (filename) {
+        
+    };
 
+    CloudIde.functionName = function() {
+        "use strict";
+        var code = encodeURI($('#codeTest').val());
+        var compId = Wix.Utils.getOrigCompId();
 
+        $.ajax({
+            'type': 'post',
+            'url': "/app/settingsupdate",
+            'dataType': "json",
+            'contentType': 'application/json; chatset=UTF-8',
+            'data': JSON.stringify({compId: Wix.Utils.getOrigCompId(), settings: {
+                appSettings: code,
+                title: 'yo'
+            }}),
+            'cache': false,
+            'success': function (res) {
+                console.log("update setting completed");
+
+                Wix.Settings.refreshAppByCompIds(compId);
+            },
+            'error': function (res) {
+                console.log('error updating data with message ' + res.responseText);
+            }
+        });
+    };
 
 
 
