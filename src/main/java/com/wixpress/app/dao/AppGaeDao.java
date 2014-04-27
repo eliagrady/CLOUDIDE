@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class AppGaeDao implements AppDao {
 
-    protected final static String SAMPLE_APP_INSTANCE = "BttAppInstance";
+    protected final static String APP_INSTANCE = "CloudIdeAppInstance";
     protected final static String BAGGAGE = "baggage";
 
     @Resource
@@ -30,7 +30,7 @@ public class AppGaeDao implements AppDao {
      * @param appSettings - The settings of the app that configure the widget
      */
     public void saveAppSettings(String instanceId, String compId, AppSettings appSettings) {
-        Entity entity = new Entity(SAMPLE_APP_INSTANCE, key(instanceId, compId));
+        Entity entity = new Entity(APP_INSTANCE, key(instanceId, compId));
         try {
             entity.setProperty(BAGGAGE, objectMapper.writeValueAsString(appSettings));
         } catch (IOException e) {
@@ -61,7 +61,7 @@ public class AppGaeDao implements AppDao {
         if (instanceId == null)
             return null;
         else {
-            final Key key = KeyFactory.createKey(SAMPLE_APP_INSTANCE, key(instanceId, compId));
+            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
             try {
                 final String baggage = dataStore.get(key).getProperty(BAGGAGE).toString();
                 return objectMapper.readValue(baggage, AppSettings.class);
@@ -71,6 +71,25 @@ public class AppGaeDao implements AppDao {
             } catch (IOException e) {
                 // we ignore the setting reading exception and return a new default settings object
                 return new AppSettings(objectMapper);
+            }
+        }
+    }
+
+    @Override
+    public AppData getAppData(String instanceId, String compId) {
+        if (instanceId == null)
+            return null;
+        else {
+            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
+            try {
+                final String baggage = dataStore.get(key).getProperty(BAGGAGE).toString();
+                return objectMapper.readValue(baggage, AppData.class);
+            } catch (EntityNotFoundException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
+            } catch (IOException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
             }
         }
     }
@@ -95,5 +114,30 @@ public class AppGaeDao implements AppDao {
      */
     public void updateAppSettings(String instanceId, String compId, AppSettings appSettings) {
         saveAppSettings(instanceId, compId, appSettings);
+    }
+
+    @Override
+    public void updateAppData(String instanceId, String compId, AppData appData) {
+        saveAppSettings(instanceId, compId, appData);
+    }
+
+    private void saveAppSettings(String instanceId, String compId, AppData appData) {
+        //TODO make revision support here and more logic
+        Entity entity = new Entity(APP_INSTANCE, key(instanceId, compId));
+        try {
+            entity.setProperty(BAGGAGE, objectMapper.writeValueAsString(appData));
+        } catch (IOException e) {
+            throw new AppDaoException("failed to serialize settings", e);
+        }
+
+        Transaction transaction = dataStore.beginTransaction();
+        try {
+            dataStore.put(entity);
+            transaction.commit();
+        } finally {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        }
     }
 }

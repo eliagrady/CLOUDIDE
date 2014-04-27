@@ -62,7 +62,7 @@
                     indentWithTabs: true, //true means indent with tabs instead of spaces
                     lineNumbers: true
                 };
-                var cm = CodeMirror.fromTextArea(myTextArea, codeMirrorConfiguration);
+                var cm = CodeMirror.fromTextArea(document.getElementById("myTextArea"), codeMirrorConfiguration);
                 var text = "function myScript(arg1,arg2) {return true;}\n";
                 var newDoc = CodeMirror.Doc(text, "javascript", 1);
                 var oldDoc = cm.swapDoc(newDoc);

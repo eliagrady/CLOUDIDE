@@ -1,7 +1,7 @@
 package com.wixpress.app.controller;
 
-import com.wixpress.app.dao.AppDao;
-import com.wixpress.app.dao.AppSettings;
+import com.wixpress.app.dao.*;
+import com.wixpress.app.dao.AppData;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 
 @Controller
-//@RequestMapping(value = "/app")
+@RequestMapping(value = "/app")
 public class AppController {
     @Resource
     private AppDao appDao;
@@ -120,7 +120,7 @@ public class AppController {
     /**
      * Saves changes from the settings dialog
      *
-     * @param instance       - the app instance, read from a cookie placed by the settings controller view operations
+     * @param instance       - the appUpdate instance, read from a cookie placed by the settings controller view operations
      * @param settingsUpdate - the new settings selected by the user and the widgetId
      * @return AjaxResult written directly to the response stream
      */
@@ -131,6 +131,27 @@ public class AppController {
         try {
             AppInstance appInstance = authenticationResolver.unsignInstance(instance);
             appDao.updateAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), settingsUpdate.getSettings());
+            return AjaxResult.ok();
+        } catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+
+
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the settings controller view operations
+     * @param appDataUpdate - the new app data edited by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> appUpdate(@CookieValue() String instance,
+                                                     @RequestBody AppDataUpdate appDataUpdate) {
+        try {
+            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+            appDao.updateAppData(appInstance.getInstanceId().toString(), appDataUpdate.getCompId(), appDataUpdate.getAppData());
             return AjaxResult.ok();
         } catch (Exception e) {
             return AjaxResult.internalServerError(e);
@@ -257,15 +278,18 @@ public class AppController {
     // Set editor.vm
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-        model.addAttribute("settings", objectMapper.writeValueAsString(appSettings));
+        AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
         return "editor";
     }
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-
-        model.addAttribute("settings", objectMapper.writeValueAsString(appSettings));
+        AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
 
         return "widget";
     }
@@ -274,10 +298,10 @@ public class AppController {
 
     // Set setting.vm
     private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId) throws IOException {
-        AppSettings appSettings = getSettings(instanceId, origCompId);
-
-        model.addAttribute("settings", objectMapper.writeValueAsString(appSettings));
-
+        AppSettings appSettings = getSettings(instanceId, compId);
+        AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
         return "settings";
     }
 
@@ -285,8 +309,8 @@ public class AppController {
      * Get settings from the DB if exists, otherwise return empty settings
      *
      * @param instanceId - the instance id
-     * @param compId     - the app comp Id
-     * @return app settings
+     * @param compId     - the appUpdate comp Id
+     * @return appUpdate settings
      */
     private AppSettings getSettings(String instanceId, String compId) {
         AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
@@ -295,6 +319,22 @@ public class AppController {
             appSettings = new AppSettings(objectMapper);
         }
         return appSettings;
+    }
+
+    /**
+     * Get app data from the DB if exists, otherwise return empty app data
+     *
+     * @param instanceId - the instance id
+     * @param compId     - the appUpdate comp Id
+     * @return appUpdate settings
+     */
+    private AppData getAppData(String instanceId, String compId) {
+        AppData appData = appDao.getAppData(instanceId, compId);
+
+        if (appData == null) {
+            appData = new AppData(objectMapper);
+        }
+        return appData;
     }
 
     private AppInstance createTestSignedInstance(String instanceId, @Nullable String userId, @Nullable String permissions) {
@@ -309,6 +349,4 @@ public class AppController {
                     original, instanceId, userId);
         }
     }
-
-
 }
