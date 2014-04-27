@@ -1,48 +1,57 @@
+#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${settings}.getTitle()} App</title>
-    <!-- Require JS runtime dependency control -->
-    <script data-main="../static/js/main" src="../static/js/require.js"></script>
-    <!--
-    <link rel="stylesheet" href="../static/ui-lib/ui-lib.min.css"/>
-    <link rel="stylesheet" href="../static/external_modules/codemirror/codemirror-4.0/lib/codemirror.css">
+    <title>${appSettings}.getTitle()} App</title>
+    <link rel="stylesheet" href="../static/js/ui-lib/ui-lib.min.css"/>
+    <link rel="stylesheet" href="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.css">
     <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
-    -->
 </head>
 
 <body>
     <div id="cldHeroContainer">
-        <div id="cldMenubar"></div>
-        <div id="cldSidebar"></div>
-        <div id="cldEditor"></div>
-        <div id="cldStatusbar"></div>
+        <div id="cldMenubar">
+            <button id="cldMenubarBttSave" onclick="cld.save('testName',cld.cm.getDoc().getValue())">Save</button>
+        </div>
+        <div id="cldSidebar">
+            <div id="cldSidbarPrj">
+                <ul>
+                    <li>filename.js</li>
+                </ul>
+            </div>
+        </div>
+        <div id="cldEditor"><!-- code editor will be inserted here--></div>
+        <div id="cldStatusbar">
+            "initializing editor"
+        </div>
     </div>
 
-    <!-- Imports
+    <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../static/external_modules/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script src="../static/external_modules/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
-    <script src="../static/external_modules/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+    <script src="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
+    <script src="../static/js/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+    <script src="../static/js/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
     <script src="../static/js/cloudide.editor.js"></script>
     <script src="../static/js/common.js"></script>
-     -->
 
-    <!-- Initialization
+
+    <!-- Initialization  -->
     <script type="text/javascript">
-        var settings = ${settings};
         $(document).ready(function () {
-            init();
+            //window.cld = new CloudIde();
+            //cld.init();
+
+            //Create and bind global
+            window.cld = CloudIde;
+            window.cld.init();
+            settings = ${appSettings};
+            data = ${cloudIdeData};
+            console.log(settings);
+            console.log(data);
         });
 
-        function init() {
-            settings.title = settings.title || "Wix Cloud IDE";
-            document.cld = new CloudIde();
-            document.cld.init();
-            console.log('cld object attached to window object, and it\'s init called successfully');
-        }
     </script>
-     -->
 </body>
 </html>

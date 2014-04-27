@@ -1,34 +1,32 @@
+#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
-    <link rel="stylesheet" href="../static/external_modules/flexcrollstyles.css"/>
-    <style wix-style type="text/css">
-        #widget-body{
-        background-color: {{style.bgColor}}
-        }
-        #feedTitle{
-    <script type="text/javascript" src="https://www.google.com/jsapi">
-        color: {{style.titleColor}}
-        }
-        </style></script>
+    <title>${appSettings}.getTitle()} App</title>
+    <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
+    <!-- Imports -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
+    <script src="../static/js/cloudide.widget.js"></script>
+    <script src="../static/js/common.js"></script>
+
 </head>
-<body>
+
+<body id="body">
+<div id="hero"></div>
 
 
-$!{settings}
-    $UtilMethods.decodeURL($settings)
 
-        <div id="main"></div>
-
+<!-- Initialization  -->
 <script type="text/javascript">
-    var newSettings = $!{settings};
-    $('#main').html(decodeURI(settings.appSettings));
+    $(document).ready(function () {
+        settings = ${appSettings};
+        data = ${cloudIdeData};
+        $('#body').append('<h1>test test</h1>');
+        $('#hero').append(data.code);
+    });
+
 </script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
-<script type="text/javascript" src="../static/external_modules/flexcroll.js"></script>
-<script type="text/javascript" src="../static/js/common.js"></script>
-<script type="text/javascript" src="../static/js/cloudide.widget.js"></script>
 </body>
 </html>
