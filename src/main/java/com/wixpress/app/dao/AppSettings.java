@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  */
 
 @JsonTypeName("AppSettings")
-public class AppSettings {
+public class AppSettings implements DataContainer {
 
     private @Nullable String title;
     private @Nullable JsonNode appSettings;

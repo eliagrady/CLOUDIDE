@@ -11,9 +11,9 @@ import javax.annotation.Nullable;
  */
 
 @JsonTypeName("AppData")
-public class AppData {
+public class AppData implements DataContainer {
 
-    private @Nullable String title;
+    private @Nullable String command;
     private @Nullable JsonNode appData;
     private @Nullable JsonNode document;
 
@@ -21,7 +21,7 @@ public class AppData {
 
     public AppData(ObjectMapper objectMapper) {
         appData = objectMapper.createObjectNode();
-        document = objectMapper.createObjectNode();
+        //document = objectMapper.createObjectNode();
     }
 
     public <T> T nvl(T value, T fallback) {
@@ -38,12 +38,12 @@ public class AppData {
     }
 
     @Nullable
-    public String getTitle() {
-        return title;
+    public String getCommand() {
+        return command;
     }
 
-    public void setTitle(@Nullable String title) {
-        this.title = title;
+    public void setCommand(@Nullable String command) {
+        this.command = command;
     }
 
     @Nullable

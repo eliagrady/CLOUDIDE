@@ -1,17 +1,16 @@
-#* @implicty )*#
+#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
 <head>
     <title>Cloud IDE Settings</title>
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
-    <link rel="stylesheet" href="../static/ui-lib/ui-lib.min.css"/>
-    <script type="text/javascript" href="../static/ui-lib/ui-lib.min.js" ></script>
+    <link rel="stylesheet" href="../static/js/ui-lib/ui-lib.min.css"/>
+    <script type="text/javascript" href="../static/js/ui-lib/ui-lib.min.js" ></script>
 </head>
 
 <body>
-<h1>${testingVelocity}</h1>
-<h2>$!{thisvardoesntexist}</h2>
-<h2>${thisvardoesntexist}</h2>
 <div class="settingsHero">
     <!-- This section is composed of two main parts:
     a. Logo - the icon that describes the app, this part won't change after login
@@ -22,7 +21,7 @@
     <header class="box">
         <!-- part a: application logo-->
         <div class="logo">
-            <img width="86" src="../static/ui-lib/images/wix_icon.png" alt="logo"/>
+            <img width="86" src="../static/js/ui-lib/images/wix_icon.png" alt="cloudide"/>
         </div>
 
         <!--
@@ -60,52 +59,8 @@ In each pane you can add different controls from the wix-ui-lib and
 listen to events when they change, a few samples will be displayed later.
 This part holds the settings panel -->
 
-
-    <!-- Settings box -->
-    <!--
-    The accordion contains two sections:
-    a. General settings - general definitions of the Widget
-    b. Styling - colors, border, opacity of the Widget elements
-    -->
-    <div wix-ctrl="Accordion">
-
-        <!-- General Settings -->
-        <div class="acc-pane">
-            <h3>Testing Some Code</h3>
-            <div class="acc-content">
-                <p>Please insert number of feed entries you would like to be displayed</p>
-                <ul class="list">
-                    <textarea id="codeTest"></textarea>
-                </ul>
-            </div>
-        </div>
-
-
-        <!-- Styling -->
-        <div class="acc-pane">
-            <h3>Color Settings: </h3>
-            <div class="acc-content">
-                <p>Set the  widget colors</p>
-                <ul class="list">
-                    <li wix-label="Title text">
-                        <div wix-param="titleColor" wix-ctrl="ColorPicker" wix-options="{startWithColor:'color-3'}"></div>
-                    </li>
-                    <li wix-label="Background">
-                        <div wix-param="bgColor" wix-ctrl="ColorPickerWithOpacity" wix-options="{startWithColor:'white/black'}"></div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-        <!-- Save settings button -->
-        <div wix-model="imagesToSync" wix-ctrl="Radio" class="rb-radio-group">
-            <div data-radio-value="sync10" class="uilib-text rb-radio rb-radio-checked"><span class="rb-radio-check"></span>Sync 10 images</div>
-            <div data-radio-value="sync25" class="uilib-text rb-radio"><span class="rb-radio-check"></span>Sync 25 images</div>
-            <div data-radio-value="sync50" class="uilib-text rb-radio"><span class="rb-radio-check"></span>Sync 50 images</div>
-        </div>
-        <button class="submit uilib-btn connect" id="updateSettingsBtn">Update</button>
+        <div class="submit uilib-btn connect" id="updateSettingsBtn">Update</div>
+        <div class="submit uilib-btn connect" id="refreshBtn">Refresh</div>
 
 </div>
 
@@ -119,19 +74,14 @@ This part holds the settings panel -->
     <!-- jQuery Dependency -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <!-- Wix UI -->
-    <script type="text/javascript" src="../static/ui-lib/ui-lib.min.js"></script>
+    <script type="text/javascript" src="../static/js/ui-lib/ui-lib.min.js"></script>
     <!-- Settings View Logic -->
     <script type="text/javascript" src="../static/js/common.js"></script>
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
 
     <script type="text/javascript">
-
-        var newSettings = $!{settings};
-
-        $(document).ready(function () {
-            Wix.UI.initialize({});
-          //  applySettings();
-        });
+        var newAppSettings = $!{appSettings};
+        var appData = $!{cloudIdeData};
     </script>
 </body>
 </html>

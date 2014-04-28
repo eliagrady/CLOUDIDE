@@ -1,0 +1,42 @@
+body {
+    overflow-x: hidden;
+}
+
+#cldEditorOpen {
+    position: absolute;
+    top: 10px;
+    right: -5px;
+}
+
+
+
+
+.round_shadow_button {
+    font: 14px/2.3em trebuchet,arial;
+    color: #aaa;
+    text-shadow: 0 1px 0 #fff;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    padding: 0 5px;
+    margin: 3px auto 5px;
+    border: 1px solid #ddd;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -ms-border-radius: 6px;
+    border-radius: 6px;
+    -moz-box-shadow: 0 3px 5px #ccc;
+    -webkit-box-shadow: 0 3px 5px #ccc;
+    -o-box-shadow: 0 3px 5px #ccc;
+    -ms-box-shadow: 0 3px 5px #ccc;
+    box-shadow: 0 3px 5px #ccc;
+}
+.round_shadow_button:active {
+    margin: 5px auto 3px;
+    -moz-box-shadow: 0 0 1px #eee;
+    -webkit-box-shadow: 0 0 1px #eee;
+    -o-box-shadow: 0 0 1px #eee;
+    -ms-box-shadow: 0 0 1px #eee;
+    box-shadow: 0 0 1px #eee;
+}

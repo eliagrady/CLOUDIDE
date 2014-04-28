@@ -7,19 +7,19 @@
  * This function init the settings object with default values or with values that were saved in the DB
  */
 
-function saveSettings() {
+function saveSettings(settingsJson) {
     "use strict";
-    var code = encodeURI($('#codeTest').val());
+    var settingsStr = JSON.stringify(settingsJson) || "";
     var compId = Wix.Utils.getOrigCompId();
-
+    var date = new Date().toDateString();
     $.ajax({
         'type': 'post',
         'url': "/app/settingsupdate",
         'dataType': "json",
         'contentType': 'application/json; chatset=UTF-8',
         'data': JSON.stringify({compId: Wix.Utils.getOrigCompId(), settings: {
-            appSettings: code,
-            title: 'yo'
+            appSettings: settingsJson,
+            title: date
         }}),
         'cache': false,
         'success': function (res) {
@@ -33,12 +33,22 @@ function saveSettings() {
     });
 }
 
-function test() {
-    "use strict";
-    Wix.openModal('http://wix.com', 400, 400, function () { window.alert('bye'); });
+/**
+ * This function init the settings object with default values or with values that were saved in the DB
+ */
+function applySettings() {
+    // App Settings Json
+    appSettings.settings.appSettings = appSettings.settings.appSettings || {};
+
+    // App Settings title
+    appSettings.settings.title = appSettings.settings.title || "Default title";
 }
 
-$('#yo').click(test);
+
+
+
+
+
 
 
 

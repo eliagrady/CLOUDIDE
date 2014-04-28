@@ -1,7 +1,8 @@
 package com.wixpress.app.controller;
 
-import com.wixpress.app.dao.*;
+import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppData;
+import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
@@ -62,6 +63,7 @@ public class AppController {
                          @RequestParam String compId,
                          @RequestParam String viewMode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+        model.addAttribute("appInstance",appInstance);
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
 
     }
@@ -81,13 +83,20 @@ public class AppController {
      */
     @RequestMapping(value = "/editor", method = RequestMethod.GET)
     public String editor(Model model,
+                         HttpServletResponse response,
                          @RequestParam String instance,
                          @RequestParam(value = "section-url", required = false) String sectionUrl,
                          @RequestParam(required = false) String target,
-                         @RequestParam Integer width,
+                         @RequestParam(required = false)Integer width,
                          @RequestParam String compId,
                          @RequestParam String viewMode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+        //Add Cookie:
+        response.addCookie(new Cookie("instance",instance));
+        //fallback to default width
+        if(width == null) {
+            width = 500;
+        }
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
 
     }
@@ -114,6 +123,7 @@ public class AppController {
                            @RequestParam String compId) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         response.addCookie(new Cookie("instance", instance));
+        model.addAttribute("appInstance",appInstance);
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
     }
 
@@ -141,18 +151,43 @@ public class AppController {
     /**
      * Saves changes from the settings dialog
      *
-     * @param instance       - the appUpdate instance, read from a cookie placed by the settings controller view operations
+     * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
      * @param appDataUpdate - the new app data edited by the user and the widgetId
      * @return AjaxResult written directly to the response stream
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<AjaxResult> appUpdate(@CookieValue() String instance,
-                                                     @RequestBody AppDataUpdate appDataUpdate) {
+                                                @RequestBody AppDataUpdate appDataUpdate) {
+        AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+        return executeUpdate(appInstance,appDataUpdate);
+    }
+
+    /**
+     * Helper function for updating
+     */
+    private ResponseEntity<AjaxResult> executeUpdate(AppInstance appInstance,AppDataUpdate appDataUpdate) {
         try {
-            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
-            appDao.updateAppData(appInstance.getInstanceId().toString(), appDataUpdate.getCompId(), appDataUpdate.getAppData());
+            AppData appData = appDataUpdate.getAppData();
+            String cmd = appData.getCommand();
+            if(cmd.contentEquals("updateProjectView")) {
+                AppData fetchedData;
+                if(appDataUpdate.getCompId() == null ) {
+                     fetchedData = appDao.getAppData(appInstance.getInstanceId().toString());
+                }
+                else {
+                    fetchedData = appDao.getAppData(appInstance.getInstanceId().toString(),appDataUpdate.getCompId());
+                }
+                //Can produce NullPointerException
+                String res = fetchedData.getAppData().toString();
+                return AjaxResult.res(fetchedData.getAppData().asText());
+
+            }
+
+            appDao.saveAppData(appInstance.getInstanceId().toString(), appDataUpdate.getCompId(), appData);
             return AjaxResult.ok();
+        } catch (NullPointerException npe) {
+            return AjaxResult.internalServerError(npe);
         } catch (Exception e) {
             return AjaxResult.internalServerError(e);
         }
@@ -290,7 +325,6 @@ public class AppController {
         AppData cloudIdeData = getAppData(instanceId, compId);
         model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
         model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
-
         return "widget";
     }
 
