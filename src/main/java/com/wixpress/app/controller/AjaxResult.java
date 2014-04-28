@@ -14,6 +14,7 @@ public class AjaxResult
     private boolean isOk;
     private @Nullable String error;
     private @Nullable String stackTrace;
+    private @Nullable String retData;
 
     public AjaxResult(boolean isOk) {
         this.isOk = isOk;
@@ -23,6 +24,10 @@ public class AjaxResult
         isOk = ok;
         this.error = error;
         this.stackTrace = stackTrace;
+    }
+
+    public AjaxResult(boolean b, String data) {
+        this.retData = data;
     }
 
     public boolean isOk() {
@@ -60,6 +65,10 @@ public class AjaxResult
 
     public static ResponseEntity<AjaxResult> ok() {
         return new ResponseEntity<AjaxResult>(new AjaxResult(true), HttpStatus.OK);
+    }
+
+    public static ResponseEntity<AjaxResult> res(String data) {
+        return new ResponseEntity<AjaxResult>(new AjaxResult(true,data),HttpStatus.OK);
     }
 
     public static ResponseEntity<AjaxResult> internalServerError(Exception e) {

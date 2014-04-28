@@ -1,5 +1,6 @@
 #* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
 #* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +17,9 @@
         </div>
         <div id="cldSidebar">
             <div id="cldSidbarPrj">
+                <div id="cldPrjExplorer">
+                    <!-- List user projects here -->
+                </div>
                 <ul>
                     <li>filename.js</li>
                 </ul>
@@ -40,14 +44,17 @@
     <!-- Initialization  -->
     <script type="text/javascript">
         $(document).ready(function () {
+            //Data Bindings
+            instanceId = ${appInstance.getInstanceId()};
+            settings = ${appSettings};
+            data = ${cloudIdeData};
+
             //window.cld = new CloudIde();
             //cld.init();
 
             //Create and bind global
             window.cld = CloudIde;
             window.cld.init();
-            settings = ${appSettings};
-            data = ${cloudIdeData};
             console.log(settings);
             console.log(data);
         });

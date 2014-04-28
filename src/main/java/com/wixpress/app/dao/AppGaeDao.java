@@ -6,6 +6,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * The DB wrapper of the app
@@ -15,7 +16,9 @@ import java.io.IOException;
 public class AppGaeDao implements AppDao {
 
     protected final static String APP_INSTANCE = "CloudIdeAppInstance";
-    protected final static String BAGGAGE = "baggage";
+    protected final static String SETTINGS = "settings";
+    protected final static String COMPID = "compId";
+    protected final static String DATA = "data";
 
     @Resource
     private ObjectMapper objectMapper;
@@ -30,22 +33,29 @@ public class AppGaeDao implements AppDao {
      * @param appSettings - The settings of the app that configure the widget
      */
     public void saveAppSettings(String instanceId, String compId, AppSettings appSettings) {
-        Entity entity = new Entity(APP_INSTANCE, key(instanceId, compId));
-        try {
-            entity.setProperty(BAGGAGE, objectMapper.writeValueAsString(appSettings));
-        } catch (IOException e) {
-            throw new AppDaoException("failed to serialize settings", e);
-        }
+        //TODO remove
+//        Entity entity = new Entity(APP_INSTANCE, key(instanceId, compId));
+//        try {
+//            entity.setProperty(BAGGAGE, objectMapper.writeValueAsString(appSettings));
+//        } catch (IOException e) {
+//            throw new AppDaoException("failed to serialize settings", e);
+//        }
+//
+//        Transaction transaction = dataStore.beginTransaction();
+//        try {
+//            dataStore.put(entity);
+//            transaction.commit();
+//        } finally {
+//            if (transaction.isActive()) {
+//                transaction.rollback();
+//            }
+//        }
+        saveToDataStore(instanceId,compId,SETTINGS,appSettings);
+    }
 
-        Transaction transaction = dataStore.beginTransaction();
-        try {
-            dataStore.put(entity);
-            transaction.commit();
-        } finally {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-        }
+    @Override
+    public void saveAppData(String instanceId, String compId, AppData appData) {
+        saveToDataStore(instanceId,compId,DATA,appData);
     }
 
     /**
@@ -63,8 +73,8 @@ public class AppGaeDao implements AppDao {
         else {
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
             try {
-                final String baggage = dataStore.get(key).getProperty(BAGGAGE).toString();
-                return objectMapper.readValue(baggage, AppSettings.class);
+                final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
+                return objectMapper.readValue(prop, AppSettings.class);
             } catch (EntityNotFoundException e) {
                 // we ignore the setting reading exception and return a new default settings object
                 return new AppSettings(objectMapper);
@@ -82,8 +92,34 @@ public class AppGaeDao implements AppDao {
         else {
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
             try {
-                final String baggage = dataStore.get(key).getProperty(BAGGAGE).toString();
-                return objectMapper.readValue(baggage, AppData.class);
+                final String prop = dataStore.get(key).getProperty(DATA).toString();
+                return objectMapper.readValue(prop, AppData.class);
+            } catch (EntityNotFoundException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
+            } catch (IOException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
+            }
+        }
+    }
+
+    /**
+     * Get global instance shared code (for retrieving global code entities)
+     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
+     * @return
+     */
+    @Override
+    public AppData getAppData(String instanceId) {
+        if (instanceId == null) {
+            return null;
+        }
+        else {
+            //TODO change from null
+            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , "null"));
+            try {
+                final String prop = dataStore.get(key).getProperty(DATA).toString();
+                return objectMapper.readValue(prop, AppData.class);
             } catch (EntityNotFoundException e) {
                 // we ignore the setting reading exception and return a new default settings object
                 return new AppData(objectMapper);
@@ -113,19 +149,36 @@ public class AppGaeDao implements AppDao {
      * @param appSettings - The settings of the app that configure the widget
      */
     public void updateAppSettings(String instanceId, String compId, AppSettings appSettings) {
-        saveAppSettings(instanceId, compId, appSettings);
+        saveToDataStore(instanceId, compId, SETTINGS, appSettings);
     }
 
     @Override
     public void updateAppData(String instanceId, String compId, AppData appData) {
-        saveAppSettings(instanceId, compId, appData);
+        saveToDataStore(instanceId, compId, DATA, appData);
     }
 
-    private void saveAppSettings(String instanceId, String compId, AppData appData) {
+
+    /**
+     * Save data to the datastore
+     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
+     * @param compId - - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
+     * @param propertyName - property name of the data ('column' in SQL)
+     * @param data - the data to save, saved as as string.
+     */
+    private void saveToDataStore(String instanceId,@Nullable String compId, String propertyName , DataContainer data) {
         //TODO make revision support here and more logic
-        Entity entity = new Entity(APP_INSTANCE, key(instanceId, compId));
+        //TODO make use of new instances mapping in future ('APP_INSTANCE')
+        Entity entity;
+        try{
+             entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
+        }
+        catch (EntityNotFoundException e){
+            entity = new Entity(APP_INSTANCE, key(instanceId, compId));
+        }
         try {
-            entity.setProperty(BAGGAGE, objectMapper.writeValueAsString(appData));
+            entity.setProperty(propertyName, objectMapper.writeValueAsString(data));
+
+
         } catch (IOException e) {
             throw new AppDaoException("failed to serialize settings", e);
         }
@@ -140,4 +193,44 @@ public class AppGaeDao implements AppDao {
             }
         }
     }
+
+
+
+    /**
+     * Get global instance shared code (for retrieving global code entities)
+     *
+     * @param propertyName
+     * @return
+     */
+    private DataContainer getData(Query query, String propertyName) {
+
+        if (query == null) {
+            return null;
+        }
+        else {
+            QueryResultIterable<Entity> entities = dataStore.prepare(query).asQueryResultIterable();
+            QueryResultIterator<Entity> iterator = entities.iterator();
+            if(iterator.hasNext()) {
+                Entity next = iterator.next();
+                Map<String, Object> properties = next.getProperties();
+                for(Entity entity: entities) {
+
+                }
+            }
+
+            //final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , instanceId));
+            Key key = null;
+            try {
+                final String prop = dataStore.get(key).getProperty(propertyName).toString();
+                return objectMapper.readValue(prop, DataContainer.class);
+            } catch (EntityNotFoundException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
+            } catch (IOException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return new AppData(objectMapper);
+            }
+        }
+    }
 }
+
