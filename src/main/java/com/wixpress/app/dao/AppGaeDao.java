@@ -169,16 +169,16 @@ public class AppGaeDao implements AppDao {
         //TODO make revision support here and more logic
         //TODO make use of new instances mapping in future ('APP_INSTANCE')
         Entity entity;
-        try{
-             entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
+        try {
+            entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
         }
         catch (EntityNotFoundException e){
             entity = new Entity(APP_INSTANCE, key(instanceId, compId));
         }
         try {
-            entity.setProperty(propertyName, objectMapper.writeValueAsString(data));
-
-
+            Text text = new Text(objectMapper.writeValueAsString(data));
+            //Should fix 500 char limit on properties
+            entity.setProperty(propertyName,text);
         } catch (IOException e) {
             throw new AppDaoException("failed to serialize settings", e);
         }
