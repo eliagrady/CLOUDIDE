@@ -316,6 +316,7 @@ public class AppController {
         AppData cloudIdeData = getAppData(instanceId, compId);
         model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
         model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s",instanceId,compId)));
         return "editor";
     }
 

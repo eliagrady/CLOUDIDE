@@ -45,9 +45,9 @@
     <script type="text/javascript">
         $(document).ready(function () {
             //Data Bindings
-            instanceId = ${appInstance.getInstanceId()};
-            settings = ${appSettings};
-            data = ${cloudIdeData};
+            instanceId = $!{appInstance.getInstanceId()};
+            settings = $!{appSettings};
+            data = $!{cloudIdeData};
 
             //window.cld = new CloudIde();
             //cld.init();

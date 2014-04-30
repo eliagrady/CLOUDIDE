@@ -88,6 +88,7 @@ var _codeWidget = (function() {
         $('#cldEditorOpen').hover(
             //on mouseover
             function() {
+                $(this).stop(true,true);
                 $(this).animate({
                         width: '+=50', //adds 250px
                         right: "+=10"
@@ -96,6 +97,7 @@ var _codeWidget = (function() {
             },
             //on mouseout
             function() {
+                $(this).stop(true,true);
                 $(this).animate({
                         width: '-=50px', //substracts 250px
                         right: "-=10"
