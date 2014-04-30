@@ -3,3 +3,43 @@
     max-width: 600px;
     max-height: 600px;
 }
+
+.appContainer {
+    width: 90%;
+    margin: 10px auto;
+    min-height:100px;
+    align-self: center;
+}
+
+.appLogo {
+    float: left;
+    width : auto;
+    clear: both;
+    padding: 0px 0px 0px 0px;
+    margin : 5px 20px 0px 0px;
+}
+.appInfo {
+    float: left;
+    width : auto;
+    max-width : 55%;
+    padding: 5px 5px 5px 5px;
+    margin : 5px 5px 5px 5px;
+}
+
+.appDescription {
+    overflow-y:scroll;
+    max-height : 50px;
+}
+.appCtrl {
+    float: right;
+    width : auto;
+    padding: 5px 5px 5px 5px;
+    margin : 5px 5px 5px 5px;
+}
+.appCtrl-btn {
+    min-width: 50px;
+    padding: 5px 5px 5px 5px;
+    margin : 5px 5px 5px 5px;
+    float: left;
+    clear: both;
+}
