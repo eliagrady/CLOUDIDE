@@ -69,8 +69,9 @@ var CloudIde = {
         //var code = encodeURI(JSON.stringify(cld.cm.getDoc()));
         //var code = cld.cm.getDoc();
 
-        //var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
-        var codeVal = cld.cm.getDoc().getValue();
+        var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
+        //var codeVal = cld.cm.getDoc().getValue();
+
         $.ajax({
             'type': 'post',
             'url': "/app/update",

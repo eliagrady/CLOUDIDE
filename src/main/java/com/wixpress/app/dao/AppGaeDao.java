@@ -25,6 +25,10 @@ public class AppGaeDao implements AppDao {
     @Resource
     private DatastoreService dataStore;
 
+    //Javascript
+    //@Resource
+    //private static ScriptEngine scriptEngine = (new ScriptEngineManager()).getEngineByName("JavaScript");
+
     /**
      * Save app settings in the DB
      *
@@ -115,7 +119,7 @@ public class AppGaeDao implements AppDao {
             return null;
         }
         else {
-            //TODO change from null
+            //TODO change from null?
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , "null"));
             try {
                 final String prop = dataStore.get(key).getProperty(DATA).toString();
@@ -169,16 +173,16 @@ public class AppGaeDao implements AppDao {
         //TODO make revision support here and more logic
         //TODO make use of new instances mapping in future ('APP_INSTANCE')
         Entity entity;
-        try{
-             entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
+        try {
+            entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
         }
         catch (EntityNotFoundException e){
             entity = new Entity(APP_INSTANCE, key(instanceId, compId));
         }
         try {
-            entity.setProperty(propertyName, objectMapper.writeValueAsString(data));
-
-
+            Text text = new Text(objectMapper.writeValueAsString(data));
+            //Should fix 500 char limit on properties
+            entity.setProperty(propertyName,text);
         } catch (IOException e) {
             throw new AppDaoException("failed to serialize settings", e);
         }

@@ -6,50 +6,44 @@
 <head>
     <title>Cloud IDE Settings</title>
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
-    <link rel="stylesheet" href="../static/js/ui-lib/ui-lib.min.css"/>
-    <script type="text/javascript" href="../static/js/ui-lib/ui-lib.min.js" ></script>
+    <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+    <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
 </head>
 
-<body>
+<body wix-ui>
 <div class="settingsHero">
-    <!-- This section is composed of two main parts:
-    a. Logo - the icon that describes the app, this part won't change after login
-    b. Login - this part contains two sections, which will be replaced according to the user login status - edit the loggedOut and loggedIn sections to describe the login process of your app.
-
-    guest - the user did not connect his app to an account yet or to a specific URL.
-    user - the user has already connected the app to an account or to a specific URL. -->
-    <header class="box">
+    <div class="appContainer box">
         <!-- part a: application logo-->
-        <div class="logo">
-            <img width="86" src="../static/js/ui-lib/images/wix_icon.png" alt="cloudide"/>
+        <div class="appLogo">
+            <div class="logo">
+                <img class="appSettings-padding" width="86" src="../static/lib/ui-lib/images/wix_icon.png" alt="cloudide"/>
+            </div>
+        </div>
+        <!-- part b: application description -->
+        <div class="appInfo">
+            <div class="uilib-text" id="prjName"><strong>Project name</strong></div>
+            <div class="uilib-input hidden" id="prjNameRename">Project new name here</div>
+            <div class="uilib-text appDescription" id="prjDesctription">
+                <strong>Project Description:</strong>
+                This is a generic project description.
+                It will appear with scrollable content,
+                and it is not limited in terms of length.
+                In this part, the user can add notes, descriptions, to-dos etc.
+            </div>
+        </div>
+        <!-- part c: application control -->
+        <div class="appCtrl">
+            <div class="submit uilib-btn connect appCtrl-btn" id="updateSettingsBtn">
+                Edit
+            </div>
+            <div class="submit uilib-btn connect appCtrl-btn" id="refreshBtn">
+                Delete
+            </div>
         </div>
 
-        <!--
-        <!-- part b: Connect account area
-            <div class="loggedOut">
-                <p>
-                    Sample Settings view for widgets and pages created with <a href="http://dev.wix.com" target="_blank">Wix's 3rd Party SDK</a>,
-                    compatible with Wix's product requirements.
-                </p>
-                <div class="login-panel">
-                    <p class="create-account">Don't have an<br/>account? <a href="#"><strong>Create one</strong></a></p>
-                    <button class="submit btn connect" id="connectBtn">Connect account</button>
-                </div>
-            </div>
-            <div class="loggedIn hidden">
-                <p>
-                    You are now connected to <strong class="user-name">John Doe (john@doe.com)</strong> account<br/>
-                    <a class="disconnect-account">Disconnect account</a>
-                </p>
-                <div class="premium">
-                    <p class="premium-features">Premium features</p>
-                    <button class="submit btn upgrade">Upgrade</button>
-                </div>
-            </div>
-        -->
-    </header>
 
 
+    </div>
 
 <!-- Part 2 - Setting controls
 Controls that can be changed to configure the Widget.
@@ -59,8 +53,6 @@ In each pane you can add different controls from the wix-ui-lib and
 listen to events when they change, a few samples will be displayed later.
 This part holds the settings panel -->
 
-        <div class="submit uilib-btn connect" id="updateSettingsBtn">Update</div>
-        <div class="submit uilib-btn connect" id="refreshBtn">Refresh</div>
 
 </div>
 
@@ -74,7 +66,7 @@ This part holds the settings panel -->
     <!-- jQuery Dependency -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <!-- Wix UI -->
-    <script type="text/javascript" src="../static/js/ui-lib/ui-lib.min.js"></script>
+    <script type="text/javascript" src="../static/lib/ui-lib/ui-lib.min.js"></script>
     <!-- Settings View Logic -->
     <script type="text/javascript" src="../static/js/common.js"></script>
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>

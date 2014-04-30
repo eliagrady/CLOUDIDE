@@ -1,3 +1,9 @@
+/* cloud ide widget javascript */
+
+/*jslint browser: true*/
+/*global $, jQuery, CodeMirror , data , newAppSettings*/
+
+
 /**
 * Class containing widget property and functions
 */
@@ -81,13 +87,11 @@ var _codeWidget = (function() {
         if(Wix.Utils.getViewMode() !== 'site') {
             $('<div id="cldEditorOpen" class="round_shadow_button">edit</div>').appendTo('#body');
         }
-        $('#body').append('<h1>test test</h1>');
-        //Validate appData for malicious code!
-        $('#hero').append(data.appData);
 
         $('#cldEditorOpen').hover(
             //on mouseover
             function() {
+                $(this).stop(true,true);
                 $(this).animate({
                         width: '+=50', //adds 250px
                         right: "+=10"
@@ -96,6 +100,7 @@ var _codeWidget = (function() {
             },
             //on mouseout
             function() {
+                $(this).stop(true,true);
                 $(this).animate({
                         width: '-=50px', //substracts 250px
                         right: "-=10"
@@ -123,6 +128,12 @@ var _codeWidget = (function() {
                 }
             }
         );
+    };
+
+    function appendCode() {
+        $('#body').append('<h1>test test</h1>');
+        //Validate appData for malicious code!
+        $('#hero').append(data.appData);
     }
 
     // Public functions
@@ -131,6 +142,7 @@ var _codeWidget = (function() {
             //applySettings();
             //loadFeed();
             custom();
+            appendCode();
         }
     };
 

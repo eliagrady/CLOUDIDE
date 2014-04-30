@@ -50,4 +50,5 @@ public class EmbeddedAppConfig {
         return new AuthenticationResolver(objectMapper());
     }
 
+    //TODO add path resolver as a bean
 }
