@@ -212,6 +212,7 @@ public class AppController {
      */
     @RequestMapping(value = "/editorstandalone", method = RequestMethod.GET)
     public String editorStandAlone(Model model,
+                                   HttpServletResponse response,
                                    @RequestParam String instanceId,
                                    @RequestParam(required = false) String userId,
                                    @RequestParam(required = false) String permissions,
@@ -221,6 +222,7 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
+        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
     }
 
@@ -242,6 +244,7 @@ public class AppController {
      */
     @RequestMapping(value = "/widgetstandalone", method = RequestMethod.GET)
     public String widgetStandAlone(Model model,
+                                   HttpServletResponse response,
                                    @RequestParam String instanceId,
                                    @RequestParam(required = false) String userId,
                                    @RequestParam(required = false) String permissions,
@@ -251,6 +254,7 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
+        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
     }
 
@@ -275,7 +279,7 @@ public class AppController {
                                      @RequestParam(required = false, defaultValue = "widgetCompId") String origCompId,
                                      @RequestParam(required = false, defaultValue = "sectionCompId") String compId) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
-        response.addCookie(new Cookie("instanceId", instanceId));
+        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,origCompId)));
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
     }
 

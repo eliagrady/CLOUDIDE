@@ -21,7 +21,8 @@
     <header class="box">
         <!-- part a: application logo-->
         <div class="logo">
-            <img width="86" src="../static/js/ui-lib/images/wix_icon.png" alt="cloudide"/>
+           <img width="86" src="../static/js/ui-lib/images/wix_icon.png" alt="cloudide"/>
+            <div class="icon-random" style="width:86"></div>
         </div>
 
         <!--

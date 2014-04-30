@@ -25,6 +25,10 @@ public class AppGaeDao implements AppDao {
     @Resource
     private DatastoreService dataStore;
 
+    //Javascript
+    //@Resource
+    //private static ScriptEngine scriptEngine = (new ScriptEngineManager()).getEngineByName("JavaScript");
+
     /**
      * Save app settings in the DB
      *
@@ -115,7 +119,7 @@ public class AppGaeDao implements AppDao {
             return null;
         }
         else {
-            //TODO change from null
+            //TODO change from null?
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , "null"));
             try {
                 final String prop = dataStore.get(key).getProperty(DATA).toString();
