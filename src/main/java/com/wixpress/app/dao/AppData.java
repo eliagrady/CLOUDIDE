@@ -14,13 +14,12 @@ import javax.annotation.Nullable;
 public class AppData implements DataContainer {
 
     private @Nullable String command;
-    private @Nullable JsonNode appData;
+    private @Nullable String appData; //Base64
     private @Nullable JsonNode document;
 
     public AppData() {}
 
     public AppData(ObjectMapper objectMapper) {
-        appData = objectMapper.createObjectNode();
         //document = objectMapper.createObjectNode();
     }
 
@@ -29,11 +28,11 @@ public class AppData implements DataContainer {
     }
 
     @Nullable
-    public JsonNode getAppData() {
+    public String getAppData() {
         return appData;
     }
 
-    public void setAppData(@Nullable JsonNode appData) {
+    public void setAppData(@Nullable String appData) {
         this.appData = appData;
     }
 

@@ -72,7 +72,7 @@ var CloudIde = {
         //var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
         console.log("about to sent window.debugMode = "+window.debugMode);
         var codeVal = cld.cm.getDoc().getValue();
-        var encodedVal = $.base64.encode(codeVal);
+        var encodedVal = encodeURI($.base64.encode(codeVal));
         $.ajax({
             'type': 'post',
             'url': "/app/update",

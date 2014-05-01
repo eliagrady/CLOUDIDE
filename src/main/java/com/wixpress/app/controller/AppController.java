@@ -195,7 +195,7 @@ public class AppController {
                 }
                 //Can produce NullPointerException
                 String res = fetchedData.getAppData().toString();
-                return AjaxResult.res(fetchedData.getAppData().asText());
+                return AjaxResult.res(fetchedData.getAppData());
 
             }
 

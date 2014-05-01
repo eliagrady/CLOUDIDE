@@ -133,10 +133,11 @@ var _codeWidget = (function() {
     function appendCode() {
         $('#body').append('<h1>test test</h1>');
         //Validate appData for malicious code!
-        $('#hero').append(this.appData);
-        $('#hero').append(this.appData.appData);
-        console.log("appended appdata:" + this.appData);
-        console.log("appended appdata:" + this.appData.appData);
+        //$('#hero').innerHTML = appData.appData;
+        $('#hero').append(appData.appData);
+        //$('#hero').append(this.appData.appData);
+        console.log("appended appData:" + this.appData);
+        //console.log("appended appData.appData:" + this.appData.appData);
     }
 
     // Public functions
@@ -164,8 +165,9 @@ $(document).ready(function() {
         _codeWidget.appData = appData;
     }
     catch (err) {
+        console("appData err:"+err.message);
         _codeWidget.appData = {};
-        _codeWidget.appData.appData = {};
+        _codeWidget.appData.appData = "";
     }
     _codeWidget.init();
 });

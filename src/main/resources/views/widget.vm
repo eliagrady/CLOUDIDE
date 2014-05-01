@@ -11,6 +11,7 @@
     <script src="../static/js/cloudide.widget.js"></script>
     <script src="../static/js/common.js"></script>
     <script src="../static/lib/jquery/jquery.base64.min.js"></script>
+    <script src="../static/lib/base64.js"></script>
     <!-- Initialization  -->
     <script type="text/javascript">
         //When this val is set to true, the app will skip authentication for the update endpoints
@@ -21,9 +22,20 @@
             window.debugMode = "false";
         }
         appData = ${cldAppData};
-        //TODO fix code support
-        //appDataEncoded = appData;
-        appData.appData = $.base64.decode(appData.appData);
+        console.log("Inspection START");
+        console.log(appData);
+        console.log(decodeURI(appData.appData));
+        console.log(btoa(decodeURI(appData.appData)));
+        console.log(Base64.decode(decodeURI(appData.appData)));
+
+        appData.appData = Base64.decode(decodeURI(appData.appData));
+
+        console.log(appData);
+        console.log(appData.appData);
+        console.log("Inspection END");
+        console.log("---------------");
+
+
     </script>
 </head>
 <body id="body">
