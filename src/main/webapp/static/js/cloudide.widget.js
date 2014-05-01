@@ -1,7 +1,7 @@
 /* cloud ide widget javascript */
 
 /*jslint browser: true*/
-/*global $, jQuery, CodeMirror , data , newAppSettings*/
+/*global $, jQuery, CodeMirror , appData , appSettings*/
 
 
 /**
@@ -128,12 +128,15 @@ var _codeWidget = (function() {
                 }
             }
         );
-    };
+    }
 
     function appendCode() {
         $('#body').append('<h1>test test</h1>');
         //Validate appData for malicious code!
-        $('#hero').append(data.appData);
+        $('#hero').append(this.appData);
+        $('#hero').append(this.appData.appData);
+        console.log("appended appdata:" + this.appData);
+        console.log("appended appdata:" + this.appData.appData);
     }
 
     // Public functions
@@ -151,7 +154,18 @@ var _codeWidget = (function() {
 //google.load("feeds", "1");
 
 $(document).ready(function() {
-    var settings = newAppSettings || {};
+    try {
+        _codeWidget.appSettings = appSettings;
+    }
+    catch (err) {
+        _codeWidget.appSettings = {};
+    }
+    try {
+        _codeWidget.appData = appData;
+    }
+    catch (err) {
+        _codeWidget.appData = {};
+        _codeWidget.appData.appData = {};
+    }
     _codeWidget.init();
-    _codeWidget.appSettings = settings;
 });

@@ -69,20 +69,22 @@ var CloudIde = {
         //var code = encodeURI(JSON.stringify(cld.cm.getDoc()));
         //var code = cld.cm.getDoc();
 
-        var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
-        //var codeVal = cld.cm.getDoc().getValue();
-
+        //var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
+        console.log("about to sent window.debugMode = "+window.debugMode);
+        var codeVal = cld.cm.getDoc().getValue();
+        var encodedVal = $.base64.encode(codeVal);
         $.ajax({
             'type': 'post',
             'url': "/app/update",
             'dataType': "json",
             'contentType': 'application/json; chatset=UTF-8',
             'data': JSON.stringify({
-                compId: Wix.Utils.getOrigCompId(),
+                mode : window.debugMode,
+                compId: compId,
                 appData: {
-                    appData : codeVal,
-                    document: codeVal,
-                    command: 'saveDocument'
+                    appData : encodedVal,
+                    document: encodedVal,
+                    command : 'saveDocument'
             }}),
             'cache': false,
             'success': function (res) {
@@ -107,7 +109,9 @@ var CloudIde = {
         CloudIde.cm = CodeMirror.fromTextArea(cldTextArea, CloudIde.getCodeMirrorConfig());
 
         //Initialize settings
-        saveSettings();
+        if(debugMode !== "true") {
+            saveSettings();
+        }
 
         //Initialize menu segment
         //Initialize project explorer segment
@@ -124,11 +128,12 @@ var CloudIde = {
             'dataType': "json",
             'contentType': 'application/json; chatset=UTF-8',
             'data': JSON.stringify({
+                mode : window.debugMode,
                 compId: Wix.Utils.getOrigCompId(),
                 appData: {
                     appData : null,
                     document: null,
-                    command: 'updateProjectView'
+                    command: 'updateProjectView',
                 }}),
             'cache': false,
             'success': function (res) {

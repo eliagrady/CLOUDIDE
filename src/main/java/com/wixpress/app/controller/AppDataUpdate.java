@@ -7,8 +7,11 @@ import com.wixpress.app.dao.AppData;
  * @author Elia 27/04/2014
  */
 public class AppDataUpdate {
+    private String mode;
     private String compId;
     private AppData appData;
+
+    public String getMode() { return mode; }
 
     public String getCompId() {
         return compId;

@@ -1,5 +1,5 @@
-#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
-#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cldAppData" type="com.wixpress.app.dao.AppData" *#
 #* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
@@ -8,6 +8,10 @@
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
     <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
+    <script type="text/javascript">
+        var cldSettings = $!{cldAppSettings};
+        var cldData = $!{cldAppData};
+    </script>
 </head>
 
 <body wix-ui>
@@ -33,11 +37,11 @@
         </div>
         <!-- part c: application control -->
         <div class="appCtrl">
-            <div class="submit uilib-btn connect appCtrl-btn" id="updateSettingsBtn">
+            <div class="submit uilib-btn connect appCtrl-btn" id="cldEditorOpenBtn">
                 Edit
             </div>
             <div class="submit uilib-btn connect appCtrl-btn" id="refreshBtn">
-                Delete
+                Refresh
             </div>
         </div>
 
@@ -70,10 +74,5 @@ This part holds the settings panel -->
     <!-- Settings View Logic -->
     <script type="text/javascript" src="../static/js/common.js"></script>
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
-
-    <script type="text/javascript">
-        var newAppSettings = $!{appSettings};
-        var appData = $!{cloudIdeData};
-    </script>
 </body>
 </html>

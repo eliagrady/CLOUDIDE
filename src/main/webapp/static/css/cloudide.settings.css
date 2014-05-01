@@ -6,7 +6,7 @@
 
 .appContainer {
     width: 90%;
-    margin: 10px auto;
+    margin: 5px auto;
     min-height:100px;
     align-self: center;
 }
@@ -21,7 +21,7 @@
 .appInfo {
     float: left;
     width : auto;
-    max-width : 55%;
+    max-width : 50%;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;
 }
@@ -31,7 +31,7 @@
     max-height : 50px;
 }
 .appCtrl {
-    float: right;
+    float: left;
     width : auto;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;

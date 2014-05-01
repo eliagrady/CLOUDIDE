@@ -8,6 +8,7 @@ import com.wixpress.app.dao.AppSettings;
 public class SettingsUpdate {
     private String compId;
     private AppSettings settings;
+    private String mode;
 
     public String getCompId() {
         return compId;
@@ -23,5 +24,9 @@ public class SettingsUpdate {
 
     public void setSettings(AppSettings settings) {
         this.settings = settings;
+    }
+
+    public String getMode() {
+        return this.mode;
     }
 }

@@ -139,6 +139,11 @@ public class AppController {
     public ResponseEntity<AjaxResult> settingsUpdate(@CookieValue() String instance,
                                                      @RequestBody SettingsUpdate settingsUpdate) {
         try {
+            //TODO remove debugMode from production code
+            if(settingsUpdate.getMode().equals("true")) {
+                appDao.updateAppSettings("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",settingsUpdate.getCompId(),settingsUpdate.getSettings());
+                return AjaxResult.ok();
+            }
             AppInstance appInstance = authenticationResolver.unsignInstance(instance);
             appDao.updateAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), settingsUpdate.getSettings());
             return AjaxResult.ok();
@@ -159,8 +164,18 @@ public class AppController {
     @ResponseBody
     public ResponseEntity<AjaxResult> appUpdate(@CookieValue() String instance,
                                                 @RequestBody AppDataUpdate appDataUpdate) {
-        AppInstance appInstance = authenticationResolver.unsignInstance(instance);
-        return executeUpdate(appInstance,appDataUpdate);
+        try {
+            //TODO remove debugMode from production code
+            String mode = appDataUpdate.getMode();
+            if (mode.equals("true")) {
+                return executeUpdate(createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null), appDataUpdate);
+            }
+            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+            return executeUpdate(appInstance, appDataUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
     }
 
     /**
@@ -170,7 +185,7 @@ public class AppController {
         try {
             AppData appData = appDataUpdate.getAppData();
             String cmd = appData.getCommand();
-            if(cmd.contentEquals("updateProjectView")) {
+            if(cmd.equals("updateProjectView")) {
                 AppData fetchedData;
                 if(appDataUpdate.getCompId() == null ) {
                      fetchedData = appDao.getAppData(appInstance.getInstanceId().toString());
@@ -318,18 +333,21 @@ public class AppController {
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
         AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(cloudIdeData));
         model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s",instanceId,compId)));
         return "editor";
     }
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
-        AppSettings appSettings = getSettings(instanceId, compId);
+        //Why do I need the settings in this view?
+
+        //AppSettings appSettings = getSettings(instanceId, compId);
         AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+
+        //model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(cloudIdeData));
         return "widget";
     }
 
@@ -339,8 +357,8 @@ public class AppController {
     private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
         AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(cloudIdeData));
         return "settings";
     }
 
@@ -353,10 +371,6 @@ public class AppController {
      */
     private AppSettings getSettings(String instanceId, String compId) {
         AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
-
-        if (appSettings == null) {
-            appSettings = new AppSettings(objectMapper);
-        }
         return appSettings;
     }
 
@@ -369,10 +383,6 @@ public class AppController {
      */
     private AppData getAppData(String instanceId, String compId) {
         AppData appData = appDao.getAppData(instanceId, compId);
-
-        if (appData == null) {
-            appData = new AppData(objectMapper);
-        }
         return appData;
     }
 

@@ -1,3 +1,25 @@
 http://wixcloudide.appspot.com/app/settings?instance=7nNDm8rn5BN1Y9beWqLXBPTBYi8R5wS8yIpijFlJNVw.eyJpbnN0YW5jZUlkIjoiMTM0OTE1YTUtMWFiZC1lN2VmLWI2MDUtNmVkODA2MTQ4OWY1Iiwic2lnbkRhdGUiOiIyMDE0LTA0LTI2VDIxOjU4OjA5LjkwMi0wNTowMCIsInVpZCI6ImMwYTNkN2IzLThjOTAtNGIzYy1iZmZhLTUwOTI2NDljY2MzYSIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJpcEFuZFBvcnQiOiI3OS4xODIuMi4yMzAvMzUwNDMiLCJkZW1vTW9kZSI6ZmFsc2V9&width=500&locale=en&origCompId=TPWdgt8-1c32&compId=TPSttngs2-13tj
 
 http://wixcloudide.appspot.com/app/widget?cacheKiller=13985674612980&compId=TPWdgt8-1c32&deviceType=desktop&instance=7nNDm8rn5BN1Y9beWqLXBPTBYi8R5wS8yIpijFlJNVw.eyJpbnN0YW5jZUlkIjoiMTM0OTE1YTUtMWFiZC1lN2VmLWI2MDUtNmVkODA2MTQ4OWY1Iiwic2lnbkRhdGUiOiIyMDE0LTA0LTI2VDIxOjU4OjA5LjkwMi0wNTowMCIsInVpZCI6ImMwYTNkN2IzLThjOTAtNGIzYy1iZmZhLTUwOTI2NDljY2MzYSIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJpcEFuZFBvcnQiOiI3OS4xODIuMi4yMzAvMzUwNDMiLCJkZW1vTW9kZSI6ZmFsc2V9&locale=en&viewMode=editor&width=683
+
+
+Original Data:
+<script>
+document.write("<h1 style=\"color:red;size:45px\">\"Hello World!\"</h1>")
+</script>
+<noscript>Sorry, your browser does not support JavaScript!</noscript>
+
+<p><b>This text is bold</b></p>
+<p><strong>This text is strong</strong></p>
+<p><i>This text is italic</i></p>
+<p><em>This text is emphasized</em></p>
+<p><code>This is computer output</code></p>
+<p>This is<sub> subscript</sub> and <sup>superscript</sup></p>
+
+<h1 style="color:red;size:45px">"Hello World!"</h1>
+
+Saved Data (on GAE):
+%22%3Cscript%3E%5Cndocument.write(%5C%22%3Ch1%20style=%5C%5C%5C%22color:red;size:45px%5C%5C%5C%22%3E%5C%5C%5C%22Hello%20World!%5C%5C%5C%22%3C/h1%3E%5C%22)%5Cn%3C/script%3E%5Cn%3Cnoscript%3ESorry,%20your%20browser%20does%20not%20support%20JavaScript!%3C/noscript%3E%5Cn%5Cn%3Cp%3E%3Cb%3EThis%20text%20is%20bold%3C/b%3E%3C/p%3E%5Cn%3Cp%3E%3Cstrong%3EThis%20text%20is%20strong%3C/strong%3E%3C/p%3E%5Cn%3Cp%3E%3Ci%3EThis%20text%20is%20italic%3C/i%3E%3C/p%3E%5Cn%3Cp%3E%3Cem%3EThis%20text%20is%20emphasized%3C/em%3E%3C/p%3E%5Cn%3Cp%3E%3Ccode%3EThis%20is%20computer%20output%3C/code%3E%3C/p%3E%5Cn%3Cp%3EThis%20is%3Csub%3E%20subscript%3C/sub%3E%20and%20%3Csup%3Esuperscript%3C/sup%3E%3C/p%3E%5Cn%5Cn%3Ch1%20style=%5C%22color:red;size:45px%5C%22%3E%5C%22Hello%20World!%5C%22%3C/h1%3E%22","document":"%22%3Cscript%3E%5Cndocument.write(%5C%22%3Ch1%20style=%5C%5C%5C%22color:red;size:45px%5C%5C%5C%22%3E%5C%5C%5C%22Hello%20World!%5C%5C%5C%22%3C/h1%3E%5C%22)%5Cn%3C/script%3E%5Cn%3Cnoscript%3ESorry,%20your%20browser%20does%20not%20support%20JavaScript!%3C/noscript%3E%5Cn%5Cn%3Cp%3E%3Cb%3EThis%20text%20is%20bold%3C/b%3E%3C/p%3E%5Cn%3Cp%3E%3Cstrong%3EThis%20text%20is%20strong%3C/strong%3E%3C/p%3E%5Cn%3Cp%3E%3Ci%3EThis%20text%20is%20italic%3C/i%3E%3C/p%3E%5Cn%3Cp%3E%3Cem%3EThis%20text%20is%20emphasized%3C/em%3E%3C/p%3E%5Cn%3Cp%3E%3Ccode%3EThis%20is%20computer%20output%3C/code%3E%3C/p%3E%5Cn%3Cp%3EThis%20is%3Csub%3E%20subscript%3C/sub%3E%20and%20%3Csup%3Esuperscript%3C/sup%3E%3C/p%3E%5Cn%5Cn%3Ch1%20style=%5C%22color:red;size:45px%5C%22%3E%5C%22Hello%20World!%5C%22%3C/h1%3E%22
+
+
+URI decode

@@ -1,12 +1,13 @@
-#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
-#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cldAppData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${appSettings}.getTitle()} App</title>
-    <link rel="stylesheet" href="../static/js/ui-lib/ui-lib.min.css"/>
-    <link rel="stylesheet" href="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.css">
+    <title>${cldAppSettings}.getTitle()} App</title>
+    <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/lib/codemirror.css">
     <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
 </head>
 
@@ -33,12 +34,13 @@
 
     <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
     <script src="../static/js/cloudide.editor.js"></script>
     <script src="../static/js/common.js"></script>
+    <script src="../static/lib/jquery/jquery.base64.min.js"></script>
 
 
     <!-- Initialization  -->
@@ -46,18 +48,23 @@
         $(document).ready(function () {
             //Data Bindings
             //TODO why does instanceId even needed?
-            //instanceId = $!{appIdentifier};
-            settings = $!{appSettings};
-            data = $!{cloudIdeData};
-
+            appSettings = $!{cldAppSettings};
+            appData = $!{cldAppData};
+            //When this val is set to true, the app will skip authentication for the update endpoints
+            if(window.location.origin == "http://localhost:8080") {
+                window.debugMode = "true";
+            }
+            else {
+                window.debugMode = "false";
+            }
             //window.cld = new CloudIde();
             //cld.init();
 
             //Create and bind global
             window.cld = CloudIde;
             window.cld.init();
-            console.log(settings);
-            console.log(data);
+            console.log(appSettings);
+            console.log(appData);
         });
 
     </script>

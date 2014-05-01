@@ -96,8 +96,14 @@ public class AppGaeDao implements AppDao {
         else {
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
             try {
+                final Text object = (Text) dataStore.get(key).getProperty(DATA);
+                final String str = ((Text) dataStore.get(key).getProperty(DATA)).toString();
+                final String asText = object.getValue();
+                final boolean eq = str.equals(asText);
+                final AppData appData = objectMapper.readValue(asText, AppData.class);
+                final AppData appDataTree = objectMapper.reader(AppData.class).readValue(asText);
                 final String prop = dataStore.get(key).getProperty(DATA).toString();
-                return objectMapper.readValue(prop, AppData.class);
+                return objectMapper.readValue(asText, AppData.class);
             } catch (EntityNotFoundException e) {
                 // we ignore the setting reading exception and return a new default settings object
                 return new AppData(objectMapper);
@@ -180,9 +186,9 @@ public class AppGaeDao implements AppDao {
             entity = new Entity(APP_INSTANCE, key(instanceId, compId));
         }
         try {
-            Text text = new Text(objectMapper.writeValueAsString(data));
+            Text textObj = new Text(objectMapper.writeValueAsString(data));
             //Should fix 500 char limit on properties
-            entity.setProperty(propertyName,text);
+            entity.setProperty(propertyName,textObj);
         } catch (IOException e) {
             throw new AppDaoException("failed to serialize settings", e);
         }
