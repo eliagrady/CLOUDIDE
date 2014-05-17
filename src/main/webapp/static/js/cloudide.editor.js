@@ -6,8 +6,8 @@
 var CloudIde = {
     cm : {},
     getCodeMirrorConfig : function () {
-        var compId = Wix.Utils.getOrigCompId();
-        var result;
+        //var compId = Wix.Utils.getOrigCompId();
+        //var result;
         /*
          $.ajax({
          'type': 'post',
@@ -38,12 +38,21 @@ var CloudIde = {
          */
         return {
             value: "function myScript() {return 100;}\n", //TODO replace with the Document module
-            mode: "javascript",
+            mode: {
+                name: "javascript",
+                globalVars: true
+            },
             indentUnit: 2, //Integer number for indentation spaces
             smartIndent: true, //Indentation is context sensitive (according to the given mode)
             tabSize: 2, //width of tabs
             indentWithTabs: true, //true means indent with tabs instead of spaces
-            lineNumbers: true
+            lineNumbers: true,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete"
+            },
+            gutters: ["CodeMirror-lint-markers"],
+            lint: true,
+            autoCloseBrackets : true
         };
     },
     updateStatusBar : function (text, timeout, callback) {
@@ -69,30 +78,76 @@ var CloudIde = {
         //var code = encodeURI(JSON.stringify(cld.cm.getDoc()));
         //var code = cld.cm.getDoc();
 
-        var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
-        //var codeVal = cld.cm.getDoc().getValue();
-
+        //var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
+        console.log("about to sent window.debugMode = "+window.debugMode);
+        var codeVal = cld.cm.getDoc().getValue();
+        var encodedVal = encodeURI($.base64.encode(codeVal));
+        data.code = encodedVal;
         $.ajax({
             'type': 'post',
-            'url': "/app/update",
+            'url': "/app/save",
             'dataType': "json",
             'contentType': 'application/json; chatset=UTF-8',
             'data': JSON.stringify({
-                compId: Wix.Utils.getOrigCompId(),
-                appData: {
-                    appData : codeVal,
-                    document: codeVal,
-                    command: 'saveDocument'
-            }}),
+                mode : window.debugMode,
+                compId: compId,
+                settings: {
+                    title: "testing",
+                    appSettings: settings,
+                    appData: data
+                }
+            }),
             'cache': false,
             'success': function (res) {
-                console.log("update setting completed");
+                console.log("save completed");
+                if(window.debugMode === "debug") {
+                    window.alert("save completed");
+                }
+                else {
+                    //TODO
+                    //Save successfully message here
+                    //Wix.Utils.openModal();
+                    window.alert("save completed");
+                }
                 Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
             },
             'error': function (res) {
                 console.log('error updating data with message ' + res.responseText);
             }
         });
+    },
+    loadAllCodeMirrorAddons : function(list) {
+        //CloudIde.loadCodeMirrorAddon("fold/foldcode.js");
+        CloudIde.loadCodeMirrorAddon("edit/closebrackets.js");
+        CloudIde.cm.setOption("autoCloseBrackets",true);
+    },
+    loadCodeMirrorAddon : function(codeMirrorRelPath) {
+        var codeMirrorBaseURL = "../static/lib/codemirror/codemirror-4.0/addon/";
+        CloudIde.loadjscssfile(codeMirrorBaseURL+codeMirrorRelPath,"js");
+
+
+//        $.getScript(codeMirrorBaseURL+codeMirrorRelPath, function( data, textStatus, jqxhr ) {
+//            console.log( data ); // Data returned //TODO remove data logging which exposes CodeMirror's internals
+//            console.log( textStatus ); // Success
+//            console.log( jqxhr.status ); // 200
+//            console.log( "Finished loading "+codeMirrorRelPath);
+//        });
+    },
+    loadjscssfile : function (filename, filetype) {
+        if (filetype === "js") { //if filename is a external JavaScript file
+            var fileref = document.createElement('script');
+            fileref.setAttribute("type", "text/javascript");
+            fileref.setAttribute("src", filename);
+        }
+        else if (filetype === "css") { //if filename is an external CSS file
+            var fileref = document.createElement("link");
+            fileref.setAttribute("rel", "stylesheet");
+            fileref.setAttribute("type", "text/css");
+            fileref.setAttribute("href", filename);
+        }
+        if (typeof fileref !== "undefined") {
+            document.getElementsByTagName("head")[0].appendChild(fileref);
+        }
     },
     replaceDoc : function () {
         var text = "<script src=\"lib/codemirror.js\"></script>\n<link rel=\"stylesheet\" href=\"../lib/codemirror.css\">\n<script src=\"mode/javascript/javascript.js\"></script>\n";
@@ -107,7 +162,11 @@ var CloudIde = {
         CloudIde.cm = CodeMirror.fromTextArea(cldTextArea, CloudIde.getCodeMirrorConfig());
 
         //Initialize settings
-        saveSettings();
+        if(debugMode !== "debug") {
+            saveSettings();
+        }
+        settings.appSettings = settings.appSettings || {};
+        data = data || {};
 
         //Initialize menu segment
         //Initialize project explorer segment
@@ -115,6 +174,10 @@ var CloudIde = {
 
         //Initialize status bar segment
         //Load add-ons
+        //TODO load it dynamically
+        //CloudIde.loadAllCodeMirrorAddons();
+
+
         //finally
     },
     loadProjectsToExplorer : function() {
@@ -124,6 +187,7 @@ var CloudIde = {
             'dataType': "json",
             'contentType': 'application/json; chatset=UTF-8',
             'data': JSON.stringify({
+                mode : window.debugMode,
                 compId: Wix.Utils.getOrigCompId(),
                 appData: {
                     appData : null,

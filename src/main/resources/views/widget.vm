@@ -1,27 +1,43 @@
-#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
-#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
-#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
+#* @vtlvariable name="cldAppData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="cloudIdeAppInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${appSettings}.getTitle()} App</title>
+    <title>CloudIde</title>
     <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
     <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
     <script src="../static/js/cloudide.widget.js"></script>
     <script src="../static/js/common.js"></script>
+    <script src="../static/lib/jquery/jquery.base64.min.js"></script>
+    <script src="../static/lib/base64.js"></script>
+    <!-- Initialization  -->
+    <script type="text/javascript">
+        //When this val is set to true, the app will skip authentication for the update endpoints
+        if(window.location.origin == "http://localhost:8080") {
+            window.debugMode = "true";
+        }
+        else {
+            window.debugMode = "false";
+        }
+        data = ${cldAppData};
+        console.log("Inspection START");
+        console.log(data);
+        console.log(decodeURI(data.data));
+        console.log(btoa(decodeURI(data.data)));
+        console.log(Base64.decode(decodeURI(data.data)));
 
+        data.data = Base64.decode(decodeURI(data.data));
+
+        console.log(data);
+        console.log(data.data);
+        console.log("Inspection END");
+        console.log("---------------");
+
+    </script>
 </head>
 <body id="body">
 <div id="hero"></div>
-
-
-
-<!-- Initialization  -->
-<script type="text/javascript">
-    newAppSettings = ${appSettings};
-    data = ${cloudIdeData};
-</script>
 </body>
 </html>

@@ -21,7 +21,8 @@ import org.springframework.context.annotation.Import;
 @Import({EmbeddedAppVelocityBeansConfig.class})
 public class EmbeddedAppConfig {
     @Bean
-    public ObjectMapper objectMapper() {
+    public ObjectMapper objectMapper() { //TODO remove FAIL_ON_UNKNOWN_PROPERTIES feature
+        //.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return new ObjectMapper();
     }
 

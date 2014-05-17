@@ -1,7 +1,6 @@
 package com.wixpress.app.controller;
 
 import com.wixpress.app.dao.AppDao;
-import com.wixpress.app.dao.AppData;
 import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
@@ -139,6 +138,11 @@ public class AppController {
     public ResponseEntity<AjaxResult> settingsUpdate(@CookieValue() String instance,
                                                      @RequestBody SettingsUpdate settingsUpdate) {
         try {
+            //TODO remove debugMode from production code
+            if(settingsUpdate.getMode().equals("debug")) {
+                appDao.updateAppSettings("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",settingsUpdate.getCompId(),settingsUpdate.getSettings());
+                return AjaxResult.ok();
+            }
             AppInstance appInstance = authenticationResolver.unsignInstance(instance);
             appDao.updateAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), settingsUpdate.getSettings());
             return AjaxResult.ok();
@@ -146,46 +150,88 @@ public class AppController {
             return AjaxResult.internalServerError(e);
         }
     }
-
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
+     * @param settingsUpdate - the new app data and settings edited by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> appSave(@CookieValue() String instance,
+                                                @RequestBody SettingsUpdate settingsUpdate) {
+        try {
+            //TODO remove debugMode from production code
+            String mode = settingsUpdate.getMode();
+            if (mode.equals("debug")) {
+                return executeSave(createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null), settingsUpdate);
+            }
+            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+            return executeSave(appInstance, settingsUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+    /**
+     * Helper function for saving
+     */
+    private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, SettingsUpdate settingsUpdate) {
+        try {
+            AppSettings appSettings = settingsUpdate.getSettings();
+            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
+            appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
+            return AjaxResult.ok();
+        } catch (NullPointerException npe) {
+            return AjaxResult.internalServerError(npe);
+        } catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
 
     /**
      * Saves changes from the settings dialog
      *
      * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
-     * @param appDataUpdate - the new app data edited by the user and the widgetId
+     * @param settingsUpdate - the new app data edited by the user and the widgetId
      * @return AjaxResult written directly to the response stream
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<AjaxResult> appUpdate(@CookieValue() String instance,
-                                                @RequestBody AppDataUpdate appDataUpdate) {
-        AppInstance appInstance = authenticationResolver.unsignInstance(instance);
-        return executeUpdate(appInstance,appDataUpdate);
+                                                @RequestBody SettingsUpdate settingsUpdate) {
+        try {
+            //TODO remove debugMode from production code
+            String mode = settingsUpdate.getMode();
+            if (mode.equals("debug")) {
+                return executeUpdate(createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null), settingsUpdate);
+            }
+            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+            return executeUpdate(appInstance, settingsUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
     }
 
     /**
      * Helper function for updating
      */
-    private ResponseEntity<AjaxResult> executeUpdate(AppInstance appInstance,AppDataUpdate appDataUpdate) {
+    private ResponseEntity<AjaxResult> executeUpdate(AppInstance appInstance,SettingsUpdate settingsUpdate) {
         try {
-            AppData appData = appDataUpdate.getAppData();
-            String cmd = appData.getCommand();
-            if(cmd.contentEquals("updateProjectView")) {
-                AppData fetchedData;
-                if(appDataUpdate.getCompId() == null ) {
-                     fetchedData = appDao.getAppData(appInstance.getInstanceId().toString());
-                }
-                else {
-                    fetchedData = appDao.getAppData(appInstance.getInstanceId().toString(),appDataUpdate.getCompId());
-                }
-                //Can produce NullPointerException
-                String res = fetchedData.getAppData().toString();
-                return AjaxResult.res(fetchedData.getAppData().asText());
-
+            //AppSettings appData = settingsUpdate.getAppData();
+            AppSettings fetched;
+            if(settingsUpdate.getCompId() == null ) {
+                fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
             }
-
-            appDao.saveAppData(appInstance.getInstanceId().toString(), appDataUpdate.getCompId(), appData);
-            return AjaxResult.ok();
+            else {
+                fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
+            }
+            //Can produce NullPointerException
+            String res = fetched.getAppData().toString();
+            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
+            return AjaxResult.res(res);
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
         } catch (Exception e) {
@@ -317,19 +363,24 @@ public class AppController {
     // Set editor.vm
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-        AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        //AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings.getAppSettings()));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
         model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s",instanceId,compId)));
         return "editor";
     }
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
+        //Why do I need the settings in this view?
+
         AppSettings appSettings = getSettings(instanceId, compId);
-        AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        //TODO use viewMode parameter to determine the binding of live site vs. edit and preview modes data segment
+        //AppData cloudIdeData = getAppData(instanceId, compId);
+
+
+        //model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
         return "widget";
     }
 
@@ -338,9 +389,9 @@ public class AppController {
     // Set setting.vm
     private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-        AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("appSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cloudIdeData", objectMapper.writeValueAsString(cloudIdeData));
+        //AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
         return "settings";
     }
 
@@ -353,28 +404,20 @@ public class AppController {
      */
     private AppSettings getSettings(String instanceId, String compId) {
         AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
-
-        if (appSettings == null) {
-            appSettings = new AppSettings(objectMapper);
-        }
         return appSettings;
     }
 
-    /**
-     * Get app data from the DB if exists, otherwise return empty app data
-     *
-     * @param instanceId - the instance id
-     * @param compId     - the appUpdate comp Id
-     * @return appUpdate settings
-     */
-    private AppData getAppData(String instanceId, String compId) {
-        AppData appData = appDao.getAppData(instanceId, compId);
-
-        if (appData == null) {
-            appData = new AppData(objectMapper);
-        }
-        return appData;
-    }
+//    /**
+//     * Get app data from the DB if exists, otherwise return empty app data
+//     *
+//     * @param instanceId - the instance id
+//     * @param compId     - the appUpdate comp Id
+//     * @return appUpdate settings
+//     */
+//    private AppData getAppData(String instanceId, String compId) {
+//        AppData appData = appDao.getAppData(instanceId, compId);
+//        return appData;
+//    }
 
     private AppInstance createTestSignedInstance(String instanceId, @Nullable String userId, @Nullable String permissions) {
         try {

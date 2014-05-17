@@ -1,48 +1,87 @@
-/**
- * Created by Elia on 30/04/2014.
- */
+///**
+// * Created by Elia on 30/04/2014.
+// */
+//
+var root = {
+    appSettings: {
+        engine: {
+            configuration: {
+                configurationProperty1: "value1",
+                configurationProperty2: "value2"
+            },
+            settings: {
 
-
-var appSettings = {
-    engine : {
-        configuration : {},
-        settings : {}
+            }
+        },
+        projectsMetaData: [
+            {
+                project: {
+                id: "projectId-in-some-format",
+                name: "String",
+                description: "@Nullable String",
+                revision: {
+                    id: 1,
+                    date: "Date in some format"
+                },
+                type: "Project type {JavaScript, MixedHTML, some other modules}"
+            }},
+            {
+                project: {
+                id: "projectId-in-some-format",
+                name: "String",
+                description: "@Nullable String",
+                revision: {
+                    id: 1,
+                    date: "Date in some format"
+                },
+                type: "Project type {JavaScript, MixedHTML, some other modules}"
+            }},
+            {
+                project: {
+                id: "projectId-in-some-format",
+                name: "String",
+                description: "@Nullable String",
+                revision: {
+                    id: 1,
+                    date: "Date in some format"
+                },
+                type: "Project type {JavaScript, MixedHTML, some other modules}"
+            }}
+        ]
     },
-    projectsMetaData : [
-        "project1Obj",
-        "project2Obj",
-        "project3Obj"
-    ]
-};
+    appData: {
+        projectId1: {
+            html: {
 
+            },
+            js: {
 
-var project = {
-    id : "projectId-in-some-format",
-    name : "String",
-    description : "@Nullable String",
-    revision : {
-        id : 1,
-        date : "Date in some format"
-    },
-    type: "Project type {JavaScript, MixedHTML, some other modules}"
+            },
+            css: {
 
-};
+            }
+        },
+        projectId2: {
+            html: {
 
-var appData = {
-    projectId1 : {
-        html : {},
-        js : {},
-        css : {}
-    },
-    projectId1 : {
-        html : {},
-        js : {},
-        css : {}
-    },
-    projectId1 : {
-        html : {},
-        js : {},
-        css : {}
+            },
+            js: {
+
+            },
+            css: {
+
+            }
+        },
+        projectId3: {
+            html: {
+
+            },
+            js: {
+
+            },
+            css: {
+
+            }
+        }
     }
-}
-
+};

@@ -18,6 +18,8 @@ public class AppSettings implements DataContainer {
 
     private @Nullable String title;
     private @Nullable JsonNode appSettings;
+    private @Nullable JsonNode appData;
+
 
     public AppSettings() {}
 
@@ -38,6 +40,17 @@ public class AppSettings implements DataContainer {
         this.appSettings = appSettings;
     }
 
+
+    @Nullable
+    public JsonNode getAppData() {
+        return appData;
+    }
+
+    public void setAppData(@Nullable JsonNode appData) {
+        this.appData = appData;
+    }
+
+
     @Nullable
     public String getTitle() {
         return title;
@@ -46,4 +59,6 @@ public class AppSettings implements DataContainer {
     public void setTitle(@Nullable String title) {
         this.title = title;
     }
+
+
 }

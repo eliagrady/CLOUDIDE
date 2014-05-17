@@ -1,44 +1,97 @@
-#* @vtlvariable name="appSettings" type="com.wixpress.app.dao.AppSettings" *#
-#* @vtlvariable name="cloudIdeData" type="com.wixpress.app.dao.AppData" *#
+#* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="cldAppData" type="org.codehaus.jackson.JsonNode" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>${appSettings}.getTitle()} App</title>
-    <link rel="stylesheet" href="../static/js/ui-lib/ui-lib.min.css"/>
-    <link rel="stylesheet" href="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.css">
+    <title>${cldAppSettings}.getTitle()} App</title>
+    <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/lib/codemirror.css">
     <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
+    <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.css"/>
+    <script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
+    <!-- Mobile view properties-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
 </head>
 
 <body>
-    <div id="cldHeroContainer">
-        <div id="cldMenubar">
-            <button id="cldMenubarBttSave" onclick="cld.save('testName',cld.cm.getDoc().getValue())">Save</button>
+    <div class="container-fluid" id="cldHeroContainer">
+        <div class="row-fluid" id="cldMenubar">
+            <button class="" id="cldMenubarBttSave" onclick="cld.save('testName',cld.cm.getDoc().getValue())">Save</button>
         </div>
-        <div id="cldSidebar">
+        <div class="row-fluid" id="cldSidebar">
             <div id="cldSidbarPrj">
                 <div id="cldPrjExplorer">
                     <!-- List user projects here -->
                 </div>
                 <ul>
-                    <li>filename.js</li>
+                    <script>
+                        function myFunction()
+                        {
+                            var w=window.outerWidth;
+                            var h=window.outerHeight;
+                            var txt="Window size: width=" + w + ", height=" + h;
+                            document.getElementById("demo").innerHTML=txt;
+                        }
+                    </script>
+                    </head>
+
+                    <body onresize="myFunction()">
+
+                    <p>Try to resize the browser window.</p>
+
+                    <p id="demo"> </p>
+
+                    <p>Note: this example will not work properly in IE8 and earlier. IE8 and earlier do not support the outerWidth/outerHeight propery of the window object.</p>
                 </ul>
             </div>
         </div>
-        <div id="cldEditor"><!-- code editor will be inserted here--></div>
-        <div id="cldStatusbar">
+        <div class="row-fluid" id="cldEditor"><!-- code editor will be inserted here--></div>
+        <div class="row-fluid" id="cldStatusbar">
             "initializing editor"
         </div>
     </div>
 
     <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
-    <script src="../static/js/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
     <script src="../static/js/cloudide.editor.js"></script>
     <script src="../static/js/common.js"></script>
+    <script src="../static/lib/jquery/jquery.base64.min.js"></script>
+
+    <!-- Runtime Imports (TODO load dynamically) -->
+
+    <!--
+    <script src="http://ajax.aspnetcdn.com/ajax/jshint/r07/jshint.js"></script>
+    <script src="https://rawgithub.com/zaach/jsonlint/79b553fb65c192add9066da64043458981b3972b/lib/jsonlint.js"></script>
+    <script src="https://rawgithub.com/stubbornella/csslint/master/release/csslint.js"></script>
+    -->
+    <script src="../static/lib/linter/jshint.js"></script>
+    <script src="../static/lib/linter/jsonlint.js"></script>
+    <script src="../static/lib/linter/csslint.js"></script>
+
+
+
+    <script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchbrackets.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closetag.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchtags.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/javascript-lint.js"></script>
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
+
+
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.js"></script>
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.css">
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/anyword-hint.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/javascript-hint.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/css-hint.js"></script>
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/html-hint.js"></script>
 
 
     <!-- Initialization  -->
@@ -46,10 +99,15 @@
         $(document).ready(function () {
             //Data Bindings
             //TODO why does instanceId even needed?
-            //instanceId = $!{appIdentifier};
-            settings = $!{appSettings};
-            data = $!{cloudIdeData};
-
+            settings = $!{cldAppSettings};
+            data = $!{cldAppData};
+            //When this val is set to true, the app will skip authentication for the update endpoints
+            if(window.location.origin == "http://localhost:8080") { //TODO replace with GET param
+                window.debugMode = "debug";
+            }
+            else {
+                window.debugMode = "";
+            }
             //window.cld = new CloudIde();
             //cld.init();
 
