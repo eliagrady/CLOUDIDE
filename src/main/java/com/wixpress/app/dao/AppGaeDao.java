@@ -1,6 +1,7 @@
 package com.wixpress.app.dao;
 
 import com.google.appengine.api.datastore.*;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
@@ -54,12 +55,15 @@ public class AppGaeDao implements AppDao {
 //                transaction.rollback();
 //            }
 //        }
-        saveToDataStore(instanceId,compId,SETTINGS,appSettings);
+        saveToDataStore(instanceId,compId,SETTINGS,appSettings.getAppSettings());
     }
 
+
+
     @Override
-    public void saveAppData(String instanceId, String compId, AppData appData) {
-        saveToDataStore(instanceId,compId,DATA,appData);
+    public void saveAppData(String instanceId, String compId, AppSettings appSettings) {
+        //saveToDataStore(instanceId,compId,DATA,appData);
+        saveToDataStore(instanceId,compId,DATA,appSettings.getAppData());
     }
 
     /**
@@ -89,56 +93,56 @@ public class AppGaeDao implements AppDao {
         }
     }
 
-    @Override
-    public AppData getAppData(String instanceId, String compId) {
-        if (instanceId == null)
-            return null;
-        else {
-            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
-            try {
-                final Text object = (Text) dataStore.get(key).getProperty(DATA);
-                final String str = ((Text) dataStore.get(key).getProperty(DATA)).toString();
-                final String asText = object.getValue();
-                final boolean eq = str.equals(asText);
-                final AppData appData = objectMapper.readValue(asText, AppData.class);
-                final AppData appDataTree = objectMapper.reader(AppData.class).readValue(asText);
-                final String prop = dataStore.get(key).getProperty(DATA).toString();
-                return objectMapper.readValue(asText, AppData.class);
-            } catch (EntityNotFoundException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppData(objectMapper);
-            } catch (IOException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppData(objectMapper);
-            }
-        }
-    }
+//    @Override
+//    public AppData getAppData(String instanceId, String compId) {
+//        if (instanceId == null)
+//            return null;
+//        else {
+//            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
+//            try {
+//                final Text object = (Text) dataStore.get(key).getProperty(DATA);
+//                final String str = ((Text) dataStore.get(key).getProperty(DATA)).toString();
+//                final String asText = object.getValue();
+//                final boolean eq = str.equals(asText);
+//                final AppData appData = objectMapper.readValue(asText, AppData.class);
+//                final AppData appDataTree = objectMapper.reader(AppData.class).readValue(asText);
+//                final String prop = dataStore.get(key).getProperty(DATA).toString();
+//                return objectMapper.readValue(asText, AppData.class);
+//            } catch (EntityNotFoundException e) {
+//                // we ignore the setting reading exception and return a new default settings object
+//                return new AppData(objectMapper);
+//            } catch (IOException e) {
+//                // we ignore the setting reading exception and return a new default settings object
+//                return new AppData(objectMapper);
+//            }
+//        }
+//    }
 
-    /**
-     * Get global instance shared code (for retrieving global code entities)
-     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
-     * @return
-     */
-    @Override
-    public AppData getAppData(String instanceId) {
-        if (instanceId == null) {
-            return null;
-        }
-        else {
-            //TODO change from null?
-            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , "null"));
-            try {
-                final String prop = dataStore.get(key).getProperty(DATA).toString();
-                return objectMapper.readValue(prop, AppData.class);
-            } catch (EntityNotFoundException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppData(objectMapper);
-            } catch (IOException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppData(objectMapper);
-            }
-        }
-    }
+//    /**
+//     * Get global instance shared code (for retrieving global code entities)
+//     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
+//     * @return
+//     */
+//    @Override
+//    public AppData getAppData(String instanceId) {
+//        if (instanceId == null) {
+//            return null;
+//        }
+//        else {
+//            //TODO change from null?
+//            final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId , "null"));
+//            try {
+//                final String prop = dataStore.get(key).getProperty(DATA).toString();
+//                return objectMapper.readValue(prop, AppData.class);
+//            } catch (EntityNotFoundException e) {
+//                // we ignore the setting reading exception and return a new default settings object
+//                return new AppData(objectMapper);
+//            } catch (IOException e) {
+//                // we ignore the setting reading exception and return a new default settings object
+//                return new AppData(objectMapper);
+//            }
+//        }
+//    }
 
     /**
      * Create a unique key to each entry in the DB that is composed from the instanceId and compID
@@ -162,10 +166,10 @@ public class AppGaeDao implements AppDao {
         saveToDataStore(instanceId, compId, SETTINGS, appSettings);
     }
 
-    @Override
-    public void updateAppData(String instanceId, String compId, AppData appData) {
-        saveToDataStore(instanceId, compId, DATA, appData);
-    }
+//    @Override
+//    public void updateAppData(String instanceId, String compId, AppData appData) {
+//        saveToDataStore(instanceId, compId, DATA, appData);
+//    }
 
 
     /**
@@ -204,7 +208,41 @@ public class AppGaeDao implements AppDao {
         }
     }
 
+    /**
+     * Save data to the datastore
+     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
+     * @param compId - - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
+     * @param propertyName - property name of the data ('column' in SQL)
+     * @param jsonNode - the data to save, saved as as string.
+     */
+    private void saveToDataStore(String instanceId,@Nullable String compId, String propertyName , JsonNode jsonNode) {
+        //TODO make revision support here and more logic
+        //TODO make use of new instances mapping in future ('APP_INSTANCE')
+        Entity entity;
+        try {
+            entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId , compId)));
+        }
+        catch (EntityNotFoundException e){
+            entity = new Entity(APP_INSTANCE, key(instanceId, compId));
+        }
+        try {
+            Text textObj = new Text(objectMapper.writeValueAsString(jsonNode));
+            //Should fix 500 char limit on properties
+            entity.setProperty(propertyName,textObj);
+        } catch (IOException e) {
+            throw new AppDaoException("failed to serialize settings", e);
+        }
 
+        Transaction transaction = dataStore.beginTransaction();
+        try {
+            dataStore.put(entity);
+            transaction.commit();
+        } finally {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        }
+    }
 
     /**
      * Get global instance shared code (for retrieving global code entities)

@@ -29,4 +29,8 @@ public class SettingsUpdate {
     public String getMode() {
         return this.mode;
     }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 }

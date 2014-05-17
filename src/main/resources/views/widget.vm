@@ -21,20 +21,19 @@
         else {
             window.debugMode = "false";
         }
-        appData = ${cldAppData};
+        data = ${cldAppData};
         console.log("Inspection START");
-        console.log(appData);
-        console.log(decodeURI(appData.appData));
-        console.log(btoa(decodeURI(appData.appData)));
-        console.log(Base64.decode(decodeURI(appData.appData)));
+        console.log(data);
+        console.log(decodeURI(data.data));
+        console.log(btoa(decodeURI(data.data)));
+        console.log(Base64.decode(decodeURI(data.data)));
 
-        appData.appData = Base64.decode(decodeURI(appData.appData));
+        data.data = Base64.decode(decodeURI(data.data));
 
-        console.log(appData);
-        console.log(appData.appData);
+        console.log(data);
+        console.log(data.data);
         console.log("Inspection END");
         console.log("---------------");
-
 
     </script>
 </head>

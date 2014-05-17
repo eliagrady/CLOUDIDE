@@ -131,7 +131,6 @@ var _codeWidget = (function() {
     }
 
     function appendCode() {
-        $('#body').append('<h1>test test</h1>');
         //Validate appData for malicious code!
         //$('#hero').innerHTML = appData.appData;
         $('#hero').append(appData.appData);

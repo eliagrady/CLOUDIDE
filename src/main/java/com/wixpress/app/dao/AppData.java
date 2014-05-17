@@ -1,6 +1,5 @@
 package com.wixpress.app.dao;
 
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -12,10 +11,8 @@ import javax.annotation.Nullable;
 
 @JsonTypeName("AppData")
 public class AppData implements DataContainer {
-
-    private @Nullable String command;
-    private @Nullable String appData; //Base64
-    private @Nullable JsonNode document;
+    private @Nullable String encodedText; //Base64
+    //private @Nullable JsonNode document;
 
     public AppData() {}
 
@@ -28,29 +25,20 @@ public class AppData implements DataContainer {
     }
 
     @Nullable
-    public String getAppData() {
-        return appData;
+    public String getEncodedText() {
+        return encodedText;
     }
 
-    public void setAppData(@Nullable String appData) {
-        this.appData = appData;
+    public void setEncodedText(@Nullable String encodedText) {
+        this.encodedText = encodedText;
     }
-
-    @Nullable
-    public String getCommand() {
-        return command;
-    }
-
-    public void setCommand(@Nullable String command) {
-        this.command = command;
-    }
-
-    @Nullable
-    public JsonNode getDocument() {
-        return document;
-    }
-
-    public void setDocument(@Nullable JsonNode document) {
-        this.document = document;
-    }
+//
+//    @Nullable
+//    public JsonNode getDocument() {
+//        return document;
+//    }
+//
+//    public void setDocument(@Nullable JsonNode document) {
+//        this.document = document;
+//    }
 }
