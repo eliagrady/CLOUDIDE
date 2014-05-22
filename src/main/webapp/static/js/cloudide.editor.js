@@ -1,5 +1,5 @@
 /* cloud ide editor javascript */
-
+console.log('Test', 3);
 /*jslint browser: true*/
 /*global $, jQuery, CodeMirror*/
 
