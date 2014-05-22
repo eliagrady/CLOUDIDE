@@ -7,7 +7,7 @@
 /**
 * Class containing widget property and functions
 */
-var _codeWidget = (function() {
+var _cld = (function() {
     /**
      * Load the feed content using google API
      */
@@ -133,7 +133,7 @@ var _codeWidget = (function() {
     function appendCode() {
         //Validate appData for malicious code!
         //$('#hero').innerHTML = appData.appData;
-        $('#hero').append(_codeWidget.currentProject.code);
+        $('#hero').append(_cld.currentProject.code);
         //$('#hero').append(this.appData.appData);
         console.log("appended appData:" + this.currentProject.code);
         //console.log("appended appData.appData:" + this.appData.appData);
@@ -155,10 +155,12 @@ var _codeWidget = (function() {
 
 $(document).ready(function() {
     try {
-        _codeWidget.currentProject = currentProject;
+        _cld.currentProject = currentProject;
     }
     catch (err) {
-        _codeWidget.currentProject = {};
+        _cld.currentProject = {};
     }
-    _codeWidget.init();
+    _cld.init();
+    //Release global
+    currentProject = undefined;
 });

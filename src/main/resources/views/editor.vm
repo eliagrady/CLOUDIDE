@@ -42,7 +42,7 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="#">Project name </a>
+            <a id="cldProjectName" class="navbar-brand" href="#">Project name</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
@@ -54,7 +54,7 @@
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
             </form>
-            <button class="" id="cldMenubarBttSave" onclick="cld.save('testName',cld.cm.getDoc().getValue())">Save</button>
+            <button class="" id="cldMenubarBttSave" onclick="_cld.save()">Save</button>
             <button type="button" class="btn btn-default btn-lg">
                 <span class="glyphicon glyphicon-star"></span> Star
             </button>
@@ -194,22 +194,8 @@
 
 <!-- Initialization of CloudIde 'Editor view' -->
 <script type="text/javascript">
-    $(document).ready(function () {
-        //Create and bind global
-        var settings = $!{cldAppSettings};
-        window.cld = CloudIde;
-        window.cld.settings = settings ;
-        //When this val is set to true, the app will skip authentication for the update endpoints
-        if(window.location.origin == "http://localhost:8080") { //TODO replace with GET param
-            cld.mode = "debug";
-        }
-        else {
-            cld.mode = "";
-        }
-        window.cld.init();
-        console.log(window.cld.settings);
-        console.log(window.cld.settings.appSettings);
-    });
+    //Create and bind global
+    var settings = $!{cldAppSettings};
 </script>
 </body>
 </html>

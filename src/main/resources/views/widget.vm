@@ -18,10 +18,10 @@
     <script type="text/javascript">
         //When this val is set to true, the app will skip authentication for the update endpoints
         if(window.location.origin == "http://localhost:8080") {
-            window.debugMode = "true";
+            window._cld.mode = "debug";
         }
         else {
-            window.debugMode = "false";
+            window._cld.mode = "";
         }
         currentProject = ${currentProject};
         console.log("Inspection START");
@@ -37,7 +37,6 @@
         console.log(currentProject.code)
         console.log("Inspection END");
         console.log("---------------");
-
     </script>
 </head>
 <body id="body">
