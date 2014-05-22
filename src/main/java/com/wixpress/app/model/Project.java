@@ -1,21 +1,18 @@
 package com.wixpress.app.model;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by Elia on 18/05/2014.
  */
 public class Project {
-    private Code code;
-    private String author;
-    private String name;
+    public Code code;
+    public String author;
+    public String name;
 
-    private Project() {
+    public Project(String projectName, @Nullable String author) {
         code = new Code();
-        author = "";
-    }
-
-    public Project CreateNewProject(String projectName) {
-        Project prj = new Project();
-        prj.name = projectName;
-        return prj;
+        this.name = projectName;
+        this.author = author;
     }
 }

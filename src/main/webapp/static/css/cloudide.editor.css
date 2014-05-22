@@ -1,67 +1,81 @@
 /* cloud ide editor css */
 
-body {
-    margin: 0; /* let's reset the body's margin first */
-    width: 100%;
-}
+/*body {*/
+    /*margin: 0; *//* let's reset the body's margin first */
+    /*width: 100%;*/
+/*}*/
 
-textarea {
-    width: 100%;
-    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;         /* Opera/IE 8+ */
-    display: block;
+/*textarea {*/
+    /*width: 100%;*/
+    /*-webkit-box-sizing: border-box; *//* Safari/Chrome, other WebKit */
+    /*-moz-box-sizing: border-box;    *//* Firefox, other Gecko */
+    /*box-sizing: border-box;         *//* Opera/IE 8+ */
+    /*display: block;*/
 
-}
-#cldHeroContainer {
-    max-width: 75em;
-    background-color: gray;
-    margin: auto;
-    position: relative;
-    z-index: 1;
-    border: 1px solid #000000;
-    box-shadow: #a9a9a9;
-}
-#cldMenubar {
-    height:10%;
-    padding:5px;
-    background-color: red;
-    position: relative;
-    z-index: 2;
-}
+/*}*/
+/*#cldHeroContainer {*/
+    /*max-width: 75em;*/
+    /*background-color: gray;*/
+    /*margin: auto;*/
+    /*position: relative;*/
+    /*z-index: 1;*/
+    /*border: 1px solid #000000;*/
+    /*box-shadow: #a9a9a9;*/
+/*}*/
+/*#cldMenubar {*/
+    /*height:10%;*/
+    /*padding:5px;*/
+    /*background-color: red;*/
+    /*position: relative;*/
+    /*z-index: 2;*/
+/*}*/
 
-#cldSidebar {
-    overflow-y: auto;
-    float: left;
-    width : 25%;
-    background-color: green;
-    z-index: 2;
-}
+/*#cldSidebar {*/
+    /*overflow-y: auto;*/
+    /*float: left;*/
+    /*width : 25%;*/
+    /*background-color: green;*/
+    /*z-index: 2;*/
+/*}*/
 
+/*#cldEditor {*/
+    /*overflow: auto;*/
+    /*float : right;*/
+    /*width: 75%;*/
+    /*background-color: #c9de00;*/
+    /*z-index: 2;*/
+    /*font-family: "Consolas", monospace;*/
+    /*font-size: 14px;*/
+    /*text-shadow:0px 1px 1px rgba(0, 0, 0, 0.2);*/
+/*}*/
+
+/*#cldEditorTextArea {*/
+    /*border-width: 0px;*/
+    /*position: relative;*/
+    /*width: 100%;*/
+    /*resize: none;*/
+    /*margin: 0px 0px 0px 0px;*/
+    /*padding: 0px 0px 0px 0px;*/
+/*}*/
+
+/*#cldStatusbar {*/
+    /*background-color: blue;*/
+    /*height: 10%;*/
+    /*clear : both;*/
+    /*position: relative;*/
+    /*z-index: 2;*/
+/*}*/
 #cldEditor {
+    margin: 0;
+    padding: 0;
     overflow: auto;
-    float : right;
-    width: 75%;
     background-color: #c9de00;
     z-index: 2;
     font-family: "Consolas", monospace;
     font-size: 14px;
-    text-shadow:0px 1px 1px rgba(0, 0, 0, 0.2);
+    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
 }
 
-#cldEditorTextArea {
-    border-width: 0px;
-    position: relative;
-    width: 100%;
-    resize: none;
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px 0px 0px;
-}
-
-#cldStatusbar {
-    background-color: blue;
-    height: 10%;
-    clear : both;
-    position: relative;
-    z-index: 2;
+.noLeftPadding {
+    padding-left: 0;
 }

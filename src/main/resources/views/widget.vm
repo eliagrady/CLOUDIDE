@@ -1,5 +1,7 @@
-#* @vtlvariable name="cldAppData" type="com.wixpress.app.dao.AppData" *#
-#* @vtlvariable name="cloudIdeAppInstance" type="com.wixpress.app.domain.AppInstance" *#
+#* @vtlvariable name="data" type="org.codehaus.jackson.JsonNode" *#
+#* @vtlvariable name="dataString" type="java.lang.String" *#
+#* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="currentProject" type="org.codehaus.jackson.JsonNode" *#
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,25 +18,25 @@
     <script type="text/javascript">
         //When this val is set to true, the app will skip authentication for the update endpoints
         if(window.location.origin == "http://localhost:8080") {
-            window.debugMode = "true";
+            window._cld.mode = "debug";
         }
         else {
-            window.debugMode = "false";
+            window._cld.mode = "";
         }
-        data = ${cldAppData};
+        currentProject = ${currentProject};
         console.log("Inspection START");
-        console.log(data);
-        console.log(decodeURI(data.data));
-        console.log(btoa(decodeURI(data.data)));
-        console.log(Base64.decode(decodeURI(data.data)));
+        console.log(currentProject);
+        console.log(currentProject.name);
+        console.log(currentProject.modified);
+        console.log(decodeURI(currentProject.code));
+        console.log(btoa(decodeURI(currentProject.code)));
+        console.log(Base64.decode(decodeURI(currentProject.code)));
 
-        data.data = Base64.decode(decodeURI(data.data));
+        currentProject.code = Base64.decode(decodeURI(currentProject.code));
 
-        console.log(data);
-        console.log(data.data);
+        console.log(currentProject.code)
         console.log("Inspection END");
         console.log("---------------");
-
     </script>
 </head>
 <body id="body">

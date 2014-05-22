@@ -1,6 +1,4 @@
 #* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
-#* @vtlvariable name="cldAppData" type="com.wixpress.app.dao.AppData" *#
-#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +8,6 @@
     <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
     <script type="text/javascript">
         var cldSettings = $!{cldAppSettings};
-        var cldData = $!{cldAppData};
     </script>
 </head>
 

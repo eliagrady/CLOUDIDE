@@ -7,6 +7,7 @@ import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
+import org.mortbay.util.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+
     @Resource
     private AppDao appDao;
 
@@ -126,6 +128,35 @@ public class AppController {
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
     }
 
+
+    /**
+     * Message - auxiliary Endpoint
+     *
+     * @param model      - Spring MVC model used by the view template setting.vm
+     * @param instance   - The signed instance {@see http://dev.wix.com/display/wixdevelopersapi/The+Signed+Instance}
+     * @param width      - The width of the frame to render in pixels
+     * @param locale     - The language of the Wix editor
+     * @param origCompId - The Wix component id of the caller widget/section
+     * @param compId     - The id of the Wix component which is the host of the IFrame
+     * @return the template setting.vm name
+     * @link http://dev.wix.com/docs/display/DRAF/App+Endpoints#AppEndpoints-SettingsEndpoint
+     */
+    @RequestMapping(value = "/message", method = RequestMethod.GET)
+    public String message(Model model,
+                           HttpServletResponse response,
+                           @RequestParam String encodedMessage,
+                           @RequestParam String instance,
+                           @RequestParam(required = false) Integer width,
+                           @RequestParam(required = false) String locale,
+                           @RequestParam(required = false) String origCompId,
+                           @RequestParam String compId) throws IOException {
+        //TODO make due with no security here
+        AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+        response.addCookie(new Cookie("instance", instance));
+        model.addAttribute("appInstance",appInstance);
+        return viewMessage(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, encodedMessage);
+    }
+
     /**
      * Saves changes from the settings dialog
      *
@@ -139,7 +170,8 @@ public class AppController {
                                                      @RequestBody SettingsUpdate settingsUpdate) {
         try {
             //TODO remove debugMode from production code
-            if(settingsUpdate.getMode().equals("debug")) {
+            String mode = settingsUpdate.getMode();
+            if(mode != null && mode.equals("debug")) {
                 appDao.updateAppSettings("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",settingsUpdate.getCompId(),settingsUpdate.getSettings());
                 return AjaxResult.ok();
             }
@@ -164,7 +196,7 @@ public class AppController {
         try {
             //TODO remove debugMode from production code
             String mode = settingsUpdate.getMode();
-            if (mode.equals("debug")) {
+            if (mode != null && mode.equals("debug")) {
                 return executeSave(createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null), settingsUpdate);
             }
             AppInstance appInstance = authenticationResolver.unsignInstance(instance);
@@ -180,7 +212,6 @@ public class AppController {
     private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, SettingsUpdate settingsUpdate) {
         try {
             AppSettings appSettings = settingsUpdate.getSettings();
-            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
             appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
             return AjaxResult.ok();
         } catch (NullPointerException npe) {
@@ -229,8 +260,8 @@ public class AppController {
                 fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
             }
             //Can produce NullPointerException
-            String res = fetched.getAppData().toString();
-            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
+            String res = fetched.getAppSettings().toString();
+            appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
             return AjaxResult.res(res);
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
@@ -363,12 +394,12 @@ public class AppController {
     // Set editor.vm
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-        //AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings.getAppSettings()));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
-        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s",instanceId,compId)));
+        //AppData appData = getAppData(instanceId, compId);
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s", instanceId, compId)));
         return "editor";
     }
+
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
@@ -377,10 +408,19 @@ public class AppController {
         AppSettings appSettings = getSettings(instanceId, compId);
         //TODO use viewMode parameter to determine the binding of live site vs. edit and preview modes data segment
         //AppData cloudIdeData = getAppData(instanceId, compId);
-
-
+        /*
+        if (viewMode.equals("edit")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        } else if (viewMode.equals("preview")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        } else if (viewMode.equals("site")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        }
+        */
+        //model.addAttribute("data", objectMapper.writeValueAsString(appSettings.getAppSettings()));
+        //model.addAttribute("dataString", objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject").get("code").getTextValue()));
         //model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
+        model.addAttribute("currentProject",objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject")));//TODO change to 'published project'
         return "widget";
     }
 
@@ -391,8 +431,15 @@ public class AppController {
         AppSettings appSettings = getSettings(instanceId, compId);
         //AppData cloudIdeData = getAppData(instanceId, compId);
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
         return "settings";
+    }
+
+    // Set message.vm
+    private String viewMessage(Model model, Integer width, String instanceId, String locale, String origCompId, String compId, String encodedMessage) throws IOException {
+        AppSettings appSettings = getSettings(instanceId, compId);
+        //AppData cloudIdeData = getAppData(instanceId, compId);
+        model.addAttribute("message", objectMapper.writeValueAsString(URI.decodePath(encodedMessage)));
+        return "message";
     }
 
     /**
@@ -406,18 +453,6 @@ public class AppController {
         AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
         return appSettings;
     }
-
-//    /**
-//     * Get app data from the DB if exists, otherwise return empty app data
-//     *
-//     * @param instanceId - the instance id
-//     * @param compId     - the appUpdate comp Id
-//     * @return appUpdate settings
-//     */
-//    private AppData getAppData(String instanceId, String compId) {
-//        AppData appData = appDao.getAppData(instanceId, compId);
-//        return appData;
-//    }
 
     private AppInstance createTestSignedInstance(String instanceId, @Nullable String userId, @Nullable String permissions) {
         try {
