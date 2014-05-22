@@ -133,9 +133,9 @@ var _codeWidget = (function() {
     function appendCode() {
         //Validate appData for malicious code!
         //$('#hero').innerHTML = appData.appData;
-        $('#hero').append(appData.appData);
+        $('#hero').append(_codeWidget.currentProject.code);
         //$('#hero').append(this.appData.appData);
-        console.log("appended appData:" + this.appData);
+        console.log("appended appData:" + this.currentProject.code);
         //console.log("appended appData.appData:" + this.appData.appData);
     }
 
@@ -155,18 +155,10 @@ var _codeWidget = (function() {
 
 $(document).ready(function() {
     try {
-        _codeWidget.appSettings = appSettings;
+        _codeWidget.currentProject = currentProject;
     }
     catch (err) {
-        _codeWidget.appSettings = {};
-    }
-    try {
-        _codeWidget.appData = appData;
-    }
-    catch (err) {
-        console("appData err:"+err.message);
-        _codeWidget.appData = {};
-        _codeWidget.appData.appData = "";
+        _codeWidget.currentProject = {};
     }
     _codeWidget.init();
 });

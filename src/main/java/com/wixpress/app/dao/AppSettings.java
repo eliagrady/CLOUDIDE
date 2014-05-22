@@ -1,5 +1,6 @@
 package com.wixpress.app.dao;
 
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -15,11 +16,7 @@ import javax.annotation.Nullable;
 
 @JsonTypeName("AppSettings")
 public class AppSettings implements DataContainer {
-
-    private @Nullable String title;
     private @Nullable JsonNode appSettings;
-    private @Nullable JsonNode appData;
-
 
     public AppSettings() {}
 
@@ -39,26 +36,4 @@ public class AppSettings implements DataContainer {
     public void setAppSettings(@Nullable JsonNode appSettings) {
         this.appSettings = appSettings;
     }
-
-
-    @Nullable
-    public JsonNode getAppData() {
-        return appData;
-    }
-
-    public void setAppData(@Nullable JsonNode appData) {
-        this.appData = appData;
-    }
-
-
-    @Nullable
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(@Nullable String title) {
-        this.title = title;
-    }
-
-
 }

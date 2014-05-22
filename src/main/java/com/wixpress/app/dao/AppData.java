@@ -1,5 +1,6 @@
 package com.wixpress.app.dao;
 
+
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.ObjectMapper;
 

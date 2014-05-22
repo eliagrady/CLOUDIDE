@@ -4,6 +4,9 @@
 /*global $, jQuery, CodeMirror*/
 
 var CloudIde = {
+    settings : {
+        appSettings : {}
+    },
     cm : {},
     getCodeMirrorConfig : function () {
         //var compId = Wix.Utils.getOrigCompId();
@@ -68,10 +71,8 @@ var CloudIde = {
             var compId = Wix.Utils.getOrigCompId() || "";
         }
         catch (err) {
-            console.log(err.message);
+            console.log(err);
         }
-
-
         //var instance = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
         //var comp = 'TPWdgt-d88e26c-217b-505f-196d-2f6d87f1c2db';
 
@@ -79,23 +80,27 @@ var CloudIde = {
         //var code = cld.cm.getDoc();
 
         //var codeVal = encodeURI(JSON.stringify(cld.cm.getDoc().getValue()));
-        console.log("about to sent window.debugMode = "+window.debugMode);
+        console.log("about to sent window.debugMode = "+CloudIde.mode);
         var codeVal = cld.cm.getDoc().getValue();
         var encodedVal = encodeURI($.base64.encode(codeVal));
-        data.code = encodedVal;
+        var currentDate = new Date();
+        var projectName = "TestProject";
+        var currentProject = {
+            name : projectName,
+            modified : currentDate,
+            code : encodedVal
+        };
+        //Saving the appSettings JSON
+        CloudIde.settings.appSettings.currentProject = currentProject;
         $.ajax({
             'type': 'post',
             'url': "/app/save",
             'dataType': "json",
             'contentType': 'application/json; chatset=UTF-8',
             'data': JSON.stringify({
-                mode : window.debugMode,
                 compId: compId,
-                settings: {
-                    title: "testing",
-                    appSettings: settings,
-                    appData: data
-                }
+                settings: CloudIde.settings,
+                mode : CloudIde.mode
             }),
             'cache': false,
             'success': function (res) {
@@ -162,11 +167,9 @@ var CloudIde = {
         CloudIde.cm = CodeMirror.fromTextArea(cldTextArea, CloudIde.getCodeMirrorConfig());
 
         //Initialize settings
-        if(debugMode !== "debug") {
+        if(CloudIde.mode !== "debug") {
             saveSettings();
         }
-        settings.appSettings = settings.appSettings || {};
-        data = data || {};
 
         //Initialize menu segment
         //Initialize project explorer segment

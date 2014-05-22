@@ -31,6 +31,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+
     @Resource
     private AppDao appDao;
 
@@ -180,7 +181,6 @@ public class AppController {
     private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, SettingsUpdate settingsUpdate) {
         try {
             AppSettings appSettings = settingsUpdate.getSettings();
-            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
             appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
             return AjaxResult.ok();
         } catch (NullPointerException npe) {
@@ -229,8 +229,8 @@ public class AppController {
                 fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
             }
             //Can produce NullPointerException
-            String res = fetched.getAppData().toString();
-            appDao.saveAppData(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
+            String res = fetched.getAppSettings().toString();
+            appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
             return AjaxResult.res(res);
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
@@ -363,12 +363,12 @@ public class AppController {
     // Set editor.vm
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
         AppSettings appSettings = getSettings(instanceId, compId);
-        //AppData cloudIdeData = getAppData(instanceId, compId);
-        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings.getAppSettings()));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
-        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s",instanceId,compId)));
+        //AppData appData = getAppData(instanceId, compId);
+        model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s", instanceId, compId)));
         return "editor";
     }
+
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
@@ -377,10 +377,19 @@ public class AppController {
         AppSettings appSettings = getSettings(instanceId, compId);
         //TODO use viewMode parameter to determine the binding of live site vs. edit and preview modes data segment
         //AppData cloudIdeData = getAppData(instanceId, compId);
-
-
+        /*
+        if (viewMode.equals("edit")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        } else if (viewMode.equals("preview")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        } else if (viewMode.equals("site")) {
+            appSettings.getAppSettings().get("projects").get(compId).get("code");
+        }
+        */
+        //model.addAttribute("data", objectMapper.writeValueAsString(appSettings.getAppSettings()));
+        //model.addAttribute("dataString", objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject").get("code").getTextValue()));
         //model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
+        model.addAttribute("currentProject",objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject")));//TODO change to 'published project'
         return "widget";
     }
 
@@ -391,7 +400,6 @@ public class AppController {
         AppSettings appSettings = getSettings(instanceId, compId);
         //AppData cloudIdeData = getAppData(instanceId, compId);
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("cldAppData", objectMapper.writeValueAsString(appSettings.getAppData()));
         return "settings";
     }
 
@@ -406,18 +414,6 @@ public class AppController {
         AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
         return appSettings;
     }
-
-//    /**
-//     * Get app data from the DB if exists, otherwise return empty app data
-//     *
-//     * @param instanceId - the instance id
-//     * @param compId     - the appUpdate comp Id
-//     * @return appUpdate settings
-//     */
-//    private AppData getAppData(String instanceId, String compId) {
-//        AppData appData = appDao.getAppData(instanceId, compId);
-//        return appData;
-//    }
 
     private AppInstance createTestSignedInstance(String instanceId, @Nullable String userId, @Nullable String permissions) {
         try {

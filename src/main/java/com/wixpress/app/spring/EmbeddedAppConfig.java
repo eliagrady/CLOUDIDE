@@ -7,6 +7,8 @@ import com.wixpress.app.controller.HelpController;
 import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppGaeDao;
 import com.wixpress.app.domain.AuthenticationResolver;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +22,14 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({EmbeddedAppVelocityBeansConfig.class})
 public class EmbeddedAppConfig {
+    //ObjectMapper objectMapper;
     @Bean
     public ObjectMapper objectMapper() { //TODO remove FAIL_ON_UNKNOWN_PROPERTIES feature
-        //.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        //configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
+        //return new ObjectMapper();
+        return objectMapper;
     }
 
     @Bean

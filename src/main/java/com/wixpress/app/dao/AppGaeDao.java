@@ -20,6 +20,7 @@ public class AppGaeDao implements AppDao {
     protected final static String SETTINGS = "settings";
     protected final static String COMPID = "compId";
     protected final static String DATA = "data";
+    private static final String CLOUDIDE = "cldInstance";
 
     @Resource
     private ObjectMapper objectMapper;
@@ -55,15 +56,7 @@ public class AppGaeDao implements AppDao {
 //                transaction.rollback();
 //            }
 //        }
-        saveToDataStore(instanceId,compId,SETTINGS,appSettings.getAppSettings());
-    }
-
-
-
-    @Override
-    public void saveAppData(String instanceId, String compId, AppSettings appSettings) {
-        //saveToDataStore(instanceId,compId,DATA,appData);
-        saveToDataStore(instanceId,compId,DATA,appSettings.getAppData());
+        saveToDataStore(instanceId,compId,SETTINGS,appSettings);
     }
 
     /**
@@ -81,8 +74,15 @@ public class AppGaeDao implements AppDao {
         else {
             final Key key = KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId));
             try {
+//                final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
+//                return objectMapper.readValue(prop, AppSettings.class);
+                final Text object = (Text) dataStore.get(key).getProperty(SETTINGS);
+                final String asText = object.getValue();
+                //final AppSettings appSettings = objectMapper.readValue(asText, AppSettings.class);
+                final AppSettings appSettingsTree = objectMapper.reader(AppSettings.class).readValue(asText);
                 final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
-                return objectMapper.readValue(prop, AppSettings.class);
+                return objectMapper.readValue(asText, AppSettings.class);
+
             } catch (EntityNotFoundException e) {
                 // we ignore the setting reading exception and return a new default settings object
                 return new AppSettings(objectMapper);
@@ -165,11 +165,6 @@ public class AppGaeDao implements AppDao {
     public void updateAppSettings(String instanceId, String compId, AppSettings appSettings) {
         saveToDataStore(instanceId, compId, SETTINGS, appSettings);
     }
-
-//    @Override
-//    public void updateAppData(String instanceId, String compId, AppData appData) {
-//        saveToDataStore(instanceId, compId, DATA, appData);
-//    }
 
 
     /**
