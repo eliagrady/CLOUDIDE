@@ -56,15 +56,15 @@ var _cldEditor = (function() {
                 return CloudIde.getSettings().projects;
             },
             addProject : function(project) {
-                var context = this.getProjects();
-                //var length = Array.prototype.push.call(context,project);
-                var length = context.push(project);
+                var settings=CloudIde.getSettings();
+                //var length = Array.prototype.push.call(settings.projects,project);
+                var length = settings.projects.push(project);
 
                 console.log("=================");
                 console.log(length+ " projects listed:");
-                for(var prj in context) {
-                    console.log(prj);
-                };
+                for(var i=0;i<length;i++){
+                    console.log('Item', settings.projects[i]);
+                }
                 console.log("=================");
             },
             createNewProjectFromTemplate : function() {
@@ -186,16 +186,17 @@ var _cldEditor = (function() {
             loadProjectsToExplorer : function() {
                 var projects = CloudIde.projectHandler.getProjects();
                 //Prepare then UL
-                var ul = $('<ul></ul>').addClass("nav").addClass("nav-sidebar");
+                var ul = $('<ul></ul>').addClass("nav").addClass("nav-sidebar").addClass('projects');
                 var project;
                 for(var i = 0 ; i < projects.length ; i++ ) {
-                    project = projects.pop();
+                    project = projects[i];
                     var funcDesc = '_cldEditor.editorActions("selectProject",'+project.id+')';
                     var a = $('<a></a>').attr('href','#').attr('onclick',funcDesc).text(project.name);
                     var li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false');
                     li.append(a);
                     ul.append(li);
                 }
+                $('#cldProjectExplorer').find('.projects').remove();
                 $('#cldProjectExplorer').append(ul);
             },
             selectProject : function(projectId) {
@@ -212,6 +213,7 @@ var _cldEditor = (function() {
             },
             createNewProject : function() {
                 var newProject = CloudIde.projectHandler.createNewProjectFromTemplate();
+
                 CloudIde.projectHandler.addProject(newProject);
                 CloudIde.editor.loadProjectsToExplorer();
             }
@@ -500,4 +502,11 @@ $(document).ready(function() {
     catch (err) {
         console.log(err.stack);
     }
+
+    window.code=_cldEditor.cldDebug();
+    console.log('projects', code.getSettings().projects);
+    code.projectHandler.addProject({test:1});
 });
+
+
+
