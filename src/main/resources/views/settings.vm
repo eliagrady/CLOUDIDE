@@ -69,7 +69,6 @@ This part holds the settings panel -->
     <!-- Wix UI -->
     <script type="text/javascript" src="../static/lib/ui-lib/ui-lib.min.js"></script>
     <!-- Settings View Logic -->
-    <script type="text/javascript" src="../static/js/common.js"></script>
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
 </body>
 </html>

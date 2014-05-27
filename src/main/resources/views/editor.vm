@@ -1,5 +1,6 @@
 #* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
 #* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
+#* @vtlvariable name="mode" type="java.lang.String" *#
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -9,19 +10,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <!-- Loading CSS definitions-->
-    <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.css"/>
+    <!-- Loading CSS definitions-- <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.css"/>  >
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+
     <!-- Custom styles for this template -->
     <link href="../static/lib/assets/css/dashboard.css" rel="stylesheet">
-
-
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
     <![endif]-->
 
     <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
@@ -42,22 +43,33 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a id="cldProjectName" class="navbar-brand" href="#">Project name</a>
+            <div id="cldProjectName" class="navbar-brand noSelect">Project name</div>
         </div>
         <div class="navbar-collapse collapse">
+
+            <!-- Fullscreen on/off toggle-->
+            <div class="nav navbar-nav navbar-right headerPadding">
+                <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
+                    <span width="50" class="glyphicon glyphicon-resize-full cldFullscreenBtn"></span>
+                    <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
+                </button>
+            </div>
+
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Dashboard</a></li>
                 <li><a href="#">Settings</a></li>
-                <li><a href="#">Profile</a></li>
                 <li><a href="#">Help</a></li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
             </form>
-            <button class="" id="cldMenubarBttSave" onclick="_cld.save()">Save</button>
-            <button type="button" class="btn btn-default btn-lg">
-                <span class="glyphicon glyphicon-star"></span> Star
-            </button>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a id="cldMenubarBttPreview" onclick="_cldEditor.preview() href="#"> Preview </a></li>
+                <li><a id="cldMenubarBttSave" onclick="_cldEditor.save()" href="#"> Save </a></li>
+                <!-- Button trigger modal -->
+                #if($mode.equals("debug"))
+                    #include("views/tests/editor/editorTestsModalButton.vm")
+                #end
+            </ul>
         </div>
     </div>
 </div>
@@ -66,41 +78,15 @@
     <div class="row">
         <!--Sidebar -->
         <div class="col-sm-3 col-md-2 sidebar">
-            <ul class="nav nav-sidebar">
-                <li class="active"><a href="#">Overview</a></li>
-                <li><a href="#">Reports</a></li>
-                <li><a href="#">Analytics</a></li>
-                <li><a href="#">Export</a></li>
-            </ul>
-            <ul class="nav nav-sidebar">
-                <li><a href="">Nav item</a></li>
-                <li><a href="">Nav item again</a></li>
-                <li><a href="">One more nav</a></li>
-                <li><a href="">Another nav item</a></li>
-                <li><a href="">More navigation</a></li>
-            </ul>
-            <ul class="nav nav-sidebar">
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-                <!-- Resizing script //TODO remove from here and implement to logic -->
-                <li onresize="myFunction()">
-                    <script>
-                        function myFunction()
-                        {
-                            var w=window.outerWidth;
-                            var h=window.outerHeight;
-                            var txt="Window size: width=" + w + ", height=" + h;
-                            document.getElementById("demo").innerHTML=txt;
-                        }
-                    </script>
-
-                    <p>Try to resize the browser window.</p>
-
-                    <p id="demo"> </p>
-                    <p>Note: this example will not work properly in IE8 and earlier. IE8 and earlier do not support the outerWidth/outerHeight propery of the window object.</p>
-                </li>
-            </ul>
+            <div id="cldProjectExplorer">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#" onclick="_cldEditor.editorActions('createNewProject')">Create new Project</a></li>
+                </ul>
+                <ul class="nav nav-sidebar">
+                    <!-- List projects here -->
+                    <!--<li class="active"><a href="#">Default Project</a></li>-->
+                </ul>
+            </div>
         </div>
         <!--Editor main -->
         <p>
@@ -108,45 +94,60 @@
         <div class="noLeftPadding col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <h1 class="page-header">Dashboard</h1>
 
-            <div id="cldEditor">
-                <!-- code editor will be inserted dynamically here-->
+            <div class="container">
+                <!-- CodeEditors Nav tabs -->
+                <!-- code editors links will be initiated here -->
+                <ul id="cldEditorTabs" class="nav nav-tabs tabs col-sm-offset-1 col-md-offset-1">
+                    <li class="active"><a href="#cldEditorHtml" data-toggle="tab">HTML</a></li>
+                    <li><a href="#cldEditorJs" data-toggle="tab">JavaScript</a></li>
+                    <li><a href="#cldEditorCss" data-toggle="tab">CSS</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <!-- code editors will be inserted dynamically here, in tabs-->
+                <div class="tab-content cldEditor">
+                    <div class="tab-pane fade in active" id="cldEditorHtml">
+                        <textarea id="cldEditorHtmlTextArea"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="cldEditorJs">
+                        <textarea id="cldEditorJsTextArea"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="cldEditorCss">
+                        <textarea id="cldEditorCssTextArea"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <!--Footer (Statusbar)-->
-<div class="navbar navbar-inverse navbar-fixed-bottom" role="status">
+<div class="navbar-inverse navbar-fixed-bottom" role="status">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-
-            <span class="navbar-default" placeholder="Idle"></span>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Settings</a></li>
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Help</a></li>
-            </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
-        </div>
+        <div id="cldStatusbar" class="input-xlarge center-block text-center" placeholder="Idle">Idle</div>
     </div>
 </div>
 
-
 <!-- jQuery dependency-->
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<!-- Bootstrap Imports -->
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-<script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
+<!-- UNUSED
+
+
+                                                 <script src="../static/lib/jquery/jquery-2.1.0.js"></script>
+                                                      <script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
+
+
+
+-->
+
+<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+<!--<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+
+
+<!-- Bootstrap Imports -->
 <script src="../static/lib/assets/js/docs.min.js"></script>
 <script src="../static/lib/assets/js/holder.js"></script>
 
@@ -168,14 +169,18 @@
 <script src="../static/lib/linter/jsonlint.js"></script>
 <script src="../static/lib/linter/csslint.js"></script>
 
+<script src="../static/lib/codemirror/codemirror-4.0/mode/xml/xml.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/css/css.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchbrackets.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closetag.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchtags.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/javascript-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/css-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/json-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
 
 <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
 
@@ -190,6 +195,12 @@
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/javascript-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/css-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/html-hint.js"></script>
+
+
+<!-- Modals loading on demand and by configuration-->
+    #if($mode.equals("debug"))
+        #include("views/tests/editor/editorTestsModal.vm")
+    #end
 
 
 <!-- Initialization of CloudIde 'Editor view' -->

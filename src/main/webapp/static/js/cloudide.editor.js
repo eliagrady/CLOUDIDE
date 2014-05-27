@@ -1,67 +1,310 @@
 /* cloud ide editor javascript */
-console.log('Test', 3);
 /*jslint browser: true*/
 /*global $, jQuery, CodeMirror*/
 
 /**
  * Class containing editor properties and functions
  */
-var _cld = (function() {
+var _cldEditor = (function() {
     "use strict";
     var CloudIde = {
         settings: {
-            appSettings: {}
+            appSettings: {
+                //Active project in editor
+                currentProject : {
+                    id : 0,
+                    code : {
+                        html : "",
+                        js : "",
+                        css : ""
+                    }, //Base64 encoded strings
+                    name : "New project",
+                    created : new Date(),
+                    modified : new Date()
+                },
+                projects : {
+                    length : 0
+                }
+            }
         },
-        cm: {},
-        getCodeMirrorConfig: function () {
-            //var compId = Wix.Utils.getOrigCompId();
-            //var result;
-            /*
-             $.ajax({
-             'type': 'post',
-             'url': "/app/update",
-             'dataType': "json",
-             'contentType': 'application/json; chatset=UTF-8',
-             'data': JSON.stringify({
-             compId: Wix.Utils.getOrigCompId(),
-             settings: {
-             appSettings: settings,
-             title: 'yo'
-             }
-             }),
-             'cache': false,
-             'success': function (res) {
-             console.log("update setting completed");
-             result = res;
-             Wix.Settings.refreshAppByCompIds(compId);
-             },
-             'error': function (res) {
-             console.log('error updating data with message ' + res.responseText);
-             }
-             });
+        //CodeMirror instances
+        cm: {
+            html : {},
+            js : {},
+            css : {},
+            cache : function (projectId, arr) {
+                var storage = {};
+                if(arr && arr.length > 0) {
+                    storage[projectId] = arr;
+                }
+                else {
+                    return storage[projectId];
+                }
+            }
+        },
+        getSettings: function () {
+            return CloudIde.settings.appSettings;
+        },
+        //here we will add callbacks to update the status bar if necessary
+        projectHandler : {
+            currentId : 0,
+            nextId : function() {
+                CloudIde.projectHandler.currentId += 1;
+                return CloudIde.projectHandler.currentId;
+            },
+            projectTemplate : {
+                id : 0,
+                code : {
+                    html : "",
+                    js : "",
+                    css : ""
+                }, //Base64 encoded strings
+                name : "New project",
+                created : new Date(),
+                modified : new Date()
+            },
+            getProjects : function() {
+                return CloudIde.settings.appSettings.projects;
+            },
+            addProject : function(project) {
+                var context = CloudIde.settings.appSettings.projects;
+                var length = Array.prototype.push.call(context,project);
+                //var length = CloudIde.settings.appSettings.projects.push(project);
+                console.log("=================");
+                console.log(length+ " projects listed:");
+                for(var prj in context) {
+                    console.log(prj);
+                };
+                console.log("=================");
+            },
+            createNewProjectFromTemplate : function() {
+//                //Save current project before creating a new one
+//                try {
+//                    CloudIde.projectHandler.addCurrentProjectToProjectsArray();
+//                }
+//                catch (err) {
+//                    console.log("unable to add current project. current project is:"+CloudIde.getSettings().currentProject);
+//                }
 
-             if(result) {
-             return result;
-             }
-             */
-            return {
-                value: "function myScript() {return 100;}\n", //TODO replace with the Document module
-                mode: {
-                    name: "javascript",
-                    globalVars: true
+                // Deep copy the template using the fastest performing method:
+                // http://jsperf.com/cloning-an-object/135 (revision 135)
+//                function clone(obj) {
+//                    var target = {};
+//                    for (var i in obj) {
+//                        if (obj.hasOwnProperty(i)) {
+//                            target[i] = obj[i];
+//                        }
+//                    }
+//                    return target;
+//                }
+                //var newProject = jQuery.extend(true, {}, CloudIde.projectHandler.projectTemplate);
+                var newProject = JSON.parse(JSON.stringify(CloudIde.projectHandler.projectTemplate));
+                //var newProject = clone(CloudIde.projectHandler.projectTemplate);
+                //Change ID:
+                newProject.id = new CloudIde.projectHandler.nextId();
+                newProject.created = new Date();
+                return newProject;
+            },
+            addCurrentProjectToProjectsArray : function() {
+                CloudIde.projectHandler.addProject(CloudIde.settings.appSettings.currentProject);
+            },
+            deleteProject : function(projectId) {
+                delete CloudIde.getSettings().projects[projectId];
+            },
+            updateCurrentProject : function() {
+                var htmlCode = CloudIde.cm.html.getDoc().getValue();
+                var jsCode = CloudIde.cm.js.getDoc().getValue();
+                var cssCode = CloudIde.cm.css.getDoc().getValue();
+                //Encoding
+                htmlCode =  encodeURI($.base64.encode(htmlCode));
+                jsCode =  encodeURI($.base64.encode(jsCode));
+                cssCode =  encodeURI($.base64.encode(cssCode));
+
+                var cp = CloudIde.getSettings().currentProject;
+                cp.name = CloudIde.editor.getCurrentProjectName();
+                cp.modified = new Date();
+                cp.code.html = htmlCode;
+                cp.code.js = jsCode;
+                cp.code.css = cssCode;
+            },
+            setCurrentProjectById : function(id) {
+                try {
+                    var settings = CloudIde.getSettings();
+                    var project = settings.projects[id];
+                    settings.currentProject = project;
+                    var cached = CloudIde.cm.cache(id);
+                    CloudIde.projectHandler.swapDocs(cached);
+                }
+                catch (err) {
+                    console.log(err.stack);
+                }
+            },
+            swapDocs : function(cache) {
+                var newHtmlDoc,newJsDoc,newCssDoc;
+                var projectId = CloudIde.getSettings().currentProject.id;
+
+                if(cache && cache.length > 2) {
+                    newHtmlDoc = cache[0];
+                    newJsDoc = cache[1];
+                    newCssDoc = cache[2];
+                }
+                else {
+                    var newHtmlCode = CloudIde.getSettings().currentProject.code.html;
+                    var newJsCode = CloudIde.getSettings().currentProject.code.js;
+                    var newCssCode = CloudIde.getSettings().currentProject.code.css;
+
+                    newHtmlDoc = CodeMirror.Doc($.base64.decode(newHtmlCode));
+                    newJsDoc = CodeMirror.Doc($.base64.decode(newJsCode));
+                    newCssDoc = CodeMirror.Doc($.base64.decode(newCssCode));
+                }
+                var oldHtmlDoc = CloudIde.cm.html.swapDoc(newHtmlDoc);
+                var oldJsDoc = CloudIde.cm.js.swapDoc(newJsDoc);
+                var oldCssDoc = CloudIde.cm.css.swapDoc(newCssDoc);
+                CloudIde.cm.cache(projectId,[oldHtmlDoc,oldJsDoc,oldCssDoc]);
+            }
+        },
+        editor : {
+            do : function(actionName,args) {
+                try {
+                    var func = CloudIde.editor[actionName];
+                    CloudIde.editor.apply(CloudIde.editor[actionName],args);
+
+                    //CloudIde.editor[actionName](args);
+                }
+                catch (err) {
+                    console.log(err.message);
+                }
+            },
+            toggleFullscreen : function() {
+                var elem = $(".cldFullscreenBtn");
+                var on,off;
+                if($(elem[0]).hasClass("hidden")) {
+                    off = elem[0];
+                    on = elem[1];
+                }
+                else {
+                    on = elem[0];
+                    off = elem[1];
+                }
+                $(on).addClass("hidden");
+                $(off).removeClass("hidden");
+            },
+            getCurrentProjectName : function() {
+                return $('#cldProjectName').get(0).text;
+            },
+            loadProjectsToExplorer : function() {
+                var projects = CloudIde.projectHandler.getProjects();
+                //Prepare then UL
+                var ul = $('<ul></ul>').addClass("nav").addClass("nav-sidebar");
+                console.log(CloudIde.settings.appSettings);
+                var project;
+                console.log("About to load projects");
+                console.log(JSON.stringify(projects));
+                for(var i = 0 ; i < projects.length ; i++ ) {
+                    project = projects.pop();
+                    var funcDesc = '_cldEditor.editorActions("selectProject",'+project.id+')';
+                    var a = $('<a></a>').attr('href','#').attr('onclick',funcDesc).text(project.name);
+                    var li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false');
+                    li.append(a);
+                    ul.append(li);
+                }
+                $('#cldProjectExplorer').append(ul);
+            },
+            selectProject : function(projectId) {
+                //TODO
+                //Deactivate last 'current project'
+                var lastActiveSelector = '[selectedProject=true]';
+                var lastActive = $(lastActiveSelector).attr('selectedProject','false').removeClass("active");
+                console.log(lastActive);
+                //Activate 'current project'
+                var cssSelector = '[projectId='+projectId+']';
+                var nowActive = $(cssSelector).attr('selectedProject','true').addClass("active");
+                console.log(nowActive);
+                //Bring to scope:
+                CloudIde.projectHandler.setCurrentProjectById(projectId);
+            },
+            createNewProject : function() {
+                var newProject = CloudIde.projectHandler.createNewProjectFromTemplate();
+                CloudIde.projectHandler.addProject(newProject);
+                CloudIde.editor.loadProjectsToExplorer();
+            }
+        },
+        /**
+         * Returns a CodeMirror configuration object, in JSON notation (json string)
+         * of the requested programming language. (codemirror/modes folder)
+         * @param lang the programming language to return it's configuration object
+         * @return JSON notation (json string) configuration object
+         */
+        getCodeMirrorDefaultConfig: function (lang) {
+            var config = {
+                htmlmixed : {
+                    value: "Hello World!\n", //TODO replace with the Document module
+                    mode: {
+                        name: "htmlmixed",
+                        globalVars: true
+                    },
+                    parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                    stylesheet: ["css/xmlcolors.css", "css/jscolors.css", "css/csscolors.css"],
+                    indentUnit: 2, //Integer number for indentation spaces
+                    smartIndent: true, //Indentation is context sensitive (according to the given mode)
+                    tabSize: 2, //width of tabs
+                    indentWithTabs: true, //true means indent with tabs instead of spaces
+                    lineNumbers: true,
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete"
+                    },
+                    gutters: ["CodeMirror-lint-markers"],
+                    getAnnotations: [""],
+                    lint: false,
+                    autoCloseBrackets: true,
+                    path: "js/",
+                    autofocus : true
                 },
-                indentUnit: 2, //Integer number for indentation spaces
-                smartIndent: true, //Indentation is context sensitive (according to the given mode)
-                tabSize: 2, //width of tabs
-                indentWithTabs: true, //true means indent with tabs instead of spaces
-                lineNumbers: true,
-                extraKeys: {
-                    "Ctrl-Space": "autocomplete"
+                js : {
+                    value: "function myScript() {return 100;}\n", //TODO replace with the Document module
+                    mode: {
+                        name: "javascript",
+                        globalVars: true
+                    },
+                    indentUnit: 2, //Integer number for indentation spaces
+                    smartIndent: true, //Indentation is context sensitive (according to the given mode)
+                    tabSize: 2, //width of tabs
+                    indentWithTabs: true, //true means indent with tabs instead of spaces
+                    lineNumbers: true,
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete"
+                    },
+                    gutters: ["CodeMirror-lint-markers"],
+                    lint: true,
+                    autoCloseBrackets: true,
+                    autofocus : true
                 },
-                gutters: ["CodeMirror-lint-markers"],
-                lint: true,
-                autoCloseBrackets: true
+                css : {
+                    value: ".body {}\n", //TODO replace with the Document module
+                    mode: {
+                        name: "css",
+                        globalVars: true
+                    },
+                    indentUnit: 2, //Integer number for indentation spaces
+                    smartIndent: true, //Indentation is context sensitive (according to the given mode)
+                    tabSize: 2, //width of tabs
+                    indentWithTabs: true, //true means indent with tabs instead of spaces
+                    lineNumbers: true,
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete"
+                    },
+                    gutters: ["CodeMirror-lint-markers"],
+                    lint: true,
+                    autoCloseBrackets: true,
+                    autofocus : true
+                }
             };
+            switch (lang) {
+                case "html" : return config.htmlmixed;
+                case "javascript" : return config.js;
+                case "css" : return config.css;
+                default : throw new Error("undefined language");
+            }
         },
         updateStatusBar: function (text, timeout, callback) {
             $('#cldStatusbar').get(0).val(text);
@@ -71,31 +314,29 @@ var _cld = (function() {
             }
             return callback();//TODO check for security and necessity of this op
         },
-        save: function (projectName, code) {
+        save: function () {
+            //Update the current project
+            CloudIde.projectHandler.updateCurrentProject();
+            CloudIde.projectHandler.addCurrentProjectToProjectsArray();
+
+
             var compId;
+            var instanceId;
             try {
-                var instanceId = Wix.Utils.getInstanceId() || "";
-                var compId = Wix.Utils.getOrigCompId() || "";
+                instanceId = Wix.Utils.getInstanceId() || "";
+                compId = Wix.Utils.getOrigCompId() || "";
             }
             catch (err) {
-                console.log(err);
-                compId = "";
-            }
-            //var instance = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-            //var comp = 'TPWdgt-d88e26c-217b-505f-196d-2f6d87f1c2db';
-            if(CloudIde.mode === 'debug') {
-                console.log("about to sent window.debugMode = " + CloudIde.mode);
+                console.log("Not in Wix editor"); //TODO check if in Wix editor
             }
 
-            var codeVal = code;
-            var encodedVal = encodeURI($.base64.encode(codeVal));
-            var currentDate = new Date();
-            //Saving the appSettings JSON
-            CloudIde.settings.appSettings.currentProject = {
-                name: projectName,
-                modified: currentDate,
-                code: encodedVal
-            };
+            if(CloudIde.mode == 'debug') {
+                console.log("about to send window.debugMode = " + CloudIde.mode);
+                compId = 'debug';
+                instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                console.log("set compId to: "+compId);
+            }
+            //Saving the appSettings JSON to the server
             $.ajax({
                 'type': 'post',
                 'url': "/app/save",
@@ -104,12 +345,12 @@ var _cld = (function() {
                 'data': JSON.stringify({
                     compId: compId,
                     settings: CloudIde.settings,
-                    mode: _cld.mode
+                    mode: _cldEditor.mode
                 }),
                 'cache': false,
                 'success': function (res) {
                     console.log("save completed");
-                    if (_cld.mode === "debug") {
+                    if (_cldEditor.mode === "debug") {
                         window.alert("save completed");
                     }
                     else {
@@ -118,7 +359,7 @@ var _cld = (function() {
                     Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
                 },
                 'error': function (res) {
-                    if (_cld.mode === "debug") {
+                    if (_cldEditor.mode === "debug") {
                         console.log('error updating data with message ' + res.responseText);
                     }
                 }
@@ -131,7 +372,7 @@ var _cld = (function() {
         },
         loadCodeMirrorAddon: function (codeMirrorRelPath) {
             var codeMirrorBaseURL = "../static/lib/codemirror/codemirror-4.0/addon/";
-            this.CloudIde.loadjscssfile(codeMirrorBaseURL + codeMirrorRelPath, "js");
+            CloudIde.loadjscssfile(codeMirrorBaseURL + codeMirrorRelPath, "js");
 
 
 //        $.getScript(codeMirrorBaseURL+codeMirrorRelPath, function( data, textStatus, jqxhr ) {
@@ -160,70 +401,97 @@ var _cld = (function() {
         replaceDoc: function () {
             var text = "<script src=\"lib/codemirror.js\"></script>\n<link rel=\"stylesheet\" href=\"../lib/codemirror.css\">\n<script src=\"mode/javascript/javascript.js\"></script>\n";
             return CloudIde.cm.swapDoc(CodeMirror.Doc(text, "javascript", 1));
-        },
-        loadProjectsToExplorer: function () {
-            $.ajax({
-                'type': 'post',
-                'url': "/app/update",
-                'dataType': "json",
-                'contentType': 'application/json; chatset=UTF-8',
-                'data': JSON.stringify({
-                    mode: window.debugMode,
-                    compId: Wix.Utils.getOrigCompId(),
-                    appData: {
-                        appData: null,
-                        document: null,
-                        command: 'updateProjectView'
-                    }}),
-                'cache': false,
-                'success': function (res) {
-                    console.log("update setting completed");
-                    //Update display with results:
-                    console.log("logged success func ret val: " + res);
-
-                    var cldPrjExplorer = $('#cldPro').get(0);
-                    console.log("parsed data: " + JSON.parse(res));
-
-                    return res;
-                },
-                'error': function (res) {
-                    console.log('error updating data with message ' + res.responseText);
-                }
-            });
         }
     };
-        // Public functions
-        return {
-            init: function(){
-                var cldTextArea = $('#cldEditorTextArea');
-                if (cldTextArea.length === 0) {
-                    cldTextArea = $('<textarea id="cldEditorTextArea"></textarea>').appendTo('#cldEditor').get(0);
+    // Public functions
+    return {
+        init: function(settings){
+            if(settings) {
+                if(settings.appSettings.currentProject == undefined || settings.appSettings.projects == undefined) {
+                    //skip setting the new setting
                 }
-                //Initialize CodeMirror
-                CloudIde.cm = CodeMirror.fromTextArea(cldTextArea, CloudIde.getCodeMirrorConfig());
-
-                //Initialize settings
-                if (_cld.mode !== "debug") {
-                    saveSettings();
+                else {
+                    CloudIde.settings = settings;
                 }
-
-                //Initialize menu segment
-                //Initialize project explorer segment
-                //Initialize buttons
-
-                //Initialize status bar segment
-                //Load add-ons
-                //TODO load it dynamically
-                //CloudIde.loadAllCodeMirrorAddons();
-
-
-                //finally
-            },
-            save: function() {
-                var name = $(cldProjectName)[0].text;
-                CloudIde.save(name,CloudIde.cm.getDoc().getValue());
+                console.log("new settings is:");
+                console.log(CloudIde.settings);
             }
-        };
+            else {
+                console.log("Error initializing, settings is:");
+                console.log(settings);
+            }
+            //Initialize template project
+            if(CloudIde.getSettings().currentProject == undefined) {
+                var blankProject = CloudIde.projectHandler.createNewProjectFromTemplate();
+                CloudIde.getSettings().currentProject = blankProject;
+                CloudIde.projectHandler.setCurrentProjectById(blankProject.id);
+            }
+
+            //Initialize menu segment
+            //Initialize project explorer segment
+            //Initialize Editor tab buttons
+            $('#cldEditorTabs a[href="#cldEditorHtml"]').click(function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+            $('#cldEditorTabs a[href="#cldEditorJs"]').click(function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+            $('#cldEditorTabs a[href="#cldEditorCss"]').click(function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+
+            //Initialize Editor tab event listeners
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                //e.target // activated tab
+                //e.relatedTarget // previous tab
+                switch (e.target.innerHTML) {
+                    case "CSS" : CloudIde.cm.css.refresh();break;
+                    case "JavaScript" : CloudIde.cm.js.refresh();break;
+                    case "HTML" : CloudIde.cm.html.refresh();
+                }
+            });
+
+            //Initialize status bar segment
+            var cldTextAreaHtml = document.getElementById('cldEditorHtmlTextArea');
+            var cldTextAreaJs = document.getElementById('cldEditorJsTextArea');
+            var cldTextAreaCss = document.getElementById('cldEditorCssTextArea');
+            CloudIde.cm.css = CodeMirror.fromTextArea(cldTextAreaCss, CloudIde.getCodeMirrorDefaultConfig("css"));
+            CloudIde.cm.js = CodeMirror.fromTextArea(cldTextAreaJs, CloudIde.getCodeMirrorDefaultConfig("javascript"));
+            CloudIde.cm.html = CodeMirror.fromTextArea(cldTextAreaHtml, CloudIde.getCodeMirrorDefaultConfig("html"));
+            //Initialize settings
+            if (_cldEditor.mode !== "debug") {
+                //saveSettings();
+            }
+            //Load add-ons
+            //TODO load it dynamically
+            //CloudIde.loadAllCodeMirrorAddons();
+
+
+
+            //finally, load projects
+            CloudIde.editor.loadProjectsToExplorer();
+            //release global
+        },
+        save: function() {
+            CloudIde.save();
+        },
+        preview: function() {
+            alert("Hasn't been implemented yet!");
+        },
+        //Exposes the project handler
+        getProjectHandler: function() {
+            return CloudIde.projectHandler;
+        },
+        editorActions : function(actionName,args) {
+            CloudIde.editor[actionName](args);
+        },
+        cldDebug : function() {
+            return CloudIde;
+        }
+    };
 }());
 
 // load google feed scripts - should be done in the beginning
@@ -231,18 +499,17 @@ var _cld = (function() {
 
 $(document).ready(function() {
     //TODO move 'settings' to private (CloudIde) object
-    //When this val is set to true, the app will skip authentication for the update endpoints
-    if(window.location.origin == "http://localhost:8080") { //TODO replace with GET param
-        _cld.mode = "debug";
-    }
-    else {
-        _cld.mode = "";
-    }
+//    //When this val is set to true, the app will skip authentication for the update endpoints
+//    if(window.location.origin == "http://localhost:8080") { //TODO replace with GET param
+//        _cldEditor.mode = "debug";
+//    }
+//    else {
+//        _cldEditor.mode = "";
+//    }
     try {
-        _cld.settings = settings;
+        _cldEditor.init(window.settings);
     }
     catch (err) {
-        _cld.settings = {};
+        console.log(err.stack);
     }
-    _cld.init();
 });

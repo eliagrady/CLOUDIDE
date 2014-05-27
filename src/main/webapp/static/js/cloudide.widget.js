@@ -7,7 +7,7 @@
 /**
 * Class containing widget property and functions
 */
-var _cld = (function() {
+var _cldWidget = (function() {
     /**
      * Load the feed content using google API
      */
@@ -87,6 +87,9 @@ var _cld = (function() {
         if(Wix.Utils.getViewMode() !== 'site') {
             $('<div id="cldEditorOpen" class="round_shadow_button">edit</div>').appendTo('#body');
         }
+        else {
+            return;
+        }
 
         $('#cldEditorOpen').hover(
             //on mouseover
@@ -123,8 +126,13 @@ var _cld = (function() {
                     Wix.openModal(localUrl,window.screen.width*0.8, window.screen.height*0.6,onClose);
                 }
                 else {
-                    var url = 'http://wixcloudide.appspot.com/app/editor?instanceId=${appInstance.getInstanceId()}';
+                    //TODO change compId logic?
+                    var compId = Wix.Utils.getCompId();
+                    var instanceId = Wix.Utils.getInstanceId();
+                    //var url = 'http://wixcloudide.appspot.com/app/editor?instanceId='+instanceId+"&compId="+compId;
+                    var url = 'http://wixcloudide.appspot.com/app/editor';
                     Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
+                    //http://wixcloudide.appspot.com/app/editor?instanceId=134915a5-1abd-e7ef-b605-6ed8061489f5&cacheKiller=140106326518122&compId=TPMdl7-bpi&deviceType=desktop&instance=ZtHW253uXw_R4tdcQU0gnu0kgoaugDg89fcnRrkuE6A.eyJpbnN0YW5jZUlkIjoiMTM0OTE1YTUtMWFiZC1lN2VmLWI2MDUtNmVkODA2MTQ4OWY1Iiwic2lnbkRhdGUiOiIyMDE0LTA1LTI1VDE4OjMwOjMyLjI0Mi0wNTowMCIsInVpZCI6ImMwYTNkN2IzLThjOTAtNGIzYy1iZmZhLTUwOTI2NDljY2MzYSIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJpcEFuZFBvcnQiOiIxMDkuNjUuMzguMTg1LzYzOTc2IiwiZGVtb01vZGUiOmZhbHNlfQ&locale=en&viewMode=preview&origCompId=TPWdgt4-5aq
                 }
             }
         );
@@ -133,19 +141,42 @@ var _cld = (function() {
     function appendCode() {
         //Validate appData for malicious code!
         //$('#hero').innerHTML = appData.appData;
-        $('#hero').append(_cld.currentProject.code);
-        //$('#hero').append(this.appData.appData);
-        console.log("appended appData:" + this.currentProject.code);
-        //console.log("appended appData.appData:" + this.appData.appData);
+        var codeHtml = Base64.decode(decodeURI(_cldWidget.currentProject.code.html));
+        var codeJs = Base64.decode(decodeURI(_cldWidget.currentProject.code.js));
+        var codeCss = Base64.decode(decodeURI(_cldWidget.currentProject.code.css));
+        $('#cldJs').html(codeJs);
+        $('#cldCss').html(codeCss);
+        $('#cldHtml').html(codeHtml);
     }
 
     // Public functions
     return {
-        init: function(){
+        init: function(currentProject){
+            _cldWidget.currentProject = currentProject;
+            //When this val is set to true, the app will skip authentication for the update endpoints
+//            if(window.location.origin == "http://localhost:8080") {
+//                _cldWidget.mode = "debug";
+//            }
+//            else {
+//                _cldWidget.mode = "";
+//            }
             //applySettings();
             //loadFeed();
-            custom();
-            appendCode();
+            try{
+                custom();
+            }
+            catch (err) {
+
+            }
+            try {
+                appendCode();
+                console.log("code injected");
+            }
+            catch (err) {
+                console.log("failed injecting code!");
+            }
+            //Release global
+            //currentProject = undefined;
         }
     };
 
@@ -155,12 +186,10 @@ var _cld = (function() {
 
 $(document).ready(function() {
     try {
-        _cld.currentProject = currentProject;
+        _cldWidget.init(currentProject);
     }
     catch (err) {
-        _cld.currentProject = {};
+        console.log("init failed:");
+        console.log(err);
     }
-    _cld.init();
-    //Release global
-    currentProject = undefined;
 });

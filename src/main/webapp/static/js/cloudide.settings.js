@@ -7,7 +7,7 @@
 /**
  * Class containing widget property and functions
  */
-var _cld = (function() {
+var _cldSettings = (function() {
     /**
      * Init the input elements
      * Init the input  with a start value, a one that was saved in the DB or a default one
@@ -167,11 +167,7 @@ var _cld = (function() {
     // Public functions
     return {
         init: function(){
-            // Getting newSettings that was set as parameter in settings.vm
-            // Check that newSettings is initialized with value
-            appSettings.settings = cldSettings || {};
-
-            applySettings();
+            //applySettings();
             //displayHeader();
             bindEvents();
             bindEdit();
@@ -185,32 +181,19 @@ var _cld = (function() {
 //google.load("feeds", "1");
 
 $(document).ready(function() {
+    //TODO move 'settings' to private (CloudIde) object
+    //When this val is set to true, the app will skip authentication for the update endpoints
+    if(window.location.origin == "http://localhost:8080") { //TODO replace with GET param
+        _cldSettings.mode = "debug";
+    }
+    else {
+        _cldSettings.mode = "";
+    }
     try {
-        _cld.currentProject = currentProject;
+        _cldSettings.settings = cldSettings;
     }
     catch (err) {
-        _cld.currentProject = {};
+        _cldSettings.settings = {};
     }
-    _cld.init();
+    _cldSettings.init();
 });
-
-//function updateSettings(settingsJson) {
-//    var settingsStr = JSON.stringify(settingsJson) || "";
-//    var compId = Wix.Utils.settingsJson();
-//    $.ajax({
-//        'type': 'post',
-//        'url': "/app/settingsupdate?instance=" + appSettings.instance ,
-//        'data': JSON.stringify(
-//            {
-//                compId: Wix.Utils.getOrigCompId(), settings: settingsStr}),
-//        'cache': false,
-//        'success': function(res) {
-//            console.log("update setting completed");
-//            appSettings.settings = settingsJson;
-//            Wix.Settings.refreshAppByCompIds(compId);
-//        },
-//        'error': function(res) {
-//            console.log('error updating data to the app server');
-//        }
-//    });
-//}

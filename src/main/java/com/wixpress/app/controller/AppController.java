@@ -33,6 +33,7 @@ import java.util.UUID;
 @RequestMapping(value = "/app")
 public class AppController {
 
+    private static final String DEBUG = "debug";
     @Resource
     private AppDao appDao;
 
@@ -297,9 +298,13 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "_self") String target,
                                    @RequestParam(required = false, defaultValue = "200") Integer width,
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
-                                   @RequestParam(required = false, defaultValue = "site") String viewMode) throws IOException {
+                                   @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                   @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
+        if(mode != null && mode.equals(DEBUG)) {
+            model.addAttribute("mode","debug");
+        }
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
     }
 

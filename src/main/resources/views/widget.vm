@@ -11,35 +11,27 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
     <script src="../static/js/cloudide.widget.js"></script>
-    <script src="../static/js/common.js"></script>
     <script src="../static/lib/jquery/jquery.base64.min.js"></script>
     <script src="../static/lib/base64.js"></script>
     <!-- Initialization  -->
     <script type="text/javascript">
-        //When this val is set to true, the app will skip authentication for the update endpoints
-        if(window.location.origin == "http://localhost:8080") {
-            window._cld.mode = "debug";
-        }
-        else {
-            window._cld.mode = "";
-        }
         currentProject = ${currentProject};
         console.log("Inspection START");
         console.log(currentProject);
         console.log(currentProject.name);
         console.log(currentProject.modified);
-        console.log(decodeURI(currentProject.code));
-        console.log(btoa(decodeURI(currentProject.code)));
-        console.log(Base64.decode(decodeURI(currentProject.code)));
-
-        currentProject.code = Base64.decode(decodeURI(currentProject.code));
-
         console.log(currentProject.code)
         console.log("Inspection END");
         console.log("---------------");
     </script>
+    <!-- Insert CSS here -->
+    <style type="text/css" id="cldCss"></style>
+    <!-- Insert JS here -->
+    <script type="text/javascript" id="cldJs"></script>
 </head>
+
 <body id="body">
-<div id="hero"></div>
+<!-- Insert HTML here -->
+<div id="cldHtml"></div>
 </body>
 </html>
