@@ -53,7 +53,7 @@ var _cldEditor = (function() {
                 modified : new Date()
             },
             getProjects : function() {
-                return CloudIde.projects;
+                return CloudIde.getSettings().projects;
             },
             addProject : function(project) {
                 var context = this.getProjects();
