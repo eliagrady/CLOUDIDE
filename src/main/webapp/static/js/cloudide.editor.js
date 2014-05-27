@@ -11,20 +11,8 @@ var _cldEditor = (function() {
         settings: {
             appSettings: {
                 //Active project in editor
-                currentProject : {
-                    id : 0,
-                    code : {
-                        html : "",
-                        js : "",
-                        css : ""
-                    }, //Base64 encoded strings
-                    name : "New project",
-                    created : new Date(),
-                    modified : new Date()
-                },
-                projects : {
-                    length : 0
-                }
+                currentProject : {},
+                projects : []
             }
         },
         //CodeMirror instances
@@ -49,8 +37,9 @@ var _cldEditor = (function() {
         projectHandler : {
             currentId : 0,
             nextId : function() {
-                CloudIde.projectHandler.currentId += 1;
-                return CloudIde.projectHandler.currentId;
+                this.currentId +=1;
+                var id = this.currentId;
+                return id;
             },
             projectTemplate : {
                 id : 0,
@@ -64,12 +53,13 @@ var _cldEditor = (function() {
                 modified : new Date()
             },
             getProjects : function() {
-                return CloudIde.settings.appSettings.projects;
+                return CloudIde.projects;
             },
             addProject : function(project) {
-                var context = CloudIde.settings.appSettings.projects;
-                var length = Array.prototype.push.call(context,project);
-                //var length = CloudIde.settings.appSettings.projects.push(project);
+                var context = this.getProjects();
+                //var length = Array.prototype.push.call(context,project);
+                var length = context.push(project);
+
                 console.log("=================");
                 console.log(length+ " projects listed:");
                 for(var prj in context) {
@@ -101,12 +91,13 @@ var _cldEditor = (function() {
                 var newProject = JSON.parse(JSON.stringify(CloudIde.projectHandler.projectTemplate));
                 //var newProject = clone(CloudIde.projectHandler.projectTemplate);
                 //Change ID:
-                newProject.id = new CloudIde.projectHandler.nextId();
+                var nextId = CloudIde.projectHandler.nextId();
+                newProject.id = nextId;
                 newProject.created = new Date();
                 return newProject;
             },
             addCurrentProjectToProjectsArray : function() {
-                CloudIde.projectHandler.addProject(CloudIde.settings.appSettings.currentProject);
+                CloudIde.projectHandler.addProject(CloudIde.getSettings().currentProject);
             },
             deleteProject : function(projectId) {
                 delete CloudIde.getSettings().projects[projectId];
@@ -196,10 +187,7 @@ var _cldEditor = (function() {
                 var projects = CloudIde.projectHandler.getProjects();
                 //Prepare then UL
                 var ul = $('<ul></ul>').addClass("nav").addClass("nav-sidebar");
-                console.log(CloudIde.settings.appSettings);
                 var project;
-                console.log("About to load projects");
-                console.log(JSON.stringify(projects));
                 for(var i = 0 ; i < projects.length ; i++ ) {
                     project = projects.pop();
                     var funcDesc = '_cldEditor.editorActions("selectProject",'+project.id+')';
@@ -211,15 +199,14 @@ var _cldEditor = (function() {
                 $('#cldProjectExplorer').append(ul);
             },
             selectProject : function(projectId) {
-                //TODO
                 //Deactivate last 'current project'
                 var lastActiveSelector = '[selectedProject=true]';
                 var lastActive = $(lastActiveSelector).attr('selectedProject','false').removeClass("active");
-                console.log(lastActive);
+                //console.log(lastActive);
                 //Activate 'current project'
                 var cssSelector = '[projectId='+projectId+']';
                 var nowActive = $(cssSelector).attr('selectedProject','true').addClass("active");
-                console.log(nowActive);
+                //console.log(nowActive);
                 //Bring to scope:
                 CloudIde.projectHandler.setCurrentProjectById(projectId);
             },
@@ -412,9 +399,9 @@ var _cldEditor = (function() {
                 }
                 else {
                     CloudIde.settings = settings;
+                    CloudIde.currentProject = settings.appSettings.currentProject;
+                    CloudIde.projects = settings.appSettings.projects;
                 }
-                console.log("new settings is:");
-                console.log(CloudIde.settings);
             }
             else {
                 console.log("Error initializing, settings is:");
@@ -426,6 +413,7 @@ var _cldEditor = (function() {
                 CloudIde.getSettings().currentProject = blankProject;
                 CloudIde.projectHandler.setCurrentProjectById(blankProject.id);
             }
+
 
             //Initialize menu segment
             //Initialize project explorer segment
