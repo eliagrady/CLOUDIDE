@@ -50,7 +50,7 @@
             <!-- Fullscreen on/off toggle-->
             <div class="nav navbar-nav navbar-right headerPadding">
                 <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
-                    <span width="50" class="glyphicon glyphicon-resize-full cldFullscreenBtn"></span>
+                    <span width="50" class="glyphicon glyphicon-fullscreen cldFullscreenBtn"></span>
                     <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
                 </button>
             </div>
@@ -82,9 +82,8 @@
                 <ul class="nav nav-sidebar">
                     <li><a href="#" onclick="_cldEditor.editorActions('createNewProject')">Create new Project</a></li>
                 </ul>
+                <!-- List projects here -->
                 <ul class="nav nav-sidebar">
-                    <!-- List projects here -->
-                    <!--<li class="active"><a href="#">Default Project</a></li>-->
                 </ul>
             </div>
         </div>
@@ -207,6 +206,7 @@
 <script type="text/javascript">
     //Create and bind global
     var settings = $!{cldAppSettings};
+    var debugMode = $!{mode};
 </script>
 </body>
 </html>

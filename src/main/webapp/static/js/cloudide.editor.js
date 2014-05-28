@@ -33,13 +33,29 @@ var _cldEditor = (function() {
         getSettings: function () {
             return CloudIde.settings.appSettings;
         },
+        /**
+         * Debugger methods for console output (console can be any object with the .log function)
+         */
+        debugger : {
+            listProjects : function(console) {
+                var settings = CloudIde.getSettings();
+                var length = settings.projects.length;
+                console.log("=================");
+                console.log(length+ " projects listed:");
+                for(var i = 0 ; i < length ; i++){
+                    console.log('Item', settings.projects[i]);
+                }
+                console.log("=================");
+            }
+        },
         //here we will add callbacks to update the status bar if necessary
         projectHandler : {
-            currentId : 0,
             nextId : function() {
-                this.currentId +=1;
-                var id = this.currentId;
-                return id;
+                return Math.uuidFast();
+
+//                this.currentId +=1;
+//                var id = this.currentId;
+//                return id;
             },
             projectTemplate : {
                 id : 0,
@@ -52,20 +68,54 @@ var _cldEditor = (function() {
                 created : new Date(),
                 modified : new Date()
             },
+            getCurrentProject : function() {
+                return CloudIde.getSettings().currentProject;
+            },
+            getCurrentProjectId : function() {
+                return CloudIde.getSettings().currentProject.id;
+            },
             getProjects : function() {
                 return CloudIde.getSettings().projects;
             },
-            addProject : function(project) {
-                var settings=CloudIde.getSettings();
-                //var length = Array.prototype.push.call(settings.projects,project);
-                var length = settings.projects.push(project);
-
-                console.log("=================");
-                console.log(length+ " projects listed:");
-                for(var i=0;i<length;i++){
-                    console.log('Item', settings.projects[i]);
+            getProjectById : function(projectId) {
+                var settings = CloudIde.getSettings();
+                var projects = settings.projects;
+                for(var i = 0 ; i < projects.length ; i++) {
+                    var project = projects[i];
+                    console.log("projectId passed: "+ projectId);
+                    console.log("currentlyChecking: "+ project.id);
+                    if(project.id == projectId) {
+                        return project;
+                    }
                 }
-                console.log("=================");
+                return null;
+            },
+            addProject : function(project) {
+                var settings = CloudIde.getSettings();
+                //var length = Array.prototype.push.call(settings.projects,project);
+                settings.projects.push(project);
+                CloudIde.debugger.listProjects(console);
+            },
+            /**
+             * Deletes a given project (can either be the actual object, or it's id)
+             * @param project either the actual object, or it's id
+             */
+            deleteProject : function(project) {
+                var settings = CloudIde.getSettings();
+                var projects = settings.projects;
+                //var length = Array.prototype.push.call(settings.projects,project);
+                if(typeof project === "string") {
+                    project = this.getProjectById(project);
+                    if(project === null) {
+                        throw new Error("projectId not found!");
+                    }
+                }
+
+                var index = settings.projects.indexOf(project);
+                if(index > -1) {
+                    settings.projects.splice(index,1);
+                }
+                CloudIde.debugger.listProjects(console);
             },
             createNewProjectFromTemplate : function() {
 //                //Save current project before creating a new one
@@ -99,10 +149,11 @@ var _cldEditor = (function() {
             addCurrentProjectToProjectsArray : function() {
                 CloudIde.projectHandler.addProject(CloudIde.getSettings().currentProject);
             },
-            deleteProject : function(projectId) {
-                delete CloudIde.getSettings().projects[projectId];
-            },
             updateCurrentProject : function() {
+                var cp = CloudIde.getSettings().currentProject;
+                if(cp === undefined) {
+                    throw new Error("Current project is undefined!");
+                }
                 var htmlCode = CloudIde.cm.html.getDoc().getValue();
                 var jsCode = CloudIde.cm.js.getDoc().getValue();
                 var cssCode = CloudIde.cm.css.getDoc().getValue();
@@ -118,12 +169,12 @@ var _cldEditor = (function() {
                 cp.code.js = jsCode;
                 cp.code.css = cssCode;
             },
-            setCurrentProjectById : function(id) {
+            setCurrentProjectById : function(projectId) {
                 try {
                     var settings = CloudIde.getSettings();
-                    var project = settings.projects[id];
+                    var project = this.getProjectById(projectId);
                     settings.currentProject = project;
-                    var cached = CloudIde.cm.cache(id);
+                    var cached = CloudIde.cm.cache(projectId);
                     CloudIde.projectHandler.swapDocs(cached);
                 }
                 catch (err) {
@@ -155,17 +206,6 @@ var _cldEditor = (function() {
             }
         },
         editor : {
-            do : function(actionName,args) {
-                try {
-                    var func = CloudIde.editor[actionName];
-                    CloudIde.editor.apply(CloudIde.editor[actionName],args);
-
-                    //CloudIde.editor[actionName](args);
-                }
-                catch (err) {
-                    console.log(err.message);
-                }
-            },
             toggleFullscreen : function() {
                 var elem = $(".cldFullscreenBtn");
                 var on,off;
@@ -181,41 +221,88 @@ var _cldEditor = (function() {
                 $(off).removeClass("hidden");
             },
             getCurrentProjectName : function() {
-                return $('#cldProjectName').get(0).text;
+                var selectedProjectSelector = '[selectedProject=true]';
+                return $(selectedProjectSelector).text();
             },
             loadProjectsToExplorer : function() {
+                var currentlySelectedProjectId = CloudIde.projectHandler.getCurrentProjectId();
                 var projects = CloudIde.projectHandler.getProjects();
                 //Prepare then UL
                 var ul = $('<ul></ul>').addClass("nav").addClass("nav-sidebar").addClass('projects');
-                var project;
-                for(var i = 0 ; i < projects.length ; i++ ) {
-                    project = projects[i];
-                    var funcDesc = '_cldEditor.editorActions("selectProject",'+project.id+')';
-                    var a = $('<a></a>').attr('href','#').attr('onclick',funcDesc).text(project.name);
-                    var li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false');
-                    li.append(a);
-                    ul.append(li);
+                //Case no projects are found
+                if(projects.length === 0) {
+                    var no_projects = $('<span></span>').text("Project list is empty!").addClass('col-sm-12');
+                    var li_noProjects = $('<li></li>').addClass('row-fluid');
+                    li_noProjects.append(no_projects);
+                    ul.append(li_noProjects);
+                }
+                //Case there are some projects listed
+                else {
+                    var project;
+                    for(var i = 0 ; i < projects.length ; i++ ) {
+                        project = projects[i];
+                        var a_projectName_fn = '_cldEditor.editorActions("selectProject","'+project.id+'")';
+                        var a_projectDel_fn = '_cldEditor.editorActions("deleteProjectById","'+project.id+'")';
+                        var a_projectSettings_fn = '_cldEditor.editorActions("editProjectSettingsById","'+project.id+'")';
+                        var a_projectName = $('<a></a>').attr('href','#').attr('onclick',a_projectName_fn).text(project.name).addClass('col-sm-8');
+                        var a_projectDel_icon = $('<span></span>').addClass('glyphicon').addClass('glyphicon-remove').addClass('showme');
+                        var a_projectDel = $('<a></a>').attr('href','#').attr('onclick',a_projectDel_fn).addClass('col-sm-1').addClass('showhim');
+                        a_projectDel.append(a_projectDel_icon);
+                        var a_projectSettings_icon = $('<span></span>').addClass('glyphicon').addClass('glyphicon-cog').addClass('showme');
+                        var a_projectSettings = $('<a></a>').attr('href','#').attr('onclick',a_projectSettings_fn).addClass('col-sm-1').addClass('showhim');
+                        a_projectSettings.append(a_projectSettings_icon);
+                        var li;
+                        console.log(typeof currentlySelectedProjectId);
+                        console.log("currentlySelectedProjectId:"+currentlySelectedProjectId);
+                        console.log("compare with: "+project.id);
+                        console.log("they are " + ((project.id == currentlySelectedProjectId)?"equal":"different"));
+
+
+                        if(project.id == currentlySelectedProjectId) {
+                            li = $('<li></li>').attr('projectId', project.id).attr('selectedProject', 'true').addClass('row-fluid');
+                        }
+                        else {
+                            li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false').addClass('row-fluid');
+                        }
+                        li.append(a_projectName);
+                        li.append(a_projectSettings);
+                        li.append(a_projectDel);
+                        ul.append(li);
+                    }
                 }
                 $('#cldProjectExplorer').find('.projects').remove();
                 $('#cldProjectExplorer').append(ul);
-            },
-            selectProject : function(projectId) {
+
+
+                //Mark selected project:
                 //Deactivate last 'current project'
                 var lastActiveSelector = '[selectedProject=true]';
                 var lastActive = $(lastActiveSelector).attr('selectedProject','false').removeClass("active");
                 //console.log(lastActive);
                 //Activate 'current project'
-                var cssSelector = '[projectId='+projectId+']';
+                var cssSelector = '[projectId='+currentlySelectedProjectId+']';
                 var nowActive = $(cssSelector).attr('selectedProject','true').addClass("active");
                 //console.log(nowActive);
+            },
+            selectProject : function(projectId) {
                 //Bring to scope:
                 CloudIde.projectHandler.setCurrentProjectById(projectId);
+                CloudIde.editor.loadProjectsToExplorer();
+            },
+            deleteProjectById : function(projectId) {
+                CloudIde.projectHandler.deleteProject(projectId);
+                CloudIde.editor.loadProjectsToExplorer();
             },
             createNewProject : function() {
                 var newProject = CloudIde.projectHandler.createNewProjectFromTemplate();
-
                 CloudIde.projectHandler.addProject(newProject);
-                CloudIde.editor.loadProjectsToExplorer();
+                if(CloudIde.projectHandler.getProjects().length === 1) {
+                    //First project, select it!
+                    CloudIde.editor.selectProject(newProject.id);
+                }
+                else {
+                    CloudIde.editor.loadProjectsToExplorer();
+                }
             }
         },
         /**
@@ -401,8 +488,6 @@ var _cldEditor = (function() {
                 }
                 else {
                     CloudIde.settings = settings;
-                    CloudIde.currentProject = settings.appSettings.currentProject;
-                    CloudIde.projects = settings.appSettings.projects;
                 }
             }
             else {
@@ -455,6 +540,31 @@ var _cldEditor = (function() {
             if (_cldEditor.mode !== "debug") {
                 //saveSettings();
             }
+
+            //Initialize UUID generator
+            var res;
+            try {
+                var res = $.getScript("../static/lib/Math.uuid.js");
+            }
+            catch (err) {
+
+            }
+            finally {
+                //If the UUID script did not load, use fallback:
+                //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+                if(!(res && res.status === 200)) {
+                    CloudIde.projectHandler.nextId = function() {
+                        var d = new Date().getTime();
+                        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                            var r = (d + Math.random()*16)%16 | 0;
+                            d = Math.floor(d/16);
+                            return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+                        });
+                        return uuid;
+                    };
+                }
+            }
+
             //Load add-ons
             //TODO load it dynamically
             //CloudIde.loadAllCodeMirrorAddons();
@@ -498,14 +608,13 @@ $(document).ready(function() {
 //    }
     try {
         _cldEditor.init(window.settings);
+        _cldEditor.mode = debugMode;
+        debugMode = undefined;
     }
     catch (err) {
         console.log(err.stack);
     }
-
-    window.code=_cldEditor.cldDebug();
-    console.log('projects', code.getSettings().projects);
-    code.projectHandler.addProject({test:1});
+    window.debug = _cldEditor.cldDebug();
 });
 
 

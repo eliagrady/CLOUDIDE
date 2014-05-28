@@ -57,3 +57,9 @@
 .headerPadding {
     padding: 10px;
 }
+.showme {
+    display: none;
+}
+.showhim:hover .showme {
+    display : block;
+}
