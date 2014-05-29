@@ -18,15 +18,20 @@ public class AjaxResult
 
     public AjaxResult(boolean isOk) {
         this.isOk = isOk;
+        this.error = getError();
+        this.stackTrace = getStackTrace();
+        this.retData = getRetData();
     }
 
     public AjaxResult(boolean ok, String error, String stackTrace) {
-        isOk = ok;
+        this.isOk = ok;
         this.error = error;
         this.stackTrace = stackTrace;
+        this.retData = getRetData();
     }
 
-    public AjaxResult(boolean b, String data) {
+    public AjaxResult(boolean ok, String data) {
+        this.isOk = ok;
         this.retData = data;
     }
 
@@ -85,5 +90,10 @@ public class AjaxResult
             stackTrace.append("caused by ").append(e.getCause().getClass()).append(" - ").append(e.getCause().getMessage()).append("\n");
             renderStackTrace(e.getCause(), stackTrace);
         }
+    }
+
+    @Nullable
+    public String getRetData() {
+        return retData;
     }
 }

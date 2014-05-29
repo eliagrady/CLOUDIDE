@@ -1,56 +1,55 @@
-///* cloud ide editor javascript */
+//function doTask1(){
+//    // Create a new process.
+//    var defer = $.Deferred();
 //
-///*jslint browser: true*/
-///*global $, jQuery, CodeMirror, Wix, console, window*/
+//    // Start main task in the process.
+//    setTimeout(function(){
+//        var rslt = Math.floor(Math.random() * 10);
+//        console.log("Task 1 returned " + rslt);
 //
-///**
-// * This function init the settings object with default values or with values that were saved in the DB
-// */
+//        // End the process after successful finish.
+//        // Pass the result to callbacks.
+//        defer.resolve(rslt);
+//    }, 500);
 //
-//function saveSettings(settingsJson) {
-//    "use strict";
-//    var settingsStr = JSON.stringify(settingsJson) || "";
-//    var compId = Wix.Utils.getOrigCompId();
-//    var date = new Date().toDateString();
-//    $.ajax({
-//        'type': 'post',
-//        'url': "/app/settingsupdate",
-//        'dataType': "json",
-//        'contentType': 'application/json; chatset=UTF-8',
-//        'data': JSON.stringify({compId: Wix.Utils.getOrigCompId(), settings: {
-//            appSettings: settingsJson,
-//            title: date
-//        }}),
-//        'cache': false,
-//        'success': function (res) {
-//            console.log("update setting completed");
+//    // Return read-only version of the process.
+//    return defer.promise();
+//}
 //
-//            Wix.Settings.refreshAppByCompIds(compId);
-//        },
-//        'error': function (res) {
-//            console.log('error updating data with message ' + res.responseText);
-//        }
+//function addTask(i){
+//    var defer = $.Deferred();
+//    setTimeout(function(){
+//        var rslt = Math.floor(Math.random() * 10);
+//        console.log("addTask finished with " + rslt);
+//        defer.resolve(i + rslt);
+//    }, 500);
+//    return defer.promise();
+//}
+//
+//function multiplyTask(i){
+//    var defer = $.Deferred();
+//    setTimeout(function(){
+//        var rslt = Math.floor(Math.random() * 10);
+//        console.log("multiplyTask finished with " + rslt);
+//        defer.resolve(i * rslt);
+//    }, 500);
+//    return defer.promise();
+//}
+//
+//$(function(){
+//    // Start task1 in a new process.
+//    var task1 = doTask1();
+//
+//    // Chain next task in a 2nd process based on task1's result.
+//    var final = task1.then(function(rslt){
+//        if(rslt >= 5)
+//            return addTask(rslt);
+//        else
+//            return multiplyTask(rslt);
 //    });
-//}
 //
-///**
-// * This function init the settings object with default values or with values that were saved in the DB
-// */
-//function applySettings() {
-//    // App Settings Json
-//    appSettings.settings.appSettings = appSettings.settings.appSettings || {};
-//
-//    // App Settings title
-//    appSettings.settings.title = appSettings.settings.title || "Default title";
-//}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+//    // Attach success callback to 2nd process.
+//    final.done(function(rslt){
+//        console.log("All tasks finished with " + rslt);
+//    });
+//});

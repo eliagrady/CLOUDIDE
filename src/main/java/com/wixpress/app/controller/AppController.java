@@ -63,9 +63,13 @@ public class AppController {
                          @RequestParam(required = false) String target,
                          @RequestParam Integer width,
                          @RequestParam String compId,
-                         @RequestParam String viewMode) throws IOException {
+                         @RequestParam String viewMode,
+                         @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         model.addAttribute("appInstance",appInstance);
+        if(mode != null) {
+            model.addAttribute("mode",mode);
+        }
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
 
     }
@@ -91,13 +95,17 @@ public class AppController {
                          @RequestParam(required = false) String target,
                          @RequestParam(required = false)Integer width,
                          @RequestParam String compId,
-                         @RequestParam String viewMode) throws IOException {
+                         @RequestParam String viewMode,
+                         @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         //Add Cookie:
         response.addCookie(new Cookie("instance",instance));
         //fallback to default width
         if(width == null) {
             width = 500;
+        }
+        if(mode != null) {
+            model.addAttribute("mode",mode);
         }
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
 
@@ -122,10 +130,14 @@ public class AppController {
                            @RequestParam(required = false) Integer width,
                            @RequestParam String locale,
                            @RequestParam String origCompId,
-                           @RequestParam String compId) throws IOException {
+                           @RequestParam String compId,
+                           @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         response.addCookie(new Cookie("instance", instance));
         model.addAttribute("appInstance",appInstance);
+        if(mode != null) {
+            model.addAttribute("mode",mode);
+        }
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
     }
 
@@ -271,6 +283,39 @@ public class AppController {
         }
     }
 
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
+     * @param settingsUpdate - the new app data edited by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/loadsettings", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> settingsFetch(@CookieValue() String instance,
+                                                @RequestBody SettingsUpdate settingsUpdate) {
+        try {
+            String mode = settingsUpdate.getMode();
+            AppInstance appInstance;
+            AppSettings fetched;
+            if (mode != null && mode.equals("debug")) {
+                appInstance = createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null);
+            }
+            else {
+                appInstance = authenticationResolver.unsignInstance(instance);
+            }
+            fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
+            //Can produce NullPointerException
+            return AjaxResult.res(objectMapper.writeValueAsString(fetched));
+        }
+        catch (NullPointerException npe) {
+            return AjaxResult.internalServerError(npe);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+
 
     /**
      * VIEW - Editor Endpoint for testing
@@ -302,8 +347,8 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
-        if(mode != null && mode.equals(DEBUG)) {
-            model.addAttribute("mode","debug");
+        if(mode != null) {
+            model.addAttribute("mode",mode);
         }
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
     }
@@ -334,9 +379,13 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "_self") String target,
                                    @RequestParam(required = false, defaultValue = "200") Integer width,
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
-                                   @RequestParam(required = false, defaultValue = "site") String viewMode) throws IOException {
+                                   @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                   @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
+        if(mode != null) {
+            model.addAttribute("mode",mode);
+        }
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
     }
 
@@ -359,9 +408,13 @@ public class AppController {
                                      @RequestParam(required = false, defaultValue = "400") Integer width,
                                      @RequestParam(required = false, defaultValue = "en") String locale,
                                      @RequestParam(required = false, defaultValue = "widgetCompId") String origCompId,
-                                     @RequestParam(required = false, defaultValue = "sectionCompId") String compId) throws IOException {
+                                     @RequestParam(required = false, defaultValue = "sectionCompId") String compId,
+                                     @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,origCompId)));
+        if(mode != null) {
+            model.addAttribute("mode",mode);
+        }
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
     }
 

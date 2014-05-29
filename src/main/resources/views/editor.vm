@@ -206,7 +206,7 @@
 <script type="text/javascript">
     //Create and bind global
     var settings = $!{cldAppSettings};
-    var debugMode = $!{mode};
+    var debugMode = "$!{mode}";
 </script>
 </body>
 </html>
