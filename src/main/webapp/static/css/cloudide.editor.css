@@ -57,6 +57,16 @@
 .headerPadding {
     padding: 10px;
 }
+.fixedHeight {
+    height: 40px;
+    text-overflow:ellipsis;
+    overflow: hidden;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
 .showme {
     display: none;
 }

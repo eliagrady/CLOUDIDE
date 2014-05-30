@@ -200,6 +200,8 @@
     #if($mode.equals("debug"))
         #include("views/tests/editor/editorTestsModal.vm")
     #end
+    #include("views/editor/modals/editorProjectSettingsModal.vm")
+
 
 
 <!-- Initialization of CloudIde 'Editor view' -->
