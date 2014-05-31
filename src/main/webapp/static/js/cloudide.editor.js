@@ -183,22 +183,26 @@ var _cldEditor = (function() {
             addCurrentProjectToProjectsArray : function() {
                 CloudIde.projectHandler.addProject(CloudIde.getSettings().currentProject);
             },
-            updateCurrentProject : function(project) {
-                var htmlCode = project.code.html;
-                var jsCode = project.code.js;
-                var cssCode = project.code.css;
+            updateCurrentProject : function() {
+//                var htmlCode = project.code.html;
+//                var jsCode = project.code.js;
+//                var cssCode = project.code.css;
+                var htmlCode = CloudIde.cm.html.getDoc().getValue();
+                var jsCode = CloudIde.cm.js.getDoc().getValue();
+                var cssCode = CloudIde.cm.css.getDoc().getValue();
                 //Encoding
                 htmlCode =  encodeURI($.base64.encode(htmlCode));
                 jsCode =  encodeURI($.base64.encode(jsCode));
                 cssCode =  encodeURI($.base64.encode(cssCode));
 
                 //setup current project
-                var cp = CloudIde.getSettings().currentProject;
-                cp.name = CloudIde.editor.getCurrentProjectName();
-                cp.modified = new Date();
-                cp.code.html = htmlCode;
-                cp.code.js = jsCode;
-                cp.code.css = cssCode;
+                var settings = CloudIde.getSettings();
+                settings.currentProject.name = CloudIde.editor.getCurrentProjectName();
+                settings.currentProject.modified = new Date();
+                settings.currentProject.code.html = htmlCode;
+                settings.currentProject.code.js = jsCode;
+                settings.currentProject.code.css = cssCode;
+                console.log("validation: ", settings.currentProject , CloudIde.getSettings.currentProject);
             },
             /**
              * Sets the current project, by it's given id.
@@ -468,8 +472,8 @@ var _cldEditor = (function() {
             }
         },
         save: function () {
-            //Update the current project
-            CloudIde.projectHandler.updateCurrentProject(CloudIde.projectHandler.getCurrentProject());
+            //Update the current project (active project)
+            CloudIde.projectHandler.updateCurrentProject();
             CloudIde.projectHandler.addCurrentProjectToProjectsArray();
 
 
