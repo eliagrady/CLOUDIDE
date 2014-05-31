@@ -1,1 +1,1 @@
-<li><a class="" data-toggle="modal" data-target="#projectSettings"> Launch demo modal </a></li>
+<li><a class="" data-toggle="modal" data-target="#projectSettingsModal"> Edit Project Settings </a></li> <!-- Unused -->

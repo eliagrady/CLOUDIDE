@@ -56,14 +56,14 @@
             </div>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Settings</a></li>
-                <li><a href="#">Help</a></li>
+                #include("views/editor/modals/editorSettingsModalButton.vm")
+                #include("views/editor/modals/editorHelpModalButton.vm")
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">
             </form>
             <ul class="nav navbar-nav navbar-right">
-                <li><a id="cldMenubarBttPreview" onclick="_cldEditor.preview() href="#"> Preview </a></li>
+                #include("views/editor/modals/editorPreviewModalButton.vm")
                 <li><a id="cldMenubarBttSave" onclick="_cldEditor.save()" href="#"> Save </a></li>
                 <!-- Button trigger modal -->
                 #if($mode.equals("debug"))
@@ -196,13 +196,14 @@
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/html-hint.js"></script>
 
 
-<!-- Modals loading on demand and by configuration-->
+<!-- Modals loading (partially) on demand and by configuration-->
     #if($mode.equals("debug"))
         #include("views/tests/editor/editorTestsModal.vm")
     #end
     #include("views/editor/modals/editorProjectSettingsModal.vm")
-
-
+    #include("views/editor/modals/editorSettingsModal.vm")
+    #include("views/editor/modals/editorHelpModal.vm")
+    #include("views/editor/modals/editorPreviewModal.vm")
 
 <!-- Initialization of CloudIde 'Editor view' -->
 <script type="text/javascript">

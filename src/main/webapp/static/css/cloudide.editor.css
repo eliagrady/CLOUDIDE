@@ -43,6 +43,9 @@
 .noLeftPadding {
     padding-left: 0;
 }
+.noPadding {
+    padding: 0px;
+}
 
 .noSelect {
     -webkit-touch-callout: none;
@@ -72,4 +75,13 @@
 }
 .showhim:hover .showme {
     display : block;
+}
+
+@media (min-width: 992px) {
+    .modal-large-preview {
+        width: 982px; /*1px for border compensation on each side, and fixed width of 980px like on Wix end*/
+    }
+    .modal-large {
+        width: 900px;
+    }
 }

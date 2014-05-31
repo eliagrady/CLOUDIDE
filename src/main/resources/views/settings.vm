@@ -13,46 +13,26 @@
 
 <body wix-ui>
 <div class="settingsHero">
-    <div class="appContainer box">
-        <!-- part a: application logo-->
-        <div class="appLogo">
-            <div class="logo">
-                <img class="appSettings-padding" width="86" src="../static/lib/ui-lib/images/wix_icon.png" alt="cloudide"/>
-            </div>
-        </div>
-        <!-- part b: application description -->
-        <div class="appInfo">
-            <div class="uilib-text" id="prjName"><strong>Project name</strong></div>
-            <div class="uilib-input hidden" id="prjNameRename">Project new name here</div>
-            <div class="uilib-text appDescription" id="prjDesctription">
-                <strong>Project Description:</strong>
-                This is a generic project description.
-                It will appear with scrollable content,
-                and it is not limited in terms of length.
-                In this part, the user can add notes, descriptions, to-dos etc.
-            </div>
-        </div>
-        <!-- part c: application control -->
-        <div class="appCtrl">
-            <div class="submit uilib-btn connect appCtrl-btn" id="cldEditorOpenBtn">
-                Edit
-            </div>
-            <div class="submit uilib-btn connect appCtrl-btn" id="refreshBtn">
-                Refresh
-            </div>
-        </div>
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
+    #include("views/settings/project.vm")
 
-
-
-    </div>
-
-<!-- Part 2 - Setting controls
-Controls that can be changed to configure the Widget.
-Main control is the accordion that contains panes that will be opened and closed
- according to your selection.
-In each pane you can add different controls from the wix-ui-lib and
-listen to events when they change, a few samples will be displayed later.
-This part holds the settings panel -->
+    <!-- Part 2 - Setting controls
+    Controls that can be changed to configure the Widget.
+    Main control is the accordion that contains panes that will be opened and closed
+     according to your selection.
+    In each pane you can add different controls from the wix-ui-lib and
+    listen to events when they change, a few samples will be displayed later.
+    This part holds the settings panel -->
 
 
 </div>
