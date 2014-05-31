@@ -642,7 +642,7 @@ var _cldEditor = (function() {
                     return string + this;
             };
             //On run, this will fire:
-            $('#projectSettings').on('shown.bs.modal', function (e) {
+            $('#projectSettingsModal').on('shown.bs.modal', function (e) {
                 // Bind Save button
                 var captured = e.relatedTarget;
                 console.log("captured shown:",captured);
@@ -669,12 +669,12 @@ var _cldEditor = (function() {
                     //Now, function looks like this:
                     console.log("now, function is",func, "and it's type: ",typeof func);
                     setTimeout(func,0);
-                    $('#projectSettings').modal('hide');
+                    $('#projectSettingsModal').modal('hide');
                     $('#projectSettingsNameInputField').val("");
 
                 };
             });
-            $('#projectSettings').on('hidden.bs.modal', function (e) {
+            $('#projectSettingsModal').on('hidden.bs.modal', function (e) {
                 // Unbind Save button
                 var captured = e.relatedTarget;
                 console.log("captured removed:",captured);
