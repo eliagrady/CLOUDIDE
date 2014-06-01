@@ -27,20 +27,19 @@ var _cldEditor = (function() {
              * @param arr an optional array of objects to cache
              * @return {*} either the cached array of objects, or undefined if it hasn't been cached.
              */
-            cache : function (projectId, arr) {
-                if(!this.storage) {
-                    //If storage isn't initialized, init it.
-                    this.storage = {};
+            cache : {
+                storage : {
+                    //Container
+                },
+                in : function(identifier,object) {
+                    CloudIde.cm.cache.storage['"'+identifier+'"'] = object;
+                },
+                out : function(identifier) {
+                    return CloudIde.cm.cache.storage['"'+identifier+'"'];
+                },
+                getStorage : function() {
+                    return CloudIde.cm.cache.storage;
                 }
-                //If given arr object, cache it, and return it.
-                if(arr && arr.length > 0) {
-                    this.storage[projectId] = arr;
-                    return this.storage[projectId];
-                }
-                else {
-                    return this.storage[projectId];
-                }
-                throw new Error("Undefined scenario for caching scheme!");
             }
         },
         getSettings: function () {
@@ -60,6 +59,18 @@ var _cldEditor = (function() {
                 console.log(length+ " projects listed:");
                 for(var i = 0 ; i < length ; i++){
                     console.log('Item', settings.projects[i]);
+                }
+                console.log("=================");
+            },
+            displayCache : function(console) {
+                var cacheStorage = CloudIde.cm.cache.getStorage();
+                if(console === undefined) {
+                    console = window.console;
+                }
+                console.log("=================");
+                console.log("projects cached:");
+                for(var cached in cacheStorage){
+                    console.log(cached,cacheStorage[cached]);
                 }
                 console.log("=================");
             }
@@ -202,7 +213,8 @@ var _cldEditor = (function() {
                 settings.currentProject.code.html = htmlCode;
                 settings.currentProject.code.js = jsCode;
                 settings.currentProject.code.css = cssCode;
-                console.log("validation: ", settings.currentProject , CloudIde.getSettings.currentProject);
+                console.log("validation, settings.currentProject: ", settings.currentProject);
+                console.log("validation, CloudIde.getSettings.currentProject: ", CloudIde.getSettings.currentProject);
             },
             /**
              * Sets the current project, by it's given id.
@@ -210,38 +222,65 @@ var _cldEditor = (function() {
              * @param projectId the id of the project to set as current project
              */
             setCurrentProjectById : function(projectId) {
+                console.log("Attempting to bring project ",projectId, " to scope");
+                //Validate that the project isn't in scope first:
+                var currentlySelectedProjectId = CloudIde.projectHandler.getCurrentProjectId();
+                if(projectId === currentlySelectedProjectId) {
+                    console.log("Currently selected project is the same as target. Aborting request.");
+                    console.log("Current project is:",CloudIde.projectHandler.getCurrentProject());
+                    CloudIde.projectHandler.swapDocs(projectId);
+                    return;
+                }
                 try {
-                    var settings = CloudIde.getSettings();
-                    var project = CloudIde.projectHandler.getProjectById(projectId);
-                    if(project !== null) {
-                        settings.currentProject = project;
+                    var newProjectToSet = CloudIde.projectHandler.getProjectById(projectId);
+                    if(newProjectToSet === null) {
+                        throw new Error("Failed setting project. reason: unknown projectId: ",projectId);
                     }
-                    console.log("project found in projects array: ",project);
-                    var cached = CloudIde.cm.cache(projectId);
-                    //var cached = CloudIde.cm.cache(undefined);
-                    CloudIde.projectHandler.swapDocs(cached);
+                    console.log("project found in projects array: ",newProjectToSet);
+                    //Try fetching the new project from cache:
+                    var cached = CloudIde.cm.cache.out(projectId);
+                    CloudIde.projectHandler.swapDocs(projectId,cached);
+                    CloudIde.getSettings().currentProject = newProjectToSet;
                 }
                 catch (err) {
                     console.log(err.stack);
                 }
             },
-            swapDocs : function(cache) {
-                var newHtmlDoc,newJsDoc,newCssDoc; //CodeMirror Doc objects
-                var newHtmlCode,newJsCode,newCssCode; //Code text
+            swapDocs : function(projectId, cache) {
+                /*
+                cache logic : lookup the current project, and push it's Docs to the cache using the id of the project.
+                 now, in order to bring up a new project to the viewer, first lookup in the cache object given (if
+                 it was previously loaded. On cache hit, bring it from the cache. on cache miss, create a new Doc.
+                 Once this project is swapped out, it will be cached so it can be loaded quickly later.
+                 */
+
+
+                var newHtmlDoc, newJsDoc, newCssDoc; //CodeMirror Doc objects
+                var newHtmlCode, newJsCode, newCssCode; //Code text
+                var oldHtmlDoc, oldJsDoc, oldCssDoc; //Current project (old) Doc objects
+                var oldHtmlCode, oldJsCode, oldCssCode; //Current project (old) Code text
                 var validCurrentProject = false;
                 var oldCurrentProjectId;
+                var settings = CloudIde.getSettings();
                 try {
-                    oldCurrentProjectId = CloudIde.getSettings().currentProject.id;
-                    newHtmlCode = CloudIde.getSettings().currentProject.code.html;
-                    newJsCode = CloudIde.getSettings().currentProject.code.js;
-                    newCssCode = CloudIde.getSettings().currentProject.code.css;
+                    oldCurrentProjectId = settings.currentProject.id;
+
+//                    oldHtmlCode = settings.currentProject.code.html;
+//                    oldJsCode = settings.currentProject.code.js;
+//                    oldCssCode = settings.currentProject.code.css;
+//
+//                    oldHtmlDoc = CloudIde.cm.html.getDoc();
+//                    oldJsDoc = CloudIde.cm.js.getDoc();
+//                    oldCssDoc = CloudIde.cm.css.getDoc();
+
                     validCurrentProject = true;
+                    console.log("valid current project before swap:",CloudIde.projectHandler.getCurrentProject());
                 }
                 catch (err) {
-                    //No 'current project' set, fetch it from the project array, and try again:
-                    newHtmlCode = CloudIde.getSettings().currentProject.code.html;
-                    newJsCode = CloudIde.getSettings().currentProject.code.js;
-                    newCssCode = CloudIde.getSettings().currentProject.code.css;
+//                    //No 'current project' set, fetch it from the project array, and try again:
+//                    newHtmlCode = CloudIde.getSettings().currentProject.code.html;
+//                    newJsCode = CloudIde.getSettings().currentProject.code.js;
+//                    newCssCode = CloudIde.getSettings().currentProject.code.css;
                 }
                 //Cache object is present and valid
                 if(cache && cache.length > 2) {
@@ -251,16 +290,19 @@ var _cldEditor = (function() {
                 }
                 //Cache object not present, generate new CodeMirror Docs from current project's code
                 else {
-                    newHtmlDoc = CodeMirror.Doc($.base64.decode(newHtmlCode),"htmlmixed");
-                    newJsDoc = CodeMirror.Doc($.base64.decode(newJsCode),"javascript");
-                    newCssDoc = CodeMirror.Doc($.base64.decode(newCssCode),"css");
+                    var newProjectToSet = CloudIde.projectHandler.getProjectById(projectId);
+                    newHtmlDoc = CodeMirror.Doc($.base64.decode(newProjectToSet.code.html),"htmlmixed");
+                    newJsDoc = CodeMirror.Doc($.base64.decode(newProjectToSet.code.js),"javascript");
+                    newCssDoc = CodeMirror.Doc($.base64.decode(newProjectToSet.code.css),"css");
+                    CloudIde.cm.cache.in(newProjectToSet.id,[newHtmlDoc,newJsDoc,newCssDoc]);
                 }
-                var oldHtmlDoc = CloudIde.cm.html.swapDoc(newHtmlDoc);
-                var oldJsDoc = CloudIde.cm.js.swapDoc(newJsDoc);
-                var oldCssDoc = CloudIde.cm.css.swapDoc(newCssDoc);
+                oldHtmlDoc = CloudIde.cm.html.swapDoc(newHtmlDoc);
+                oldJsDoc = CloudIde.cm.js.swapDoc(newJsDoc);
+                oldCssDoc = CloudIde.cm.css.swapDoc(newCssDoc);
                 if(validCurrentProject) { //If the current project is valid, cache it.
-                    CloudIde.cm.cache(oldCurrentProjectId,[oldHtmlDoc,oldJsDoc,oldCssDoc]);
+                    //CloudIde.cm.cache(oldCurrentProjectId,[oldHtmlDoc,oldJsDoc,oldCssDoc]);
                 }
+                CloudIde.debugger.displayCache(console);
             }
         },
         editor : {
@@ -311,10 +353,10 @@ var _cldEditor = (function() {
                         a_projectSettings.attr('data-toggle','modal').attr('data-target','#projectSettingsModal');
                         a_projectSettings.append(a_projectSettings_icon);
                         var li;
-                        console.log(typeof currentlySelectedProjectId);
-                        console.log("currentlySelectedProjectId:"+currentlySelectedProjectId);
-                        console.log("compare with: "+project.id);
-                        console.log("they are " + ((project.id == currentlySelectedProjectId)?"equal":"different"));
+//                        console.log(typeof currentlySelectedProjectId);
+//                        console.log("currentlySelectedProjectId:"+currentlySelectedProjectId);
+//                        console.log("compare with: "+project.id);
+//                        console.log("they are " + ((project.id == currentlySelectedProjectId)?"equal":"different"));
 
 
                         if(project.id == currentlySelectedProjectId) {
@@ -508,12 +550,12 @@ var _cldEditor = (function() {
                 'success': function (res) {
                     console.log("save completed");
                     if (_cldEditor.mode === "debug") {
-                        window.alert("save completed");
+                        CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
                     }
                     else {
                         CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
+                        Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
                     }
-                    Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
                 },
                 'error': function (res) {
                     if (_cldEditor.mode === "debug") {
@@ -755,15 +797,6 @@ var _cldEditor = (function() {
             function useFetchedSettings(res){
                 console.log("res is",res);
                 var settings = JSON.parse(res.retData);
-                if (_cldEditor.mode === "debug") {
-                    console.log("loaded settings from server (debug)");
-                    CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
-                }
-                else {
-                    CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
-                    Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
-                }
-
                 CloudIde.settings = settings;
                 //Initialize template project if the fetched settings aren't proper
                 if(CloudIde.getSettings().currentProject == undefined) {
@@ -773,13 +806,25 @@ var _cldEditor = (function() {
                         CloudIde.getSettings().projects = [];
                     }
                     CloudIde.projectHandler.addProject(blankProject);
-                    //CloudIde.getSettings().currentProject = blankProject;
-                    CloudIde.projectHandler.setCurrentProjectById(blankProject.id);
+                    //Set the blank template to the model (later loaded visually as well)
+                    CloudIde.getSettings().currentProject = blankProject;
+                    //CloudIde.projectHandler.setCurrentProjectById(blankProject.id);
                 }
+                //Set the currentProject (display and model)
+                CloudIde.projectHandler.setCurrentProjectById(CloudIde.projectHandler.getCurrentProjectId());
                 //load projects
                 CloudIde.editor.loadProjectsToExplorer();
-            }
 
+                //Finally, notify:
+                if (_cldEditor.mode === "debug") {
+                    console.log("loaded settings from server (debug)");
+                    CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
+                }
+                else {
+                    CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
+                    Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
+                }
+            }
             CloudIde.fetchSettings(useFetchedSettings);
         }
     };

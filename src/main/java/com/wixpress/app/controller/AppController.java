@@ -345,6 +345,12 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+        if(userId == null) {
+            userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
+        }
+        if(permissions == null) {
+            permissions = "OWNER";
+        }
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
         if(mode != null) {
