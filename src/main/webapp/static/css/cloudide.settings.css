@@ -22,17 +22,19 @@
 .appInfo {
     float: left;
     width : auto;
-    max-width : 50%;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;
 }
 
 .appDescription {
-    overflow-y:scroll;
+    float: left;
+    width : auto;
+    padding: 5px 5px 5px 5px;
+    margin : 5px 5px 5px 5px;
     max-height : 50px;
 }
 .appCtrl {
-    float: left;
+    float: right;
     width : auto;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;
@@ -44,3 +46,7 @@
     float: left;
     clear: both;
 }
+
+.autoMargin {
+    margin: auto;
+ }

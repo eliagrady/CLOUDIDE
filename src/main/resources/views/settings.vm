@@ -4,35 +4,19 @@
 <head>
     <title>Cloud IDE Settings</title>
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
+    <!-- TODO move to async loading -->
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
     <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
     <script type="text/javascript">
-        var cldSettings = $!{cldAppSettings};
+
     </script>
 </head>
 
 <body wix-ui>
-<div class="settingsHero">
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-    #include("views/settings/project.vm")
-
-    <!-- Part 2 - Setting controls
-    Controls that can be changed to configure the Widget.
-    Main control is the accordion that contains panes that will be opened and closed
-     according to your selection.
-    In each pane you can add different controls from the wix-ui-lib and
-    listen to events when they change, a few samples will be displayed later.
-    This part holds the settings panel -->
+<div class="settingsHero" id="cldProjectExplorer">
+    #if(false) {
+        #include("views/settings/project.vm")
+    #end
 
 
 </div>

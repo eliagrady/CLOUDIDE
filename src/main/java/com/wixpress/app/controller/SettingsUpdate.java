@@ -6,12 +6,22 @@ import com.wixpress.app.dao.AppSettings;
  * A container class for the request body
  */
 public class SettingsUpdate {
+
+    private String userId;
     private String compId;
     private AppSettings settings;
     private String mode;
 
+    public String getUserId() {
+        return this.userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getCompId() {
-        return compId;
+        return this.compId;
     }
 
     public void setCompId(String compId) {
@@ -19,7 +29,7 @@ public class SettingsUpdate {
     }
 
     public AppSettings getSettings() {
-        return settings;
+        return this.settings;
     }
 
     public void setSettings(AppSettings settings) {

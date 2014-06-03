@@ -70,7 +70,7 @@ public class AppController {
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
+        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance);
 
     }
 
@@ -107,7 +107,7 @@ public class AppController {
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
+        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
 
     }
 
@@ -138,7 +138,7 @@ public class AppController {
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
+        return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, appInstance);
     }
 
 
@@ -185,11 +185,17 @@ public class AppController {
             //TODO remove debugMode from production code
             String mode = settingsUpdate.getMode();
             if(mode != null && mode.equals("debug")) {
-                appDao.updateAppSettings("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",settingsUpdate.getCompId(),settingsUpdate.getSettings());
+                //AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+
+                String userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
+                String permissions = "OWNER";
+                AppInstance appInstance = createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", userId, permissions);
+
+                //appDao.updateAppSettings("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",settingsUpdate.getCompId(),settingsUpdate.getSettings());
                 return AjaxResult.ok();
             }
             AppInstance appInstance = authenticationResolver.unsignInstance(instance);
-            appDao.updateAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), settingsUpdate.getSettings());
+            appDao.updateAppSettings(appInstance.getUid().toString(), settingsUpdate.getSettings());
             return AjaxResult.ok();
         } catch (Exception e) {
             return AjaxResult.internalServerError(e);
@@ -209,10 +215,21 @@ public class AppController {
         try {
             //TODO remove debugMode from production code
             String mode = settingsUpdate.getMode();
+            AppInstance appInstance;
             if (mode != null && mode.equals("debug")) {
-                return executeSave(createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null), settingsUpdate);
+                String userId; //CloudIde userId
+                if(instance != null && instance != "") {
+                    userId = instance;
+                }
+                else {
+                    userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a";
+                }
+                String permissions = "OWNER";
+                appInstance = createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", userId, permissions);
             }
-            AppInstance appInstance = authenticationResolver.unsignInstance(instance);
+            else {
+                appInstance = authenticationResolver.unsignInstance(instance);
+            }
             return executeSave(appInstance, settingsUpdate);
         }
         catch (Exception e) {
@@ -225,7 +242,7 @@ public class AppController {
     private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, SettingsUpdate settingsUpdate) {
         try {
             AppSettings appSettings = settingsUpdate.getSettings();
-            appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), appSettings);
+            appDao.saveAppSettings(appInstance.getUid().toString(), appSettings);
             return AjaxResult.ok();
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
@@ -264,17 +281,13 @@ public class AppController {
      */
     private ResponseEntity<AjaxResult> executeUpdate(AppInstance appInstance,SettingsUpdate settingsUpdate) {
         try {
+            //TODO REMOVE
             //AppSettings appData = settingsUpdate.getAppData();
             AppSettings fetched;
-            if(settingsUpdate.getCompId() == null ) {
-                fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
-            }
-            else {
-                fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
-            }
+            fetched = appDao.getAppSettings(appInstance.getUid().toString());
             //Can produce NullPointerException
             String res = fetched.getAppSettings().toString();
-            appDao.saveAppSettings(appInstance.getInstanceId().toString(), settingsUpdate.getCompId(), fetched);
+            appDao.saveAppSettings(appInstance.getUid().toString(), settingsUpdate.getSettings());
             return AjaxResult.res(res);
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
@@ -299,12 +312,20 @@ public class AppController {
             AppInstance appInstance;
             AppSettings fetched;
             if (mode != null && mode.equals("debug")) {
-                appInstance = createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", null, null);
+                String userId; //CloudIde userId
+                if(instance != null && instance != "") {
+                    userId = instance;
+                }
+                else {
+                    userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a";
+                }
+                String permissions = "OWNER";
+                appInstance = createTestSignedInstance("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", userId, permissions);
             }
             else {
                 appInstance = authenticationResolver.unsignInstance(instance);
             }
-            fetched = appDao.getAppSettings(appInstance.getInstanceId().toString(),settingsUpdate.getCompId());
+            fetched = appDao.getAppSettings(appInstance.getUid().toString());
             //Can produce NullPointerException
             return AjaxResult.res(objectMapper.writeValueAsString(fetched));
         }
@@ -352,11 +373,12 @@ public class AppController {
             permissions = "OWNER";
         }
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
-        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
+        //Add 'Cookie' (not a real instance, just the userId is present):
+        response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
+        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
     }
 
     /**
@@ -387,12 +409,19 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+        if(userId == null) {
+            userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
+        }
+        if(permissions == null) {
+            permissions = "OWNER";
+        }
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
-        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,compId)));
+        //Add 'Cookie' (not a real instance, just the userId is present):
+        response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode);
+        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
     }
 
     /**
@@ -416,12 +445,19 @@ public class AppController {
                                      @RequestParam(required = false, defaultValue = "widgetCompId") String origCompId,
                                      @RequestParam(required = false, defaultValue = "sectionCompId") String compId,
                                      @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+        if(userId == null) {
+            userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
+        }
+        if(permissions == null) {
+            permissions = "OWNER";
+        }
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
-        response.addCookie(new Cookie("instance", String.format("%s.%s",instanceId,origCompId)));
+        //Add 'Cookie' (not a real instance, just the userId is present):
+        response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
         if(mode != null) {
             model.addAttribute("mode",mode);
         }
-        return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId);
+        return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, appInstance);
     }
 
     /**
@@ -456,34 +492,20 @@ public class AppController {
     }
 
     // Set editor.vm
-    private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
-        AppSettings appSettings = getSettings(instanceId, compId);
+    private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance) throws IOException {
+        AppSettings appSettings = getSettings(appInstance.getUid().toString());
         //AppData appData = getAppData(instanceId, compId);
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
-        model.addAttribute("appInstance", objectMapper.writeValueAsString(String.format("%s.%s", instanceId, compId)));
+        model.addAttribute("appInstance", objectMapper.writeValueAsString(appInstance.getUid().toString()));
         return "editor";
     }
 
 
     // Set widget.vm
-    private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode) throws IOException {
+    private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance) throws IOException {
         //Why do I need the settings in this view?
-
-        AppSettings appSettings = getSettings(instanceId, compId);
+        AppSettings appSettings = getSettings(appInstance.getUid().toString());
         //TODO use viewMode parameter to determine the binding of live site vs. edit and preview modes data segment
-        //AppData cloudIdeData = getAppData(instanceId, compId);
-        /*
-        if (viewMode.equals("edit")) {
-            appSettings.getAppSettings().get("projects").get(compId).get("code");
-        } else if (viewMode.equals("preview")) {
-            appSettings.getAppSettings().get("projects").get(compId).get("code");
-        } else if (viewMode.equals("site")) {
-            appSettings.getAppSettings().get("projects").get(compId).get("code");
-        }
-        */
-        //model.addAttribute("data", objectMapper.writeValueAsString(appSettings.getAppSettings()));
-        //model.addAttribute("dataString", objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject").get("code").getTextValue()));
-        //model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
         model.addAttribute("currentProject",objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject")));//TODO change to 'published project'
         return "widget";
     }
@@ -491,16 +513,15 @@ public class AppController {
 
 
     // Set setting.vm
-    private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId) throws IOException {
-        AppSettings appSettings = getSettings(instanceId, compId);
-        //AppData cloudIdeData = getAppData(instanceId, compId);
+    private String viewSettings(Model model, Integer width, String instanceId, String locale, String origCompId, String compId, AppInstance appInstance) throws IOException {
+        AppSettings appSettings = getSettings(appInstance.getUid().toString());
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
         return "settings";
     }
 
     // Set message.vm
     private String viewMessage(Model model, Integer width, String instanceId, String locale, String origCompId, String compId, String encodedMessage) throws IOException {
-        AppSettings appSettings = getSettings(instanceId, compId);
+        //AppSettings appSettings = getSettings(instanceId, compId);
         //AppData cloudIdeData = getAppData(instanceId, compId);
         model.addAttribute("message", objectMapper.writeValueAsString(URI.decodePath(encodedMessage)));
         return "message";
@@ -508,16 +529,21 @@ public class AppController {
 
     /**
      * Get settings from the DB if exists, otherwise return empty settings
-     *
-     * @param instanceId - the instance id
-     * @param compId     - the appUpdate comp Id
-     * @return appUpdate settings
+     * @param userId - the Wix unique user id
+     * @return the app settings
      */
-    private AppSettings getSettings(String instanceId, String compId) {
-        AppSettings appSettings = appDao.getAppSettings(instanceId, compId);
+    private AppSettings getSettings(String userId) {
+        AppSettings appSettings = appDao.getAppSettings(userId);
         return appSettings;
     }
 
+    /**
+     * Creates a debug version of a signed instance, mimicking the way it is supposed to be delivered on Wix end
+     * @param instanceId - the instanceId member of the signed instance
+     * @param userId - the Wix unique user id
+     * @param permissions - - the permissions member of the signed instance
+     * @return
+     */
     private AppInstance createTestSignedInstance(String instanceId, @Nullable String userId, @Nullable String permissions) {
         try {
             UUID instanceUuid = UUID.fromString(instanceId);

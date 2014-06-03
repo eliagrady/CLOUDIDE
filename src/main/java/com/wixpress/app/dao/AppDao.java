@@ -14,7 +14,7 @@ public interface AppDao {
      * @param compId      - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
      * @param appSettings - The settings of the app that configure the widget
      */
-    public void saveAppSettings(String instanceId, String compId, AppSettings appSettings);
+    public void saveAppSettings(String userId, AppSettings appSettings);
 
 
     /**
@@ -24,7 +24,7 @@ public interface AppDao {
      * @param compId     - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
      * @return
      */
-    public AppSettings getAppSettings(String instanceId, String compId);
+    public AppSettings getAppSettings(String userId);
 
 
     /**
@@ -34,5 +34,5 @@ public interface AppDao {
      * @param compId      - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
      * @param appSettings - The settings of the app that configure the widget
      */
-    public void updateAppSettings(String instanceId, String compId, AppSettings appSettings);
+    public void updateAppSettings(String userId, AppSettings appSettings);
 }

@@ -1,6 +1,6 @@
 /* cloud ide editor javascript */
 /*jslint browser: true*/
-/*global $, jQuery, CodeMirror*/
+/*global $, jQuery, CodeMirror , Wix*/
 
 /**
  * Class containing editor properties and functions
@@ -86,6 +86,8 @@ var _cldEditor = (function() {
             },
             projectTemplate : {
                 id : 0,
+                compId : "",
+                instanceId : "",
                 code : {
                     html : "",
                     js : "",
@@ -213,6 +215,22 @@ var _cldEditor = (function() {
                 settings.currentProject.code.html = htmlCode;
                 settings.currentProject.code.js = jsCode;
                 settings.currentProject.code.css = cssCode;
+                var compId,instanceId;
+                if(_cldEditor.mode === "debug") {
+                    compId = "null";
+                    instanceId = Utils.getCookie('instance');
+                }
+                else {
+                    try {
+                        compId = Wix.Utils.getOrigCompId();
+                        instanceId = Wix.Utils.getInstanceId;
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                }
+                settings.currentProject.compId = compId;
+                settings.currentProject.instanceId = instanceId;
                 console.log("validation, settings.currentProject: ", settings.currentProject);
                 console.log("validation, CloudIde.getSettings.currentProject: ", CloudIde.getSettings.currentProject);
             },
@@ -287,6 +305,7 @@ var _cldEditor = (function() {
                     newHtmlDoc = cache[0];
                     newJsDoc = cache[1];
                     newCssDoc = cache[2];
+                    console.log("Loaded from cache");
                 }
                 //Cache object not present, generate new CodeMirror Docs from current project's code
                 else {
@@ -295,6 +314,7 @@ var _cldEditor = (function() {
                     newJsDoc = CodeMirror.Doc($.base64.decode(newProjectToSet.code.js),"javascript");
                     newCssDoc = CodeMirror.Doc($.base64.decode(newProjectToSet.code.css),"css");
                     CloudIde.cm.cache.in(newProjectToSet.id,[newHtmlDoc,newJsDoc,newCssDoc]);
+                    console.log("Created new cache entry");
                 }
                 oldHtmlDoc = CloudIde.cm.html.swapDoc(newHtmlDoc);
                 oldJsDoc = CloudIde.cm.js.swapDoc(newJsDoc);
@@ -519,9 +539,9 @@ var _cldEditor = (function() {
             CloudIde.projectHandler.addCurrentProjectToProjectsArray();
 
 
-            var compId;
-            var instanceId;
+            var compId ,instanceId, userId;
             try {
+                userId = Wix.Utils.getUid() || "";
                 instanceId = Wix.Utils.getInstanceId() || "";
                 compId = Wix.Utils.getOrigCompId() || "";
             }
@@ -533,6 +553,8 @@ var _cldEditor = (function() {
                 console.log("about to send window.debugMode = " + _cldEditor.mode);
                 compId = 'null';
                 instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                userId = Utils.getCookie('instance');
+                console.log("set userId to: "+userId);
                 console.log("set compId to: "+compId);
             }
             //Saving the appSettings JSON to the server
@@ -542,6 +564,7 @@ var _cldEditor = (function() {
                 'dataType': "json",
                 'contentType': 'application/json; chatset=UTF-8',
                 'data': JSON.stringify({
+                    userId: userId,
                     compId: compId,
                     settings: CloudIde.settings,
                     mode: _cldEditor.mode
@@ -565,9 +588,9 @@ var _cldEditor = (function() {
             });
         },
         fetchSettings: function (onSuccessCallback) {
-            var compId;
-            var instanceId;
+            var compId , instanceId , userId;
             try {
+                userId = Wix.Utils.getUid() || "";
                 instanceId = Wix.Utils.getInstanceId() || "";
                 compId = Wix.Utils.getOrigCompId() || "";
             }
@@ -575,10 +598,12 @@ var _cldEditor = (function() {
                 console.log("Not in Wix editor"); //TODO check if in Wix editor
             }
 
-            if(_cldEditor.mode == 'debug') {
+            if(_cldEditor.mode === 'debug') {
                 console.log("about to send window.debugMode = " + _cldEditor.mode);
                 compId = 'null';
                 instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                userId = Utils.getCookie('instance');
+                console.log("set userId to: "+userId);
                 console.log("set compId to: "+compId);
             }
             //Loading the appSettings JSON from the server
@@ -589,6 +614,7 @@ var _cldEditor = (function() {
                 'timeout' : 5000,
                 'contentType': 'application/json; chatset=UTF-8',
                 'data': JSON.stringify({
+                    userId: userId,
                     compId: compId,
                     settings: {},
                     mode: _cldEditor.mode
@@ -639,8 +665,20 @@ var _cldEditor = (function() {
         replaceDoc: function () {
             var text = "<script src=\"lib/codemirror.js\"></script>\n<link rel=\"stylesheet\" href=\"../lib/codemirror.css\">\n<script src=\"mode/javascript/javascript.js\"></script>\n";
             return CloudIde.cm.swapDoc(CodeMirror.Doc(text, "javascript", 1));
-        },
-
+        }
+    };
+    var Utils = {
+        getCookie : function(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i].trim();
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length,c.length);
+            }
+        }
+        return "";
+    },
         getURLParameter : function(sParam) {
             var sPageURL = window.location.search.substring(1);
             var sURLVariables = sPageURL.split('&');
@@ -651,6 +689,7 @@ var _cldEditor = (function() {
                 }
             }
         }
+
     };
     var initPhases = {
         asyncLoader : function() {
@@ -750,7 +789,7 @@ var _cldEditor = (function() {
             });
         },
         setEditorMode : function() {
-            var mode = CloudIde.getURLParameter('mode') || "";
+            var mode = Utils.getURLParameter('mode') || "";
             console.log("Mode set to: "+ (mode === 'debug'?mode:"mode not set"));
             _cldEditor.mode = mode;
         },
