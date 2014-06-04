@@ -85,3 +85,10 @@
         width: 900px;
     }
 }
+
+.CodeMirror-fullscreen {
+    z-index: 1100!important;
+}
+.CodeMirror-fullscreen-button-overlay {
+    z-index: 1102!important;
+}

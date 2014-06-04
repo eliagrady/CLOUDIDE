@@ -339,6 +339,8 @@ var _cldEditor = (function() {
                 }
                 $(on).addClass("hidden");
                 $(off).removeClass("hidden");
+                var character = "F11";
+                jQuery.event.trigger({ type : 'keypress', which : character.charCodeAt(0) });
             },
             getCurrentProjectName : function() {
                 var selectedProjectSelector = '[selectedProject=true]';
@@ -478,7 +480,13 @@ var _cldEditor = (function() {
                     indentWithTabs: true, //true means indent with tabs instead of spaces
                     lineNumbers: true,
                     extraKeys: {
-                        "Ctrl-Space": "autocomplete"
+                        "Ctrl-Space": "autocomplete",
+                        "F11": function(cm) {
+                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                        },
+                        "Esc": function(cm) {
+                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        }
                     },
                     gutters: ["CodeMirror-lint-markers"],
                     getAnnotations: [""],
@@ -499,7 +507,13 @@ var _cldEditor = (function() {
                     indentWithTabs: true, //true means indent with tabs instead of spaces
                     lineNumbers: true,
                     extraKeys: {
-                        "Ctrl-Space": "autocomplete"
+                        "Ctrl-Space": "autocomplete",
+                        "F11": function(cm) {
+                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                        },
+                        "Esc": function(cm) {
+                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        }
                     },
                     gutters: ["CodeMirror-lint-markers"],
                     lint: true,
@@ -518,7 +532,13 @@ var _cldEditor = (function() {
                     indentWithTabs: true, //true means indent with tabs instead of spaces
                     lineNumbers: true,
                     extraKeys: {
-                        "Ctrl-Space": "autocomplete"
+                        "Ctrl-Space": "autocomplete",
+                        "F11": function(cm) {
+                            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                        },
+                        "Esc": function(cm) {
+                            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        }
                     },
                     gutters: ["CodeMirror-lint-markers"],
                     lint: true,
@@ -772,6 +792,17 @@ var _cldEditor = (function() {
             CloudIde.cm.css = CodeMirror.fromTextArea(cldTextAreaCss, CloudIde.getCodeMirrorDefaultConfig("css"));
             CloudIde.cm.js = CodeMirror.fromTextArea(cldTextAreaJs, CloudIde.getCodeMirrorDefaultConfig("javascript"));
             CloudIde.cm.html = CodeMirror.fromTextArea(cldTextAreaHtml, CloudIde.getCodeMirrorDefaultConfig("html"));
+            //Set height:
+            var innerHeight = window.innerHeight;
+            var headerHeight = 50;
+            var footerHeight = 20;
+            var tabsHeight = 42;
+            //42:  Answer to the Ultimate Question of Life, The Universe, and Everything
+            var newHeight = innerHeight - headerHeight - footerHeight - tabsHeight - 42;
+
+            CloudIde.cm.html.setSize(null,newHeight);
+            CloudIde.cm.js.setSize(null,newHeight);
+            CloudIde.cm.css.setSize(null,newHeight);
         },
         bindCodeMirrorTabs : function() {
             //Initialize Editor tab buttons
@@ -850,7 +881,14 @@ var _cldEditor = (function() {
                     //CloudIde.projectHandler.setCurrentProjectById(blankProject.id);
                 }
                 //Set the currentProject (display and model)
-                CloudIde.projectHandler.setCurrentProjectById(CloudIde.projectHandler.getCurrentProjectId());
+                var projId = Utils.getURLParameter('projectId');
+                if(projId) {
+                    CloudIde.projectHandler.setCurrentProjectById(projId);
+                }
+                else {
+                    CloudIde.projectHandler.setCurrentProjectById(CloudIde.projectHandler.getCurrentProjectId());
+                }
+
                 //load projects
                 CloudIde.editor.loadProjectsToExplorer();
 

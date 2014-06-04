@@ -1,11 +1,13 @@
 /* cloud ide settings endpoint javascript */
 
 /*jslint browser: true*/
-/*global $, jQuery, CodeMirror , appData , appSettings , Wix*/
+/*global $, jQuery, CodeMirror , appData , appSettings , Wix , console*/
 
 
 /**
  * Class containing widget property and functions
+ * This class is using the module pattern:
+ * http://www.yuiblog.com/blog/2007/06/12/module-pattern/
  */
 var _cldSettings = (function() {
     "use strict";
@@ -13,11 +15,13 @@ var _cldSettings = (function() {
     function loadProjects() {
         console.log("loading projects to explorer...");
         var projects = getProjects();
-        var currentlySelectedProjectId = projects[0];
+        if(projects) {
+            var currentlySelectedProjectId = projects[0];
+        }
         //Prepare main div
-        var mainDiv = $('<div></div>').addClass("appContainer").addClass("box").addClass('projects');
-        //Case no projects are found
-        if(projects.length === 0) {
+        var mainDiv = $('<div></div>').addClass('projects');
+        //Case no projects are found   //TODO create one now button
+        if(!projects || projects.length === 0) {
             var no_projects = $('<div></div>').text("Project list is empty!").addClass('col-sm-12');
             var div_noProjects = $('<div></div>').addClass('row-fluid');
             div_noProjects.append(no_projects);
@@ -32,17 +36,21 @@ var _cldSettings = (function() {
             var selectFunc = function(e) {
                 var projectId = e.data.projectId;
                 console.log("Select pressed for projectId:"+projectId);
-                var compId;
+                var instanceId, compId;
                 if(_cldSettings.mode !== "debug"){
+                    instanceId = Wix.Utils.getInstanceId();
                     compId = Wix.Utils.getOrigCompId();
+                    updateSelectedProject(projectId,instanceId,compId);
                 }
                 else {
                     compId = "null";  //TODO remove debug mode
                 }
+                //OVERRIDER
                 var queryParams = {
-                    selectedProject : projectId
+
+                    projectId : projectId
                 };
-                Wix.Settings.refreshAppByCompIds([compId],queryParams);
+                //Wix.Settings.refreshAppByCompIds([compId],queryParams);
             };
             var editFunc = function(e) {
                 var projectId = e.data.projectId;
@@ -62,11 +70,76 @@ var _cldSettings = (function() {
                     selectedProject : projectId
                 };
                 //Open editor
-                var url = 'http://wixcloudide.appspot.com/app/editor';
-                Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
+                var url;
+                if(_cldSettings.mode === "debug") {
+                    url = 'http://localhost:8080/app/editorstandalone?';
+                    url += "&instanceId=" +  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                    url += "&compId=" + 'null';
+                    url += "&mode=" + _cldSettings.mode;
+                }
+                else {
+                    url = 'http://wixcloudide.appspot.com/app/editor?';
+                    url += "instance=" + Utils.getCookie('instance');
+                    url += "&instanceId=" + Wix.Utils.getInstanceId();
+                    url += "&compId=" + Wix.Utils.getOrigCompId();
+                }
+
+                //var url = 'http://wixcloudide.appspot.com/app/editor' + ?projectId=+projectId;
+                console.log("opening editor should be done now");
+                //TODO open editor in a quick edit mode (just one project)
+                //Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
+                var title = "CloudIde Editor";
+                var w = window.screen.width*0.8;
+                var h = window.screen.height*0.6;
+                if(h < 720) {
+                    h = 700;
+                }
+                if(w < 1000) {
+                    w = 980;
+                }
+                var windowObjectReference = PopupCenter(url,title,w,h);
+
+                //http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
+                function PopupCenter(url, title, w, h) {
+                    // Fixes dual-screen position                         Most browsers      Firefox
+                    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+                    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+                    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+                    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+                    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+                    var top = ((height / 2) - (h / 2)) + dualScreenTop;
+                    var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+                    // Puts focus on the newWindow
+                    if (window.focus) {
+                        newWindow.focus();
+                    }
+                    return newWindow;
+                }
+//                // Find the right method, call on correct element
+//                function launchFullscreen(element) {
+//                    if(element.requestFullscreen) {
+//                        element.requestFullscreen();
+//                    } else if(element.mozRequestFullScreen) {
+//                        element.mozRequestFullScreen();
+//                    } else if(element.webkitRequestFullscreen) {
+//                        element.webkitRequestFullscreen();
+//                    } else if(element.msRequestFullscreen) {
+//                        element.msRequestFullscreen();
+//                    }
+//                }
+//
+//                // Launch fullscreen for browsers that support it!
+//                //launchFullscreen(windowObjectReference.document.documentElement); // the whole page
+//                launchFullscreen(windowObjectReference); // the whole page
+//                //launchFullScreen(document.getElementById("videoElement")); // any individual element
             };
 
             for(var i = 0 ; i < projects.length ; i++ ) {
+                //Prepare appContainer
+                var appContainer = $('<div></div>').addClass("appContainer").addClass("box");
                 project = projects[i];
                 // part a: application logo
                 var appLogoDiv = $('<div></div>').addClass("appLogo");
@@ -93,10 +166,10 @@ var _cldSettings = (function() {
                 var appCtrlDiv = $('<div></div>').addClass("appCtrl");
                 var appCtrlEdit = $('<div></div>')
                     .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn")
-                    .click({projectId: project.id}, selectFunc);
+                    .click({projectId: project.id}, editFunc);
                 var appCtrlSelect = $('<div></div>')
                     .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn")
-                    .click({projectId: project.id}, editFunc);
+                    .click({projectId: project.id}, selectFunc);
                 appCtrlEdit.text("Edit");
                 appCtrlSelect.text("Select");
                 //Add functionality
@@ -110,9 +183,10 @@ var _cldSettings = (function() {
 //                else {
 //                    li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false').addClass('row-fluid');
 //                }
-                mainDiv.append(appLogoDiv);
-                mainDiv.append(appInfoDiv);
-                mainDiv.append(appCtrlDiv);
+                appContainer.append(appLogoDiv);
+                appContainer.append(appInfoDiv);
+                appContainer.append(appCtrlDiv);
+                mainDiv.append(appContainer);
             }
         }
         $('#cldProjectExplorer').find('.projects').remove();
@@ -134,6 +208,82 @@ var _cldSettings = (function() {
 
     function getSettings() {
         return this.settings;
+    }
+
+    function updateSelectedProject(projectId,instanceId,compId) {
+        var appSettings = _cldSettings.settings.appSettings;
+        //Search for the project to update
+        for(var i = 0 ; i < appSettings.projects.length ; i++) {
+            var project = appSettings.projects[i];
+            //If the project was found, update it's compId and instanceId fields
+            if(project.id === projectId) {
+                //First, clear previous compId definition
+                for(var j = 0 ; j < appSettings.projects.length ; j++) {
+                    var innerProject = appSettings.projects[j];
+                    //If the project was found, update it's compId and instanceId fields
+                    if(innerProject.compId === compId) {
+                        innerProject.compId = "";
+                        appSettings.projects[j] = innerProject;
+                        break;
+                    }
+                }
+                //Now set the correct one:
+                project.compId = compId;
+                project.instanceId = instanceId;
+                appSettings.projects[i] = project;
+                _cldSettings.settings.appSettings = appSettings;
+                break;
+            }
+        }
+        //And finally, update the server with the new settings
+        updateSettings(_cldSettings.settings, function() {
+            console.log("updated successfully");
+            Wix.Settings.refreshAppByCompIds(compId);
+        });
+    }
+
+    function updateSettings(newSettings, onSuccessCallback) {
+        var compId ,instanceId, userId;
+        try {
+            userId = Wix.Utils.getUid() || "";
+            instanceId = Wix.Utils.getInstanceId() || "";
+            compId = Wix.Utils.getOrigCompId() || "";
+        }
+        catch (err) {
+            console.log("Not in Wix editor"); //TODO check if in Wix editor
+        }
+
+        if(_cldSettings.mode == 'debug') {
+            console.log("about to send window.debugMode = " + _cldSettings.mode);
+            compId = 'null';
+            instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+            userId = Utils.getCookie('instance');
+            console.log("set userId to: "+userId);
+            console.log("set compId to: "+compId);
+        }
+        //Saving the appSettings JSON to the server
+        $.ajax({
+            'type': 'post',
+            'url': "/app/save",
+            'dataType': "json",
+            'contentType': 'application/json; chatset=UTF-8',
+            'data': JSON.stringify({
+                userId: userId,
+                compId: compId,
+                settings: newSettings,
+                mode: _cldSettings.mode
+            }),
+            'cache': false,
+            'success': onSuccessCallback,
+            'error': function (res) {
+                if (_cldSettings.mode === "debug") {
+                    console.log('error updating data with message ' + res.responseText);
+                }
+                else {
+                    console.log('error updating data with message ' + res.responseText);
+                }
+            }
+        });
     }
 
     function getProjects() {
@@ -315,8 +465,75 @@ var _cldSettings = (function() {
                     return sParameterName[1];
                 }
             }
-        }
+        },
+        /**
+         * http://johndyer.name/native-fullscreen-javascript-api-plus-jquery-plugin/
+         */
+        fullscreen : function() {
+            var fullScreenApi = {
+                    supportsFullScreen: false,
+                    isFullScreen: function() { return false; },
+                    requestFullScreen: function() {},
+                    cancelFullScreen: function() {},
+                    fullScreenEventName: '',
+                    prefix: ''
+                },
+                browserPrefixes = 'webkit moz o ms khtml'.split(' ');
 
+            // check for native support
+            if (typeof document.cancelFullScreen != 'undefined') {
+                fullScreenApi.supportsFullScreen = true;
+            }
+            else {
+                // check for fullscreen support by vendor prefix
+                for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
+                    fullScreenApi.prefix = browserPrefixes[i];
+
+                    if (typeof document[fullScreenApi.prefix + 'CancelFullScreen' ] != 'undefined' ) {
+                        fullScreenApi.supportsFullScreen = true;
+
+                        break;
+                    }
+                }
+            }
+
+            // update methods to do something useful
+            if (fullScreenApi.supportsFullScreen) {
+                fullScreenApi.fullScreenEventName = fullScreenApi.prefix + 'fullscreenchange';
+
+                fullScreenApi.isFullScreen = function() {
+                    switch (this.prefix) {
+                        case '':
+                            return document.fullScreen;
+                        case 'webkit':
+                            return document.webkitIsFullScreen;
+                        default:
+                            return document[this.prefix + 'FullScreen'];
+                    }
+                };
+                fullScreenApi.requestFullScreen = function(el) {
+                    return (this.prefix === '') ? el.requestFullScreen() : el[this.prefix + 'RequestFullScreen']();
+                };
+                fullScreenApi.cancelFullScreen = function(el) {
+                    return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + 'CancelFullScreen']();
+                };
+            }
+
+            // jQuery plugin
+            if (typeof jQuery != 'undefined') {
+                jQuery.fn.requestFullScreen = function() {
+
+                    return this.each(function() {
+                        if (fullScreenApi.supportsFullScreen) {
+                            fullScreenApi.requestFullScreen(this);
+                        }
+                    });
+                };
+            }
+
+            // export api
+            return fullScreenApi;
+        }
     };
     return {
         init: function(){

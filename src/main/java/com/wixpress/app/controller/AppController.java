@@ -5,6 +5,7 @@ import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.mortbay.util.URI;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -64,13 +66,12 @@ public class AppController {
                          @RequestParam Integer width,
                          @RequestParam String compId,
                          @RequestParam String viewMode,
+                         @RequestParam(required = false, defaultValue = "") String projectId,
                          @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         model.addAttribute("appInstance",appInstance);
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
-        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance);
+        model.addAttribute("mode",mode);
+        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance, projectId);
 
     }
 
@@ -94,8 +95,9 @@ public class AppController {
                          @RequestParam(value = "section-url", required = false) String sectionUrl,
                          @RequestParam(required = false) String target,
                          @RequestParam(required = false)Integer width,
-                         @RequestParam String compId,
-                         @RequestParam String viewMode,
+                         @RequestParam(required = false) String compId,
+                         @RequestParam(required = false) String viewMode,
+                         @RequestParam(required = false, defaultValue= "") String projectId,
                          @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         //Add Cookie:
@@ -104,10 +106,8 @@ public class AppController {
         if(width == null) {
             width = 500;
         }
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
-        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
+        model.addAttribute("mode",mode);
+        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, projectId, appInstance);
 
     }
 
@@ -135,9 +135,7 @@ public class AppController {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         response.addCookie(new Cookie("instance", instance));
         model.addAttribute("appInstance",appInstance);
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
+        model.addAttribute("mode",mode);
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, appInstance);
     }
 
@@ -365,6 +363,7 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "200") Integer width,
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                   @RequestParam(required = false, defaultValue = "") String projectId,
                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         if(userId == null) {
             userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
@@ -375,10 +374,8 @@ public class AppController {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         //Add 'Cookie' (not a real instance, just the userId is present):
         response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
-        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
+        model.addAttribute("mode",mode);
+        return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, projectId, appInstance);
     }
 
     /**
@@ -408,6 +405,7 @@ public class AppController {
                                    @RequestParam(required = false, defaultValue = "200") Integer width,
                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                   @RequestParam(required = false, defaultValue = "") String projectId,
                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         if(userId == null) {
             userId = "c0a3d7b3-8c90-4b3c-bffa-5092649ccc3a"; //CloudIde userId if not explicitly overridden
@@ -418,10 +416,8 @@ public class AppController {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         //Add 'Cookie' (not a real instance, just the userId is present):
         response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
-        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance);
+        model.addAttribute("mode",mode);
+        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
     }
 
     /**
@@ -454,9 +450,7 @@ public class AppController {
         AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
         //Add 'Cookie' (not a real instance, just the userId is present):
         response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
-        if(mode != null) {
-            model.addAttribute("mode",mode);
-        }
+        model.addAttribute("mode",mode);
         return viewSettings(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, appInstance);
     }
 
@@ -492,21 +486,56 @@ public class AppController {
     }
 
     // Set editor.vm
-    private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance) throws IOException {
+    private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, String projectId, AppInstance appInstance) throws IOException {
         AppSettings appSettings = getSettings(appInstance.getUid().toString());
         //AppData appData = getAppData(instanceId, compId);
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
         model.addAttribute("appInstance", objectMapper.writeValueAsString(appInstance.getUid().toString()));
+        model.addAttribute("projectId",projectId);
         return "editor";
     }
 
 
     // Set widget.vm
-    private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance) throws IOException {
-        //Why do I need the settings in this view?
+    private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
+        //Why do I need the settings in this view? //TODO add direct fetching of project
         AppSettings appSettings = getSettings(appInstance.getUid().toString());
         //TODO use viewMode parameter to determine the binding of live site vs. edit and preview modes data segment
-        model.addAttribute("currentProject",objectMapper.writeValueAsString(appSettings.getAppSettings().get("currentProject")));//TODO change to 'published project'
+
+        //Overrider: Not sufficient (temp solution)
+        if(projectId != null && !projectId.isEmpty()) {
+            Iterator<JsonNode> iter2 = appSettings.getAppSettings().get("projects").getElements();
+            while (iter2.hasNext()) {
+                JsonNode project = iter2.next();
+                String iterProjectId = project.get("id").getTextValue();
+                if(iterProjectId.equals(projectId)) {
+                    model.addAttribute("currentProject",objectMapper.writeValueAsString(project));
+                }
+                System.out.println(iterProjectId);
+            }
+        }
+        try {
+            Iterator<JsonNode> iter = appSettings.getAppSettings().get("projects").getElements();
+            while (iter.hasNext()) {
+                JsonNode project = iter.next();
+                String iterInstanceId;
+                String iterCompId;
+                try {
+                    iterInstanceId = project.get("instanceId").getTextValue();
+                    iterCompId = project.get("compId").getTextValue();
+                    if(instanceId.equals(iterInstanceId) && compId.equals(iterCompId)) {
+                        model.addAttribute("currentProject",objectMapper.writeValueAsString(project));
+                    }
+                }
+                catch (Exception e) {
+                    //Skips bad projects
+                }
+            }
+        }
+        catch (Exception e) {
+            //can't bind, do default:
+            model.addAttribute("currentProject",objectMapper.writeValueAsString("undefined"));
+        }
         return "widget";
     }
 

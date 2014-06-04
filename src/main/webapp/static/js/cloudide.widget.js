@@ -152,7 +152,24 @@ var _cldWidget = (function() {
     // Public functions
     return {
         init: function(currentProject){
+            //TODO project loader
+
+            function getURLParameter(sParam) {
+                var sPageURL = window.location.search.substring(1);
+                var sURLVariables = sPageURL.split('&');
+                for (var i = 0; i < sURLVariables.length; i++) {
+                    var sParameterName = sURLVariables[i].split('=');
+                    if (sParameterName[0] == sParam) {
+                        return sParameterName[1];
+                    }
+                }
+            };
+            //var projectId = getURLParameter('loadProject');
+
+
             _cldWidget.currentProject = currentProject;
+
+
             //When this val is set to true, the app will skip authentication for the update endpoints
 //            if(window.location.origin == "http://localhost:8080") {
 //                _cldWidget.mode = "debug";

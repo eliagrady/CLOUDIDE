@@ -1,6 +1,7 @@
 #* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
 #* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 #* @vtlvariable name="mode" type="java.lang.String" *#
+#* @vtlvariable name="projectId" type="java.lang.String" *#
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -28,6 +29,7 @@
     <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
 
     <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/lib/codemirror.css">
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.css">
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
 
 </head>
@@ -48,7 +50,7 @@
         <div class="navbar-collapse collapse">
 
             <!-- Fullscreen on/off toggle-->
-            <div class="nav navbar-nav navbar-right headerPadding">
+            <div class="nav navbar-nav navbar-right headerPadding CodeMirror-fullscreen-button-overlay">
                 <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
                     <span width="50" class="glyphicon glyphicon-fullscreen cldFullscreenBtn"></span>
                     <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
@@ -74,51 +76,11 @@
     </div>
 </div>
 <!--Main (sidebar and editor)-->
-<div class="container-fluid">
-    <div class="row">
-        <!--Sidebar -->
-        <div class="col-sm-3 col-md-2 sidebar">
-            <div id="cldProjectExplorer">
-                <ul class="nav nav-sidebar">
-                    <li><a href="#" onclick="_cldEditor.editorActions('createNewProject')">Create new Project</a></li>
-                </ul>
-                <!-- List projects here -->
-                <ul class="nav nav-sidebar">
-                </ul>
-            </div>
-        </div>
-        <!--Editor main -->
-        <p>
-        </p>
-        <div class="noLeftPadding col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <h1 class="page-header">Dashboard</h1>
-
-            <div class="container">
-                <!-- CodeEditors Nav tabs -->
-                <!-- code editors links will be initiated here -->
-                <ul id="cldEditorTabs" class="nav nav-tabs tabs col-sm-offset-1 col-md-offset-1">
-                    <li class="active"><a href="#cldEditorHtml" data-toggle="tab">HTML</a></li>
-                    <li><a href="#cldEditorJs" data-toggle="tab">JavaScript</a></li>
-                    <li><a href="#cldEditorCss" data-toggle="tab">CSS</a></li>
-                </ul>
-
-                <!-- Tab panes -->
-                <!-- code editors will be inserted dynamically here, in tabs-->
-                <div class="tab-content cldEditor">
-                    <div class="tab-pane fade in active" id="cldEditorHtml">
-                        <textarea id="cldEditorHtmlTextArea"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="cldEditorJs">
-                        <textarea id="cldEditorJsTextArea"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="cldEditorCss">
-                        <textarea id="cldEditorCssTextArea"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+#if($projectId.equals(""))
+        #include("views/editor/editorMultiProject.vm")
+    #else
+        #include("views/editor/editorSingleProject.vm")
+#end
 <!--Footer (Statusbar)-->
 <div class="navbar-inverse navbar-fixed-bottom" role="status">
     <div class="container-fluid">
@@ -152,7 +114,7 @@
 
 <!-- Imports -->
 <script src="../static/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
-<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.28.0/js/Wix.js"></script>
+<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
 <script src="../static/js/cloudide.editor.js"></script>
 <script src="../static/js/common.js"></script>
 <script src="../static/lib/jquery/jquery.base64.min.js"></script>
@@ -181,6 +143,8 @@
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/json-lint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
 
+<script src="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.js"></script>
+
 <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
 
 
@@ -200,7 +164,9 @@
     #if($mode.equals("debug"))
         #include("views/tests/editor/editorTestsModal.vm")
     #end
-    #include("views/editor/modals/editorProjectSettingsModal.vm")
+    #if($projectId.equals(""))
+        #include("views/editor/modals/editorProjectSettingsModal.vm")
+    #end
     #include("views/editor/modals/editorSettingsModal.vm")
     #include("views/editor/modals/editorHelpModal.vm")
     #include("views/editor/modals/editorPreviewModal.vm")
@@ -210,6 +176,7 @@
     //Create and bind global
     var settings = $!{cldAppSettings};
     var debugMode = "$!{mode}";
+    var projectId = "$!{projectId}";
 </script>
 </body>
 </html>
