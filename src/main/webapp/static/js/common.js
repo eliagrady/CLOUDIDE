@@ -30,7 +30,7 @@ var _common = (function() {
             }
         },
         getProjectById : function(projectId) {
-            //return CloudIde.getSettings().projects[projectId];
+            //return CloudIde.getProject().projects[projectId];
             var settings = CloudIde.getSettings();
             var projects = settings.projects;
             for(var i = 0 ; i < projects.length ; i++) {

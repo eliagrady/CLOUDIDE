@@ -107,7 +107,7 @@ var _cldEditor = (function() {
                 return CloudIde.getSettings().projects;
             },
             getProjectById : function(projectId) {
-                //return CloudIde.getSettings().projects[projectId];
+                //return CloudIde.getProject().projects[projectId];
                 var settings = CloudIde.getSettings();
                 var projects = settings.projects;
                 for(var i = 0 ; i < projects.length ; i++) {
@@ -170,7 +170,7 @@ var _cldEditor = (function() {
 //                    CloudIde.projectHandler.addCurrentProjectToProjectsArray();
 //                }
 //                catch (err) {
-//                    console.log("unable to add current project. current project is:"+CloudIde.getSettings().currentProject);
+//                    console.log("unable to add current project. current project is:"+CloudIde.getProject().currentProject);
 //                }
 
                 // Deep copy the template using the fastest performing method:
@@ -296,9 +296,9 @@ var _cldEditor = (function() {
                 }
                 catch (err) {
 //                    //No 'current project' set, fetch it from the project array, and try again:
-//                    newHtmlCode = CloudIde.getSettings().currentProject.code.html;
-//                    newJsCode = CloudIde.getSettings().currentProject.code.js;
-//                    newCssCode = CloudIde.getSettings().currentProject.code.css;
+//                    newHtmlCode = CloudIde.getProject().currentProject.code.html;
+//                    newJsCode = CloudIde.getProject().currentProject.code.js;
+//                    newCssCode = CloudIde.getProject().currentProject.code.css;
                 }
                 //Cache object is present and valid
                 if(cache && cache.length > 2) {
@@ -554,6 +554,112 @@ var _cldEditor = (function() {
             }
         },
         save: function () {
+            //Update the current project (active project)
+            CloudIde.projectHandler.updateCurrentProject();
+            CloudIde.projectHandler.addCurrentProjectToProjectsArray();
+
+
+            var compId ,instanceId, userId;
+            try {
+                userId = Wix.Utils.getUid() || "";
+                instanceId = Wix.Utils.getInstanceId() || "";
+                compId = Wix.Utils.getOrigCompId() || "";
+            }
+            catch (err) {
+                console.log("Not in Wix editor"); //TODO check if in Wix editor
+            }
+
+            if(_cldEditor.mode == 'debug') {
+                console.log("about to send window.debugMode = " + _cldEditor.mode);
+                compId = 'null';
+                instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                userId = Utils.getCookie('instance');
+                console.log("set userId to: "+userId);
+                console.log("set compId to: "+compId);
+            }
+            //Saving the appSettings JSON to the server
+            $.ajax({
+                'type': 'post',
+                'url': "/app/save",
+                'dataType': "json",
+                'contentType': 'application/json; chatset=UTF-8',
+                'data': JSON.stringify({
+                    userId: userId,
+                    settings: CloudIde.settings,
+                    mode: _cldEditor.mode
+                }),
+                'cache': false,
+                'success': function (res) {
+                    console.log("save completed");
+                    if (_cldEditor.mode === "debug") {
+                        CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
+                    }
+                    else {
+                        CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
+                        Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
+                    }
+                },
+                'error': function (res) {
+                    if (_cldEditor.mode === "debug") {
+                        console.log('error updating data with message ' + res.responseText);
+                    }
+                }
+            });
+        },
+        saveAppSettings: function () {
+            //Update the current project (active project)
+            CloudIde.projectHandler.updateCurrentProject();
+            CloudIde.projectHandler.addCurrentProjectToProjectsArray();
+
+
+            var compId ,instanceId, userId;
+            try {
+                userId = Wix.Utils.getUid() || "";
+                instanceId = Wix.Utils.getInstanceId() || "";
+                compId = Wix.Utils.getOrigCompId() || "";
+            }
+            catch (err) {
+                console.log("Not in Wix editor"); //TODO check if in Wix editor
+            }
+
+            if(_cldEditor.mode == 'debug') {
+                console.log("about to send window.debugMode = " + _cldEditor.mode);
+                compId = 'null';
+                instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+                userId = Utils.getCookie('instance');
+                console.log("set userId to: "+userId);
+                console.log("set compId to: "+compId);
+            }
+            //Saving the appSettings JSON to the server
+            $.ajax({
+                'type': 'post',
+                'url': "/app/save",
+                'dataType': "json",
+                'contentType': 'application/json; chatset=UTF-8',
+                'data': JSON.stringify({
+                    userId: userId,
+                    settings: CloudIde.settings,
+                    mode: _cldEditor.mode
+                }),
+                'cache': false,
+                'success': function (res) {
+                    console.log("save completed");
+                    if (_cldEditor.mode === "debug") {
+                        CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
+                    }
+                    else {
+                        CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);
+                        Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
+                    }
+                },
+                'error': function (res) {
+                    if (_cldEditor.mode === "debug") {
+                        console.log('error updating data with message ' + res.responseText);
+                    }
+                }
+            });
+        },
+        publish: function () {
             //Update the current project (active project)
             CloudIde.projectHandler.updateCurrentProject();
             CloudIde.projectHandler.addCurrentProjectToProjectsArray();
@@ -883,7 +989,12 @@ var _cldEditor = (function() {
                 //Set the currentProject (display and model)
                 var projId = Utils.getURLParameter('projectId');
                 if(projId) {
-                    CloudIde.projectHandler.setCurrentProjectById(projId);
+                    try {
+                        CloudIde.projectHandler.setCurrentProjectById(CloudIde.projectHandler.getProjectById(projId));
+                    }
+                    catch (err) {
+                        console.log(err.stack);
+                    }
                 }
                 else {
                     CloudIde.projectHandler.setCurrentProjectById(CloudIde.projectHandler.getCurrentProjectId());
@@ -911,8 +1022,8 @@ var _cldEditor = (function() {
             var startLoading = Date.now();
             var async = initPhases.asyncLoader();
             async.executePhase("setEditorMode",initPhases.setEditorMode);
+            initPhases.loadCodeMirrorToTextAreasPhase();
             async.executePhase("loadSettingsFromServer",initPhases.loadSettingsFromServer);
-            async.executePhase("loadCodeMirrorToTextAreasPhase",initPhases.loadCodeMirrorToTextAreasPhase);
             async.executePhase("bindCodeMirrorTabs",initPhases.bindCodeMirrorTabs);
             async.executePhase("bindCodeMirrorTabsListeners",initPhases.bindCodeMirrorTabsListeners);
             async.executePhase("loadModalsPhase",initPhases.loadModalsPhase);

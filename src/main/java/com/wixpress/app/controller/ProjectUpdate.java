@@ -1,15 +1,15 @@
 package com.wixpress.app.controller;
 
-import com.wixpress.app.dao.AppSettings;
+import com.wixpress.app.dao.AppProject;
 
 /**
  * A container class for the request body
  */
-public class SettingsUpdate {
+public class ProjectUpdate {
 
     private String userId;
-    private AppSettings settings;
-    private String mode;
+    private AppProject project;
+    private String mode; //Request mode
 
     public String getUserId() {
         return this.userId;
@@ -19,12 +19,12 @@ public class SettingsUpdate {
         this.userId = userId;
     }
 
-    public AppSettings getSettings() {
-        return this.settings;
+    public AppProject getProject() {
+        return this.project;
     }
 
-    public void setSettings(AppSettings settings) {
-        this.settings = settings;
+    public void setProject(AppProject project) {
+        this.project = project;
     }
 
     public String getMode() {
