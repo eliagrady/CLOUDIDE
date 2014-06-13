@@ -21,6 +21,11 @@ public class AppProject implements DataContainer {
         code = objectMapper.createObjectNode();
     }
 
+    public AppProject(String projectId, JsonNode code) {
+        this.projectId = projectId;
+        this.code = code;
+    }
+
     public <T> T nvl(T value, T fallback) {
         return (value != null)?value:fallback;
     }

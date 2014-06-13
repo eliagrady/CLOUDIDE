@@ -79,7 +79,13 @@ public class AjaxResult
     public static ResponseEntity<AjaxResult> internalServerError(Exception e) {
         StringBuilder stackTrace = new StringBuilder();
         renderStackTrace(e, stackTrace);
-        return new ResponseEntity<AjaxResult>(new AjaxResult(false, e.getMessage(), stackTrace.toString()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<AjaxResult>(new AjaxResult(false, e.getMessage(), stackTrace.toString()), HttpStatus.INTERNAL_SERVER_ERROR); //TODO check HTTP status on client to retry
+    }
+
+    public static ResponseEntity<AjaxResult> entityLookupError(Exception e) {
+        StringBuilder stackTrace = new StringBuilder();
+        renderStackTrace(e, stackTrace);
+        return new ResponseEntity<AjaxResult>(new AjaxResult(false, e.getMessage(), stackTrace.toString()), HttpStatus.NOT_FOUND); //TODO check HTTP status on client to retry
     }
 
     public static void renderStackTrace(Throwable e, StringBuilder stackTrace) {
@@ -95,5 +101,11 @@ public class AjaxResult
     @Nullable
     public String getRetData() {
         return retData;
+    }
+
+    public static ResponseEntity<AjaxResult> notOk() {
+//        StringBuilder stackTrace = new StringBuilder();
+//        renderStackTrace(e, stackTrace);
+        return new ResponseEntity<AjaxResult>(new AjaxResult(false), HttpStatus.OK);
     }
 }

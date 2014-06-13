@@ -50,3 +50,7 @@
 .autoMargin {
     margin: auto;
  }
+
+.fullWidth {
+    width: 100%;
+}

@@ -6,6 +6,9 @@
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
     <!-- TODO move to async loading -->
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
     <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
     <script type="text/javascript">
 
@@ -13,24 +16,23 @@
 </head>
 
 <body wix-ui>
-<div class="settingsHero" id="cldProjectExplorer">
+<div class="settingsHero container" id="cldProjectExplorer">
     #if(false) {
         #include("views/settings/project.vm")
     #end
-
-
 </div>
-
-
     <!-- Part 3 - Libs that are usually used while developing the settings end point -->
 
 
 
-    <!-- Wix SDK -->
+        <!-- Wix SDK -->
     <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
 
-    <!-- jQuery Dependency -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <!-- jQuery dependency-->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <!-- Wix UI -->
     <script type="text/javascript" src="../static/lib/ui-lib/ui-lib.min.js"></script>
     <!-- Settings View Logic -->

@@ -1,6 +1,7 @@
 package com.wixpress.app.dao;
 
 import com.google.appengine.api.datastore.*;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
@@ -42,7 +43,7 @@ public class AppGaeDao implements AppDao {
 
     /**
      * Save app settings in the DB
-     * @param userId - the Wix userid (UUID)
+     * @param userId - the Wix userId (UUID)
      * @param appSettings - The settings of the app that configure the widget
      */
     public Boolean saveAppSettings(String userId, AppSettings appSettings) {
@@ -50,7 +51,7 @@ public class AppGaeDao implements AppDao {
     }
 
     @Override
-    public AppProject getAppProject(String instanceId, String compId) {
+    public JsonNode getAppProjectCode(String instanceId, String compId) {
         if (instanceId == null || compId == null)
             return null;
         else {
@@ -62,31 +63,55 @@ public class AppGaeDao implements AppDao {
                 final Key projectKey = KeyFactory.createKey(APP_INSTANCE, key(projectid));
                 final Text object = (Text) dataStore.get(projectKey).getProperty(CODEJSON);
                 final String asText = object.getValue();
-                return objectMapper.readValue(asText, AppProject.class);
+                return objectMapper.readValue(asText, JsonNode.class);
             } catch (EntityNotFoundException e) {
                 // we ignore the setting reading exception and return a new default settings object
-                return new AppProject(objectMapper);
+                return null;
             } catch (IOException e) {
                 // we ignore the setting reading exception and return a new default settings object
-                return new AppProject(objectMapper);
+                return null;
             }
         }
     }
 
     @Override
-    public Boolean saveAppProject(String projectId, String userId, AppProject appProject) {
+    public AppProject getAppProject(String userId, String projectId) {
+        if (userId == null || projectId == null)
+            return null;
+        else {
+            final Key projectKey = KeyFactory.createKey(APP_INSTANCE, key(projectId));
+            try {
+//                final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
+//                return objectMapper.readValue(prop, AppSettings.class);
+                final Text object = (Text) dataStore.get(projectKey).getProperty(CODEJSON);
+                final String asText = object.getValue();
+                final JsonNode code = objectMapper.readTree(asText);
+                return new AppProject(projectId,code);
+                //return objectMapper.readValue(asText, AppProject.class);
+            } catch (EntityNotFoundException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return null;
+            } catch (IOException e) {
+                // we ignore the setting reading exception and return a new default settings object
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public Boolean saveAppProject(String userId, String projectId, AppProject appProject) {
         return saveAppProjectToDataStore(projectId, userId, appProject);
     }
 
     @Override
-    public Boolean publishProject(String instanceId, String compId, String projectId) {
-        return saveProjectCorrelationToDataStore(instanceId, compId, projectId);
+    public Boolean publishProject(String userId, String instanceId, String compId, String projectId) {
+        return saveProjectCorrelationToDataStore(userId, instanceId, compId, projectId);
     }
 
 
     /**
      * Get app settings from the DB
-     * @param userId - the Wix userid (UUID)
+     * @param userId - the Wix userId (UUID)
      * @return
      */
     public
@@ -102,23 +127,21 @@ public class AppGaeDao implements AppDao {
                 final Text object = (Text) dataStore.get(key).getProperty(SETTINGS);
                 final String asText = object.getValue();
                 //final AppSettings appSettings = objectMapper.readValue(asText, AppSettings.class);
-                final AppSettings appSettingsTree = objectMapper.reader(AppSettings.class).readValue(asText);
-                final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
+                //final AppSettings appSettingsTree = objectMapper.reader(AppSettings.class).readValue(asText);
+                //final String prop = dataStore.get(key).getProperty(SETTINGS).toString();
                 return objectMapper.readValue(asText, AppSettings.class);
 
             } catch (EntityNotFoundException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppSettings(objectMapper);
+                return null; //Settings not found
             } catch (IOException e) {
-                // we ignore the setting reading exception and return a new default settings object
-                return new AppSettings(objectMapper);
+                return null;
             }
         }
     }
 
     /**
      * Create a unique key to each entry in the DB that is composed from the instanceId and compID
-     * @param userId - the Wix userid (UUID)
+     * @param userId - the Wix userId (UUID)
      * @return a key for saving and loading from GAE datastore
      */
     public String key(String userId) {
@@ -139,7 +162,7 @@ public class AppGaeDao implements AppDao {
 
     /**
      * Save appProject to the datastore
-     * @param userId - the Wix userid (UUID)
+     * @param userId - the Wix userId (UUID)
      * @param propertyName - property name of the appProject ('column' in SQL)
      * @param data - the appProject to save, saved as as string.
      * @return true if the save action has been successfully performed
@@ -177,7 +200,7 @@ public class AppGaeDao implements AppDao {
     /**
      * Save appProject to the datastore
      * @param projectId - the current projectId
-     * @param userId - the Wix userid (UUID)
+     * @param userId - the Wix userId (UUID)
      * @param appProject - the appProject to save, saved as as string.
      * @return true if the save action has been successfully performed
      */
@@ -192,14 +215,15 @@ public class AppGaeDao implements AppDao {
             entity = new Entity(APP_INSTANCE, key(projectId));
         }
         try {
-            Text textObj = new Text(objectMapper.writeValueAsString(appProject.getCode()));
+            Text textObj = new Text(objectMapper.writeValueAsString(appProject));
+            //Text textObj3 = new Text(objectMapper.writeValue,appProject);
             //Should fix 500 char limit on properties
             entity.setProperty(CODEJSON,textObj);
-            Integer revisionNum;
+            Long revisionNum;
             try {
-                revisionNum = (Integer) entity.getProperty(REVISION);
+                revisionNum = (Long) entity.getProperty(REVISION);
                 if(revisionNum == null) {
-                    revisionNum = 0;
+                    revisionNum = new Long(0);
                 }
                 else {
                     revisionNum++;
@@ -231,14 +255,17 @@ public class AppGaeDao implements AppDao {
 
     /**
      * Save a correlation between an app instance and a projectId to the datastore
+     *
+     * @param userId
      * @param instanceId - - Instance id of the app, It is shared by multiple Widgets of the same app within the same sitecurrent projectId
      * @param compId - - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
      * @param projectId - - the current projectId
      * @return true if the save action has been successfully performed
      */
-    private Boolean saveProjectCorrelationToDataStore(String instanceId, String compId, String projectId) {
+    private Boolean saveProjectCorrelationToDataStore(String userId, String instanceId, String compId, String projectId) {
         Boolean isSuccessful = false;
         //TODO make revision support here and more logic
+        //TODO use the USERID to verify write permissions
         Entity entity;
         try {
             entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId)));

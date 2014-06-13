@@ -6,6 +6,7 @@ import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.mortbay.util.URI;
@@ -202,15 +203,16 @@ public class AppController {
      * Saves changes from the settings dialog
      *
      * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
-     * @param settingsUpdate - the new app data and settings edited by the user and the widgetId
+     * @param projectUpdate - the new app data and settings edited by the user and the widgetId
      * @return AjaxResult written directly to the response stream
      */
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @RequestMapping(value = "/publish", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<AjaxResult> appSave(@CookieValue() String instance,
-                                                @RequestBody SettingsUpdate settingsUpdate) {
+    public ResponseEntity<AjaxResult> appPublish(@CookieValue() String instance,
+                                                 @RequestBody ProjectUpdate projectUpdate) {
         try {
-            String mode = settingsUpdate.getMode();
+            //TODO remove debugMode from production code
+            String mode = projectUpdate.getMode();
             AppInstance appInstance;
             if (mode != null && mode.equals(DEBUG.MODE)) {
                 String userId; //CloudIde userId
@@ -225,7 +227,7 @@ public class AppController {
             else {
                 appInstance = authenticationResolver.unsignInstance(instance);
             }
-            return executeSave(appInstance, settingsUpdate);
+            return executePublish(appInstance, projectUpdate);
         }
         catch (Exception e) {
             return AjaxResult.internalServerError(e);
@@ -234,10 +236,125 @@ public class AppController {
     /**
      * Helper function for saving
      */
-    private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, SettingsUpdate settingsUpdate) {
+    private ResponseEntity<AjaxResult> executePublish(AppInstance appInstance, ProjectUpdate projectUpdate) {
         try {
-            AppSettings appSettings = settingsUpdate.getSettings();
+            String instanceId = projectUpdate.getInstanceId();
+            String compId = projectUpdate.getCompId();
+            String userId = appInstance.getUid().toString();
+            String projectId = projectUpdate.getProjectId();
+            Boolean result = appDao.publishProject(userId, instanceId, compId, projectId);
+            if(result) {
+                return AjaxResult.ok();
+            }
+            else {
+                return AjaxResult.notOk();
+            }
+        } catch (NullPointerException npe) {
+            return AjaxResult.internalServerError(npe);
+        } catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
+     * @param projectUpdate - the new app data and settings edited by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/loadproject", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> loadProject(@CookieValue() String instance,
+                                                 @RequestBody ProjectUpdate projectUpdate) {
+        try {
+            String mode = projectUpdate.getMode();
+            AppInstance appInstance;
+            if (mode != null && mode.equals(DEBUG.MODE)) {
+                String userId; //CloudIde userId
+                if(instance != null && instance != "") {
+                    userId = instance;
+                }
+                else {
+                    userId = DEBUG.userId;
+                }
+                appInstance = createTestSignedInstance(DEBUG.instanceId, userId, DEBUG.permissions);
+            }
+            else {
+                appInstance = authenticationResolver.unsignInstance(instance);
+            }
+            return executeLoadProject(appInstance, projectUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+    /**
+     * Helper function for saving
+     */
+    private ResponseEntity<AjaxResult> executeLoadProject(AppInstance appInstance, ProjectUpdate projectUpdate) {
+        try {
+            String instanceId = projectUpdate.getInstanceId();
+            String compId = projectUpdate.getCompId();
+            String userId = appInstance.getUid().toString();
+            String projectId = projectUpdate.getProjectId();
+            AppProject project = getAppProject(userId,projectId);
+            if(project != null) {
+                return AjaxResult.res(objectMapper.writeValueAsString(project));
+            }
+            else {
+                return AjaxResult.notOk();
+                //throw new NullPointerException("Failed fetching project from DB");
+            }
+        } catch (NullPointerException npe) {
+            return AjaxResult.entityLookupError(npe);
+        } catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the editor controller view operations
+     * @param projectUpdate - the new app data and settings edited by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> appSave(@CookieValue() String instance,
+                                              @RequestBody ProjectUpdate projectUpdate) {
+        try {
+            String mode = projectUpdate.getMode();
+            AppInstance appInstance;
+            if (mode != null && mode.equals(DEBUG.MODE)) {
+                String userId; //CloudIde userId
+                if(instance != null && instance != "") {
+                    userId = instance;
+                }
+                else {
+                    userId = DEBUG.userId;
+                }
+                appInstance = createTestSignedInstance(DEBUG.instanceId, userId, DEBUG.permissions);
+            }
+            else {
+                appInstance = authenticationResolver.unsignInstance(instance);
+            }
+            return executeSave(appInstance, projectUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+    /**
+     * Helper function for saving
+     */
+    private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, ProjectUpdate projectUpdate) {
+        try {
+            AppSettings appSettings = projectUpdate.getSettings();
             appDao.saveAppSettings(appInstance.getUid().toString(), appSettings);
+            AppProject appProject = projectUpdate.getProject();
+            appDao.saveAppProject(appInstance.getUid().toString(), projectUpdate.getProjectId(), appProject);
             return AjaxResult.ok();
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);
@@ -322,10 +439,14 @@ public class AppController {
             }
             fetched = appDao.getAppSettings(appInstance.getUid().toString());
             //Can produce NullPointerException
+            if(fetched == null) {
+                return AjaxResult.notOk();
+                //throw new NullPointerException("Failed fetching settings from DB");
+            }
             return AjaxResult.res(objectMapper.writeValueAsString(fetched));
         }
         catch (NullPointerException npe) {
-            return AjaxResult.internalServerError(npe);
+            return AjaxResult.entityLookupError(npe);
         }
         catch (Exception e) {
             return AjaxResult.internalServerError(e);
@@ -418,6 +539,48 @@ public class AppController {
     }
 
     /**
+     * VIEW - Widget Endpoint for testing
+     * This endpoint does not implement the Wix API. It can be used directly to test the application from any browser,
+     * substituting the signed instance parameter with explicit values given as URL parameters
+     *
+     * @param model       - model used by the view template widget.vm
+     * @param instanceId  - the instanceId member of the signed instance
+     * @param userId      - the uid member of the signed instance
+     * @param permissions - the permissions member of the signed instance
+     * @param sectionUrl  - The base URL of the application section, if present
+     * @param target      - The target attribute that must be added to all href anchors within the application frame
+     * @param width       - The width of the frame to render in pixels
+     * @param compId      - The id of the Wix component which is the host of the IFrame
+     * @param viewMode    - An indication whether the user is currently in editor / site
+     * @return the template widget.vm name
+     */
+    @RequestMapping(value = "/widget2standalone", method = RequestMethod.GET)
+    public String widgetStandAlone2(Model model,
+                                   HttpServletResponse response,
+                                   @RequestParam String instanceId,
+                                   @RequestParam(required = false) String userId,
+                                   @RequestParam(required = false) String permissions,
+                                   @RequestParam(value = "section-url", required = false, defaultValue = "/") String sectionUrl,
+                                   @RequestParam(required = false, defaultValue = "_self") String target,
+                                   @RequestParam(required = false, defaultValue = "200") Integer width,
+                                   @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
+                                   @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                   @RequestParam(required = false, defaultValue = "") String projectId,
+                                   @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+        if(userId == null) {
+            userId = DEBUG.userId;
+        }
+        if(permissions == null) {
+            permissions = DEBUG.permissions;
+        }
+        AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
+        //Add 'Cookie' (not a real instance, just the userId is present):
+        response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
+        model.addAttribute("mode",mode);
+        return viewWidget2(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
+    }
+
+    /**
      * VIEW - Setting Endpoint for testing
      * This endpoint does not implement the Wix API. It can be used directly to test the application from any browser,
      * substituting the signed instance parameter with explicit values given as URL parameters
@@ -496,9 +659,19 @@ public class AppController {
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
         //TODO test base64 decoding on server (can impact performance)
-        AppProject appProject = getAppProject(instanceId,compId);
+        //AppProject appProject = getAppProject(instanceId, compId);
+        JsonNode appProject = getAppProjectCode(instanceId, compId);
         model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
         return "widget";
+    }
+
+    // Set widget2.vm
+    private String viewWidget2(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
+        //TODO test base64 decoding on server (can impact performance)
+        //AppProject appProject = getAppProject(instanceId, compId);
+        JsonNode appProject = getAppProjectCode(instanceId, compId);
+        model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
+        return "widget2";
     }
 
 
@@ -529,13 +702,24 @@ public class AppController {
     }
 
     /**
+     * Get AppProject from the DB if exists, otherwise return empty settings
+     * @param userId - the uid member of the signed instance
+     * @param projectId - the project's id
+     * @return the app project
+     */
+    private AppProject getAppProject(String userId, String projectId) {
+        AppProject appProject = appDao.getAppProject(userId, projectId);
+        return appProject;
+    }
+
+    /**
      * Get settings from the DB if exists, otherwise return empty settings
      * @param instanceId - - the instance id member of the signed instance
      * @param compId - - The id of the Wix component which is the host of the IFrame
      * @return the app project
      */
-    private AppProject getAppProject(String instanceId, String compId) {
-        AppProject appProject = appDao.getAppProject(instanceId, compId);
+    private JsonNode getAppProjectCode(String instanceId, String compId) {
+        JsonNode appProject = appDao.getAppProjectCode(instanceId, compId);
         return appProject;
     }
 
