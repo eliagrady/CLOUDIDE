@@ -149,6 +149,18 @@ var _cldWidget = (function() {
         $('#cldHtml').html(codeHtml);
     }
 
+    function appendDefault() {
+        //Validate appData for malicious code!
+        //$('#hero').innerHTML = appData.appData;
+
+        //$('#cldJs').html(codeJs);
+        //$('#cldCss').html(codeCss);
+        //$('#cldHtml').html(codeHtml);
+        var $body = $('body');
+        var $text = $('<div></div>').addClass('addNewProjectTextStyling').text('Create a new project, and assign it in order to start using this Widget!');
+        $body.append($text);
+    }
+
     // Public functions
     return {
         init: function(currentProject){
@@ -180,7 +192,8 @@ var _cldWidget = (function() {
             //applySettings();
             //loadFeed();
             try{
-                custom();
+                //'Edit' button inside the Wix editor (deprecated)
+                //custom();
             }
             catch (err) {
 
@@ -190,6 +203,7 @@ var _cldWidget = (function() {
                 console.log("code injected");
             }
             catch (err) {
+                appendDefault();
                 console.log("failed injecting code!");
             }
             //Release global

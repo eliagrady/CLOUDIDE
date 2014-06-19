@@ -44,12 +44,14 @@ var _cldSettings = (function() {
                 url += "&instanceId=" +  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
                 url += "&compId=" + 'null';
                 url += "&mode=" + _cldSettings.mode;
+                url += "&projectId=" + projectId;
             }
             else {
                 url = 'http://wixcloudide.appspot.com/app/editor?';
                 url += "instance=" + Utils.getCookie('instance');
                 url += "&instanceId=" + Wix.Utils.getInstanceId();
                 url += "&compId=" + Wix.Utils.getOrigCompId();
+                url += "&projectId=" + projectId;
             }
 
             //var url = 'http://wixcloudide.appspot.com/app/editor' + ?projectId=+projectId;
@@ -94,8 +96,28 @@ var _cldSettings = (function() {
             var currentlySelectedProjectId = projects[0];
         }
         //Prepare main div
-        var mainDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth');
-        //Case no projects are found   //TODO create one now button
+        var topDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('appTop');
+        var mainDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('uilib-footer');
+
+
+        //Regardless of whether there are or aren't any projects, display the 'CloudIde' MultiProjectEditor link:
+        //var openMultiProjectEditorBtnIcon = $('<span></span>').addClass('glyphicon').addClass('glyphicon-3x').addClass('glyphicon-cloud').addClass('appLogo');
+        var openMultiProjectEditorBtnText = $('<span></span>').text("Create new projects!").addClass('appLogoText');
+        //var openMultiProjectEditorBtnIconContainer = $('<div></div>').addClass('col-xs-10').addClass('col-xs-offset-1');
+        var openMultiProjectEditorBtnIconContainer = $('<div></div>').addClass('fullWidth');
+        //openMultiProjectEditorBtnIconContainer.append(openMultiProjectEditorBtnIcon);
+        var openMultiProjectEditorBtn = $('<div></div>').attr('id','openMultiProjectEditorBtn')
+            .addClass('submit').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
+            .click({projectId: null}, editFunc);
+        var controlRow = $('<div></div>').addClass('row');
+        openMultiProjectEditorBtn.prepend(openMultiProjectEditorBtnText);
+        //openMultiProjectEditorBtn.prepend(openMultiProjectEditorBtnIconContainer);
+        controlRow.append(openMultiProjectEditorBtn);
+        topDiv.append(controlRow);
+
+
+
+        //Case no projects are found   //TODO change to display message or, open new editor
         if(!projects || projects.length === 0) {
             var createNewProjectBtn = $('<div></div>').text("Create new project").attr('id','createNewProjectBtn')
                 .addClass('submit').addClass('btn-large').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
@@ -116,16 +138,16 @@ var _cldSettings = (function() {
                 var appContainer = $('<div></div>').addClass("appContainer").addClass('box').addClass('fullWidth');
                 project = projects[i];
                 // part a: application logo
-                var appLogoDiv = $('<div></div>').addClass("appLogo");
-                var appLogo = $('<div></div>').addClass("logo");
+                var appProjectLogoDiv = $('<div></div>').addClass("appProjectLogo");
+                var appProjectLogo = $('<div></div>').addClass("logo");
                 var imgSrc = "../static/lib/ui-lib/images/wix_icon.png"; //TODO change to custom image
                 var appImg = $('<img/>').addClass("appSettings-padding").attr("width",86).attr("src",imgSrc).attr('alt',"cloudide");
-                appLogo.append(appImg);
-                appLogoDiv.append(appLogo);
+                appProjectLogo.append(appImg);
+                appProjectLogoDiv.append(appProjectLogo);
                 // part b: application description
                 var appInfoDiv = $('<div></div>').addClass("appInfo");
                 var prjName = $('<strong></strong>').text(project.name);
-                var prjNameDiv = $('<div></div>').addClass("uilib-text");
+                var prjNameDiv = $('<div></div>').addClass("uilib-text").addClass('projectName');
                 prjNameDiv.append(prjName);
                 //TODO add date formatter
                 var prjDescModified = $('<div></div>').html("<strong>Modified: </strong>"+project.modified);
@@ -137,16 +159,29 @@ var _cldSettings = (function() {
                 appInfoDiv.append(prjDescDiv);
 
                 //part c: application control
+//                var appCtrlDiv = $('<div></div>').addClass("appCtrl");
+//                var appCtrlEdit = $('<div></div>')
+//                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
+//                    .click({projectId: project.id}, editFunc);
+//                var appCtrlSelect = $('<div></div>')
+//                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
+//                    .click({projectId: project.id}, selectFunc);
+//                appCtrlEdit.text("Edit");
+//                appCtrlSelect.text("Select");
+//                //Adds functionality
+
                 var appCtrlDiv = $('<div></div>').addClass("appCtrl");
-                var appCtrlEdit = $('<div></div>')
-                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
-                    .click({projectId: project.id}, editFunc);
-                var appCtrlSelect = $('<div></div>')
-                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
-                    .click({projectId: project.id}, selectFunc);
-                appCtrlEdit.text("Edit");
-                appCtrlSelect.text("Select");
-                //Add functionality
+                var appCtrlEdit = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintTan");
+                var appCtrlEdit_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-pencil').click({projectId: project.id}, editFunc).addClass("floatRight");
+                appCtrlEdit.append(appCtrlEdit_icon);
+
+                var appCtrlSelect = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintGreen");
+                var appCtrlSelect_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-ok').click({projectId: project.id}, selectFunc).addClass("floatRight");
+                appCtrlSelect.append(appCtrlSelect_icon);
+
+                //appCtrlEdit.text("Edit");
+                //appCtrlSelect.text("Select");
+                //Adds functionality
 
                 appCtrlDiv.append(appCtrlEdit);
                 appCtrlDiv.append(appCtrlSelect);
@@ -157,13 +192,14 @@ var _cldSettings = (function() {
 //                else {
 //                    li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false').addClass('row-fluid');
 //                }
-                appContainer.append(appLogoDiv);
+                appContainer.append(appProjectLogoDiv);
                 appContainer.append(appInfoDiv);
                 appContainer.append(appCtrlDiv);
                 mainDiv.append(appContainer);
             }
         }
         $('#cldProjectExplorer').find('.projects').remove();
+        $('#cldProjectExplorer').append(topDiv);
         $('#cldProjectExplorer').append(mainDiv);
 
 

@@ -16,9 +16,12 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
+    <link rel="stylesheet" href="../static/lib/font-awesome-4.1.0/css/font-awesome.css">
+    <!--<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">-->
+
 
     <!-- Custom styles for this template -->
-    <link href="../static/lib/assets/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/lib/assets/css/dashboard.css">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -35,9 +38,12 @@
 </head>
 <body>
 <!--Header (Menu)-->
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="navbar navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
+            <div class="nav navbar-left">
+                <span class="glyphicon glyphicon-2x-outer glyphicon-cloud appLogo paint-uilib-colors"></span>
+            </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
@@ -45,8 +51,9 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <div id="cldProjectName" class="navbar-brand noSelect">Project name</div>
+            <div id="cldProjectName" class="navbar-brand noSelect">Loading project name...</div>
         </div>
+        <!-- Show on smaller screen resolutions -->
         <div class="navbar-collapse collapse">
 
             <!-- Fullscreen on/off toggle-->
@@ -77,12 +84,14 @@
 </div>
 <!--Main (sidebar and editor)-->
 #if($projectId.equals(""))
+        <!--sidebar and editor-->
         #include("views/editor/editorMultiProject.vm")
     #else
+        <!--editor only-->
         #include("views/editor/editorSingleProject.vm")
 #end
 <!--Footer (Statusbar)-->
-<div class="navbar-inverse navbar-fixed-bottom" role="status">
+<div class="navbar-fixed-bottom" role="status">
     <div class="container-fluid">
         <div id="cldStatusbar" class="input-xlarge center-block text-center" placeholder="Idle">Idle</div>
     </div>
@@ -98,7 +107,7 @@
 
 
                                                  <script src="../static/lib/jquery/jquery-2.1.0.js"></script>
-                                                      <script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
+                                                 <script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
 
 
 
@@ -114,6 +123,9 @@
 
 <!-- Imports -->
 <script src="../static/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
+
+<script src="../static/lib/codemirror/codemirror-4.0/keymap/sublime.js"></script>
+
 <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
 <script src="../static/js/cloudide.editor.js"></script>
 <script src="../static/js/common.js"></script>
@@ -121,6 +133,19 @@
 
 <!-- Runtime Imports (TODO load dynamically) -->
 
+<!-- CodeMirror Modes -->
+<script src="../static/lib/codemirror/codemirror-4.0/mode/xml/xml.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/css/css.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- CodeMirror Addons: close bracket, match brackets, closetag and matchtags -->
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchbrackets.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closetag.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchtags.js"></script>
+
+<!-- CodeMirror Linter -->
 <!-- CDN resources
 <script src="http://ajax.aspnetcdn.com/ajax/jshint/r07/jshint.js"></script>
 <script src="https://rawgithub.com/zaach/jsonlint/79b553fb65c192add9066da64043458981b3972b/lib/jsonlint.js"></script>
@@ -129,35 +154,62 @@
 <script src="../static/lib/linter/jshint.js"></script>
 <script src="../static/lib/linter/jsonlint.js"></script>
 <script src="../static/lib/linter/csslint.js"></script>
-
-<script src="../static/lib/codemirror/codemirror-4.0/mode/xml/xml.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/mode/css/css.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchbrackets.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closetag.js"></script>
-<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchtags.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/javascript-lint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/css-lint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/json-lint.js"></script>
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
 <script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
+
+
+
+
+
+
+
+<!-- CodeMirror Fullscreen -->
 
 <script src="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.js"></script>
 
-<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
-
-
-<!-- CodeMirror Addons and Extensions -->
-<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.js"></script>
-
+<!-- CodeMirror Hint -->
 <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.css">
-
-
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/anyword-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/javascript-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/css-hint.js"></script>
 <script src="../static/lib/codemirror/codemirror-4.0/addon/hint/html-hint.js"></script>
+
+<!-- CodeMirror Fold -->
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/foldcode.js"></script>
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/fold/foldgutter.css">
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/foldgutter.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/brace-fold.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/xml-fold.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/markdown-fold.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/fold/comment-fold.js"></script>
+
+<!-- CodeMirror Comments -->
+<script src="../static/lib/codemirror/codemirror-4.0/addon/comment/comment.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/comment/continuecomment.js"></script>
+
+<!-- CodeMirror Dialog -->
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/dialog/dialog.css">
+<script src="../static/lib/codemirror/codemirror-4.0/addon/dialog/dialog.js"></script>
+
+
+<!-- CodeMirror Tern -->
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.css">
+<script src="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.js"></script>
+
+<script src="http://marijnhaverbeke.nl/acorn/acorn.js"></script>
+<script src="http://marijnhaverbeke.nl/acorn/acorn_loose.js"></script>
+<script src="http://marijnhaverbeke.nl/acorn/util/walk.js"></script>
+<script src="http://ternjs.net/doc/demo/polyfill.js"></script>
+<script src="http://ternjs.net/lib/signal.js"></script>
+<script src="http://ternjs.net/lib/tern.js"></script>
+<script src="http://ternjs.net/lib/def.js"></script>
+<script src="http://ternjs.net/lib/comment.js"></script>
+<script src="http://ternjs.net/lib/infer.js"></script>
+<script src="http://ternjs.net/plugin/doc_comment.js"></script>
 
 
 <!-- Modals loading (partially) on demand and by configuration-->
@@ -165,7 +217,9 @@
         #include("views/tests/editor/editorTestsModal.vm")
     #end
     #if($projectId.equals(""))
+        #include("views/editor/modals/editorCreateNewProjectModal.vm")
         #include("views/editor/modals/editorProjectSettingsModal.vm")
+        #include("views/editor/modals/editorDuplicateProjectModal.vm")
     #end
     #include("views/editor/modals/editorSettingsModal.vm")
     #include("views/editor/modals/editorHelpModal.vm")

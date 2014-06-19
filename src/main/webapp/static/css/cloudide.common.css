@@ -1,52 +1,7 @@
-/* cloud ide editor css */
-
-#cldMenubar {
-    background-color: #2b2b2b;
-}
-
-#cldSidebar {
-    background-color: #313335;
-}
-
-.cldEditor {
-    font-family: "Consolas", monospace;
-    font-size: 14px;
-    text-shadow:0px 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-#cldEditorTextArea {
-    border-width: 0px;
-    position: relative;
-    width: 100%;
-    resize: none;
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px 0px 0px;
-}
-
-#cldStatusbar {
-    color: #0099ff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-}
-#cldEditor {
-    margin: 0;
-    padding: 0;
-    overflow: auto;
-    background-color: #c9de00;
-    z-index: 2;
-    font-family: "Consolas", monospace;
-    font-size: 14px;
-    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-}
+/* common css */
 
 .noLeftPadding {
     padding-left: 0;
-}
-.editorPadding {
-    padding-left: 0;
-    padding-bottom: 0;
-    padding-right: 0;
 }
 .noPadding {
     padding: 0px;
@@ -91,19 +46,9 @@
     }
 }
 
-.appLogo {
-    -webkit-text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
-    text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
-    margin: auto;
-    padding: 5px 50px 5px 5px;
+.glyphicon-1x{
+    font-size: 20px;
 }
-
-/*
-.appLogo:hover {
-    animation-timing-function: linear;
-    text-shadow:0 5px 10px rgba(0, 153, 255, 0.30);
-}
-*/
 
 .glyphicon-2x{
     font-size: 40px;
@@ -125,13 +70,6 @@
     right: auto;
 }
 
-.CodeMirror-fullscreen {
-    z-index: 1100!important;
-}
-.CodeMirror-fullscreen-button-overlay {
-    z-index: 1102!important;
-}
-
 .paintRed {
     color: red;
 }
@@ -140,6 +78,9 @@
 }
 .paintGreen {
     color: green;
+}
+.paintTan {
+    color: tan;
 }
 .paintBlack {
     color: #000000;
@@ -153,27 +94,10 @@
 .paintWixBlue {
     color: #09f;
 }
-.panel-primary {
-    border-color: #09f;
-}
-.panel-primary > .panel-heading {
-    color: #fff;
-    background-color: #09f;
-    border-color: #09f;
-}
 .outerMargin {
     margin-bottom: 20px!important;
 }
-.projectSettingsCog:hover {
 
-}
-
-.projectName {
-    white-space : nowrap;
-    width: inherit;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 .floatLeftInlineAndUnder {
     float: left;
     display: inline;
@@ -182,16 +106,6 @@
     text-overflow: ellipsis;
 }
 
-/* Override for code folding marker styling */
-.CodeMirror-foldmarker {
-    color: #000000!important;
-    background-color: rgba(0, 0, 0, 0.04)!important;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif!important;
-    text-shadow: none!important;
-    font-weight: bolder!important;
-    line-height: .3;
-    cursor: pointer;
-}
 
 .paint-uilib-colors {
     -webkit-border-radius: 3px;

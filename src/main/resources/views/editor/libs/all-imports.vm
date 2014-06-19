@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.css"/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+
+    <!-- Custom styles for this template -->
+    <link href="../static/lib/assets/css/dashboard.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="../static/css/cloudide.editor.css"/>
+
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/lib/codemirror.css">
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.css">
+    <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+
+<!-- jQuery dependency-->
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="../static/lib/jquery/jquery-2.1.0.js"></script>
+<script type="javascript" href="../static/lib/bootstrap/js/bootstrap.js"/>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+
+<!-- Bootstrap Imports -->
+<script src="../static/lib/assets/js/docs.min.js"></script>
+<script src="../static/lib/assets/js/holder.js"></script>
+
+<!-- Imports -->
+<script src="../static/lib/codemirror/codemirror-4.0/lib/codemirror.js"></script>
+<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
+<script src="../static/js/cloudide.editor.js"></script>
+<script src="../static/js/common.js"></script>
+<script src="../static/lib/jquery/jquery.base64.min.js"></script>
+
+<!-- Runtime Imports (TODO load dynamically) -->
+
+
+<script src="http://ajax.aspnetcdn.com/ajax/jshint/r07/jshint.js"></script>
+<script src="https://rawgithub.com/zaach/jsonlint/79b553fb65c192add9066da64043458981b3972b/lib/jsonlint.js"></script>
+<script src="https://rawgithub.com/stubbornella/csslint/master/release/csslint.js"></script>
+
+<script src="../static/lib/linter/jshint.js"></script>
+<script src="../static/lib/linter/jsonlint.js"></script>
+<script src="../static/lib/linter/csslint.js"></script>
+
+<script src="../static/lib/codemirror/codemirror-4.0/mode/xml/xml.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/css/css.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/javascript/javascript.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closebrackets.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchbrackets.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/closetag.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/edit/matchtags.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/javascript-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/css-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/json-lint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.js"></script>
+
+<script src="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.js"></script>
+
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/lint/lint.css">
+
+
+<!-- CodeMirror Addons and Extensions -->
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.js"></script>
+
+<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/hint/show-hint.css">
+
+
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/anyword-hint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/javascript-hint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/css-hint.js"></script>
+<script src="../static/lib/codemirror/codemirror-4.0/addon/hint/html-hint.js"></script>

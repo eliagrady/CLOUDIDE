@@ -42,12 +42,21 @@ public interface AppDao {
 
     /**
      * Save app settings in the data store
-     * @param userId  - The Wix user id of the app.
+     * @param userId  - The Wix user id of the apgp.
      * @param projectId  - The Wix user id of the app.
      * @param appProject - The project to save
      * @return true if the project was successfully saved to the DB
      */
     public Boolean saveAppProject(String userId, String projectId, AppProject appProject);
+
+    /**
+     * Save app settings in the data store
+     * @param userId  - The Wix user id of the apgp.
+     * @param projectIds  - The projects ids to save
+     * @param appProjects - The projects data to save
+     * @return true if the project was successfully saved to the DB
+     */
+    public Boolean saveAppProjects(String userId, String[] projectIds, AppProject[] appProjects);
 
 
     /**

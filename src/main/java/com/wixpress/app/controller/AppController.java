@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -354,7 +355,24 @@ public class AppController {
             AppSettings appSettings = projectUpdate.getSettings();
             appDao.saveAppSettings(appInstance.getUid().toString(), appSettings);
             AppProject appProject = projectUpdate.getProject();
-            appDao.saveAppProject(appInstance.getUid().toString(), projectUpdate.getProjectId(), appProject);
+            if(appProject == null) {
+                //Save all projects
+                JsonNode projectsData = projectUpdate.getProjects();
+                int projectCount = projectsData.size();
+                Iterator<String> iter = projectsData.getFieldNames();
+                AppProject[] appProjects = new AppProject[projectCount];
+                int idx = 0;
+                while(iter.hasNext()) {
+                    JsonNode proj = projectsData.get(iter.next());
+                    appProjects[idx++] = new AppProject(proj.get("projectId").asText(),proj.get("code"));
+                }
+                System.out.println(appProjects);
+                appDao.saveAppProjects(appInstance.getUid().toString(), null, appProjects);
+            }
+            else {
+                //Save single project
+                appDao.saveAppProject(appInstance.getUid().toString(), projectUpdate.getProjectId(), appProject);
+            }
             return AjaxResult.ok();
         } catch (NullPointerException npe) {
             return AjaxResult.internalServerError(npe);

@@ -13,6 +13,32 @@
 }
 
 .appLogo {
+    -webkit-text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
+    text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+.appLogoText {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size : 20px;
+    font-weight : bolder;
+    -webkit-text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
+    text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.glyphicon-1x{
+    font-size: 20px;
+}
+.glyphicon-2x{
+    font-size: 40px;
+}
+.glyphicon-3x{
+    font-size: 60px;
+}
+
+.appProjectLogo {
     float: left;
     width : auto;
     clear: both;
@@ -22,6 +48,7 @@
 .appInfo {
     float: left;
     width : auto;
+    max-width: 60%;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;
 }
@@ -29,6 +56,7 @@
 .appDescription {
     float: left;
     width : auto;
+    max-width: 100%;
     padding: 5px 5px 5px 5px;
     margin : 5px 5px 5px 5px;
     max-height : 50px;
@@ -46,11 +74,49 @@
     float: left;
     clear: both;
 }
-
+.appTop {
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
 .autoMargin {
     margin: auto;
- }
+}
 
 .fullWidth {
     width: 100%;
+}
+
+.projectName {
+    white-space : nowrap;
+    width: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.paintGreen {
+    color: green;
+}
+.paintTan {
+    color: tan;
+}
+.floatRight {
+    float: right;
+}
+.arrow_box {
+    position: relative;
+    background: #09f;
+}
+.arrow_box:after {
+    right: 100%;
+    top: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(0, 153, 255, 0);
+    border-right-color: #09f;
+    border-width: 50px;
+    margin-top: -50px;
 }

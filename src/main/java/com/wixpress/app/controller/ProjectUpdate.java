@@ -2,6 +2,7 @@ package com.wixpress.app.controller;
 
 import com.wixpress.app.dao.AppProject;
 import com.wixpress.app.dao.AppSettings;
+import org.codehaus.jackson.JsonNode;
 
 import javax.annotation.Nullable;
 
@@ -16,6 +17,7 @@ public class ProjectUpdate {
     private @Nullable String projectId;
     private @Nullable AppSettings settings;
     private @Nullable AppProject project;
+    private @Nullable JsonNode projects;
     private String mode; //Request mode
 
     public ProjectUpdate() {};
@@ -78,5 +80,14 @@ public class ProjectUpdate {
 
     public void setSettings(@Nullable AppSettings settings) {
         this.settings = settings;
+    }
+
+    @Nullable
+    public JsonNode getProjects() {
+        return projects;
+    }
+
+    public void setProjects(@Nullable JsonNode projects) {
+        this.projects = projects;
     }
 }

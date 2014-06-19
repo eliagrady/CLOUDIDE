@@ -49,7 +49,7 @@
   }
 
   function makeWidget(options) {
-    var widget = (options && options.widget) || "\u2194";
+    var widget = (options && options.widget) || "\u2026";
     if (typeof widget == "string") {
       var text = document.createTextNode(widget);
       widget = document.createElement("span");

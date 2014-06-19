@@ -31,6 +31,7 @@ public class AppGaeDao implements AppDao {
     protected static final String REVISION = "revision";
     protected static final String PROJECT_ID = "projectId";
     protected static final String MODIFIED = "modified";
+    protected static final String USER = "userId";
 
     @Resource
     private ObjectMapper objectMapper;
@@ -100,7 +101,22 @@ public class AppGaeDao implements AppDao {
 
     @Override
     public Boolean saveAppProject(String userId, String projectId, AppProject appProject) {
-        return saveAppProjectToDataStore(projectId, userId, appProject);
+        return saveAppProjectToDataStore(userId, projectId, appProject);
+    }
+
+    @Override
+    public Boolean saveAppProjects(String userId, String[] projectIds, AppProject[] appProjects) {
+        boolean success = false;
+        int successes = 0;
+        for (AppProject project: appProjects) {
+            String projectId = project.getProjectId();
+            success = saveAppProjectToDataStore(userId, projectId, project);
+            if(success) {
+                successes++;
+            }
+        }
+        success = successes == appProjects.length ? true : false;
+        return success;
     }
 
     @Override
@@ -199,12 +215,12 @@ public class AppGaeDao implements AppDao {
 
     /**
      * Save appProject to the datastore
-     * @param projectId - the current projectId
      * @param userId - the Wix userId (UUID)
+     * @param projectId - the current projectId
      * @param appProject - the appProject to save, saved as as string.
      * @return true if the save action has been successfully performed
      */
-    private Boolean saveAppProjectToDataStore(String projectId, String userId, AppProject appProject) {
+    private Boolean saveAppProjectToDataStore(String userId, String projectId, AppProject appProject) {
         Boolean isSuccessful = false;
         //TODO make revision support here and more logic
         Entity entity;
@@ -219,6 +235,7 @@ public class AppGaeDao implements AppDao {
             //Text textObj3 = new Text(objectMapper.writeValue,appProject);
             //Should fix 500 char limit on properties
             entity.setProperty(CODEJSON,textObj);
+            entity.setProperty(USER,userId);
             Long revisionNum;
             try {
                 revisionNum = (Long) entity.getProperty(REVISION);
@@ -269,6 +286,7 @@ public class AppGaeDao implements AppDao {
         Entity entity;
         try {
             entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId)));
+            entity.setProperty(PROJECT_ID,projectId);
         }
         catch (EntityNotFoundException e){
             entity = new Entity(APP_INSTANCE, key(instanceId,compId));
