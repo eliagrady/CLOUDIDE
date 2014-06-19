@@ -1,0 +1,44 @@
+<div class="container-fluid fullHeight">
+    <div class="row fullHeight">
+        <!--Sidebar -->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <div id="cldProjectExplorer">
+                <ul class="nav nav-sidebar">
+                    <li>
+
+                    </li>
+                </ul>
+                <button type="button" data-toggle="modal" data-target="#createNewProjectModal"
+                        class="uilib-btn btn-large fullWidth outerMargin" projectId="" func='_cldEditor.editorActions("createNewProject")'>
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create new Project
+                </button>
+                <!-- List projects here -->
+            </div>
+        </div>
+        <!--Editor main -->
+        <div class="editorPadding col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <!-- CodeEditors Nav tabs -->
+            <!-- code editors links will be initiated here -->
+            <ul id="cldEditorTabs" class="nav nav-tabs tabs col-sm-offset-1 col-md-offset-1">
+                <li class="active"><a href="#cldEditorHtml" data-toggle="tab">HTML</a></li>
+                <li><a href="#cldEditorJs" data-toggle="tab">JavaScript</a></li>
+                <li><a href="#cldEditorCss" data-toggle="tab">CSS</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <!-- code editors will be inserted dynamically here, in tabs-->
+            <div class="tab-content cldEditor">
+                <div class="tab-pane fade in active" id="cldEditorHtml">
+                    <textarea id="cldEditorHtmlTextArea"></textarea>
+                </div>
+                <div class="tab-pane fade" id="cldEditorJs">
+                    <textarea id="cldEditorJsTextArea"></textarea>
+                </div>
+                <div class="tab-pane fade" id="cldEditorCss">
+                    <textarea id="cldEditorCssTextArea"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
