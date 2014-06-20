@@ -12,7 +12,7 @@ var _cldEditor = (function() {
             appSettings: {
                 //Active project in editor
                 currentProject : {},
-                projects : [],
+                projects : []
             }
         },
         projectsData : {}, //mapping projectId -> projectCodeObject (JSON)
@@ -471,6 +471,7 @@ var _cldEditor = (function() {
                     var div_noProjects = $('<div></div>');
                     div_noProjects.append(span_no_projects);
                     div_projectsContainer.append(div_noProjects);
+                    $('#cldProjectName').text("Please create a new project!");
                 }
                 //Case there are some projects listed
                 else {
@@ -671,7 +672,9 @@ var _cldEditor = (function() {
                 console.log("options object is:",options);
                 var newName = options.name;
                 var newProject = CloudIde.projectHandler.createNewProjectFromTemplate();
-                newProject.name = newName;
+                if(newName) {
+                    newProject.name = newName;
+                }
                 var newProjectData = CloudIde.projectHandler.createNewProjectDataFromTemplate();
                 //Adds the project to the projects array, as well as it's data.
                 CloudIde.projectHandler.addProject(newProject);
@@ -1171,11 +1174,16 @@ var _cldEditor = (function() {
                 }),
                 'cache': false,
                 'success': function(res) {
-                    console.log("res is", res);
-                    var ret = JSON.parse(res.retData);
-                    console.log("ret.projectId", ret.projectId);
-                    console.log("ret.code", ret.code);
-                    CloudIde.projectsData[ret.projectId] = ret.code;
+                    try {
+                        console.log("res is", res);
+                        var ret = JSON.parse(res.retData);
+                        console.log("ret.projectId", ret.projectId);
+                        console.log("ret.code", ret.code);
+                        CloudIde.projectsData[ret.projectId] = ret.code;
+                    }
+                    catch (err) {
+                        console.log("load project failed");
+                    }
                 },
                 'error': function (res) {
                     if (_cldEditor.mode === "debug") {
@@ -1528,7 +1536,8 @@ var _cldEditor = (function() {
                 }
                 else {//No settings loaded, init a new editor instance
                     //Initialize template project if the fetched settings aren't proper
-                    CloudIde.editor.createNewProject();
+                    //CloudIde.editor.createNewProject({name: undefined});
+                    CloudIde.editor.loadProjectsToExplorer();
                 }
 
                 //Finally, notify:

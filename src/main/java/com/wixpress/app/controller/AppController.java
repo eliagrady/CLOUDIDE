@@ -406,8 +406,6 @@ public class AppController {
      */
     private ResponseEntity<AjaxResult> executeSave(AppInstance appInstance, ProjectUpdate projectUpdate) {
         try {
-            AppSettings appSettings = projectUpdate.getSettings();
-            appDao.saveAppSettings(appInstance.getUid().toString(), appSettings);
             AppProject appProject = projectUpdate.getProject();
             if(appProject == null) {
                 //Save all projects
@@ -415,12 +413,17 @@ public class AppController {
                 int projectCount = projectsData.size();
                 Iterator<String> iter = projectsData.getFieldNames();
                 AppProject[] appProjects = new AppProject[projectCount];
+
                 int idx = 0;
                 while(iter.hasNext()) {
-                    JsonNode proj = projectsData.get(iter.next());
-                    appProjects[idx++] = new AppProject(proj.get("projectId").asText(),proj.get("code"));
+                    String projectId =iter.next();
+                    JsonNode project = projectsData.get(projectId);
+                    JsonNode projectCode = project.get("code");
+
+                    appProjects[idx++] = new AppProject(projectId,projectCode);
                 }
-                System.out.println(appProjects);
+                AppSettings appSettings = projectUpdate.getSettings();
+                appDao.saveAppSettings(appInstance.getUid().toString(), appSettings);
                 appDao.saveAppProjects(appInstance.getUid().toString(), null, appProjects);
             }
             else {

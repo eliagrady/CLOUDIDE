@@ -53,7 +53,9 @@ var _cldSettings = (function() {
                 url += "instance=" + Utils.getCookie('instance');
                 url += "&instanceId=" + Wix.Utils.getInstanceId();
                 url += "&compId=" + Wix.Utils.getOrigCompId();
-                url += "&projectId=" + projectId;
+                if(projectId !== null && projectId !== undefined && projectId !== "") {
+                    url += "&projectId=" + projectId;
+                }
             }
 
             //var url = 'http://wixcloudide.appspot.com/app/editor' + ?projectId=+projectId;
@@ -121,13 +123,14 @@ var _cldSettings = (function() {
 
         //Case no projects are found   //TODO change to display message or, open new editor
         if(!projects || projects.length === 0) {
-            var createNewProjectBtn = $('<div></div>').text("Create new project").attr('id','createNewProjectBtn')
-                .addClass('submit').addClass('btn-large').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
-                .click({projectId: null}, editFunc);
+//            var createNewProjectBtn = $('<div></div>').text("Create new project").attr('id','createNewProjectBtn')
+//                .addClass('submit').addClass('btn-large').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
+//                .click({projectId: null}, editFunc);
+            var span_no_projects = $('<div></div>').text("Project list is empty!").addClass('col-xs-8').addClass('col-xs-offset-2').addClass("uilib-inline").addClass("uilib-text");
             var noProjectsRow = $('<div></div>').addClass('row');
-            noProjectsRow.append(createNewProjectBtn);
+            noProjectsRow.append(span_no_projects);
             mainDiv.removeClass("box").addClass("uilib-inline").addClass("uilib-text");
-            mainDiv.append(createNewProjectBtn);
+            mainDiv.append(noProjectsRow);
             //    <div class="row-fluid">
             // <div id="createNewProjectBtn" class="submit btn-large uilib-btn connect appCtrl-btn col-xs-6 col-xs-offset-3">Create new project</div></div>
 

@@ -1,0 +1,20 @@
+<!-- Show on smaller screen resolutions -->
+<div class="navbar-collapse collapse">
+
+    <!-- Fullscreen on/off toggle-->
+    <div class="nav navbar-nav navbar-right headerPadding CodeMirror-fullscreen-button-overlay">
+        <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
+            <span width="50" class="glyphicon glyphicon-fullscreen cldFullscreenBtn"></span>
+            <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
+        </button>
+    </div>
+    <!-- Settings and Help modals-->
+    <ul class="nav navbar-nav navbar-right">
+        #include("views/editor/modals/editorSettingsModalButton.vm")
+        #include("views/editor/modals/editorHelpModalButton.vm")
+    </ul>
+    <!-- Search functionallity-->
+    <form class="navbar-form navbar-right">
+        <input type="text" class="form-control" placeholder="Search...">
+    </form>
+</div>

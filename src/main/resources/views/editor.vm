@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
-    <title> test </title>
+    <title> CloudIde Editor </title>
     <!--Document properties -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -55,24 +55,23 @@
         </div>
         <!-- Show on smaller screen resolutions -->
         <div class="navbar-collapse collapse">
-
-            <!-- Fullscreen on/off toggle-->
-            <div class="nav navbar-nav navbar-right headerPadding CodeMirror-fullscreen-button-overlay">
-                <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
-                    <span width="50" class="glyphicon glyphicon-fullscreen cldFullscreenBtn"></span>
-                    <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
-                </button>
-            </div>
-
+            #if($mode.equals("debug"))
+                #include("views/editor/editorTopMenuFullscreen.vm")
+            #end
+            <!-- Settings and Help modals-->
             <ul class="nav navbar-nav navbar-right">
+            #if($mode.equals("debug"))
                 #include("views/editor/modals/editorSettingsModalButton.vm")
                 #include("views/editor/modals/editorHelpModalButton.vm")
+            #end
             </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
+            #if($mode.equals("debug"))
+                #include("views/editor/editorTopMenuSearch.vm")
+            #end
             <ul class="nav navbar-nav navbar-right">
-                #include("views/editor/modals/editorPreviewModalButton.vm")
+                #if($mode.equals("debug"))
+                    #include("views/editor/modals/editorPreviewModalButton.vm")
+                #end
                 <li><a id="cldMenubarBttSave" onclick="_cldEditor.save()" href="#"> Save </a></li>
                 <!-- Button trigger modal -->
                 #if($mode.equals("debug"))
@@ -83,7 +82,7 @@
     </div>
 </div>
 <!--Main (sidebar and editor)-->
-#if($projectId.equals(""))
+#if($projectId.equals("") || $projectId.equals("null"))
         <!--sidebar and editor-->
         #include("views/editor/editorMultiProject.vm")
     #else

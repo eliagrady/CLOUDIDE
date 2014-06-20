@@ -1,0 +1,7 @@
+<!-- Fullscreen on/off toggle-->
+<div class="nav navbar-nav navbar-right headerPadding CodeMirror-fullscreen-button-overlay">
+    <button type="button" class="btn btn-navbar btn-sm" onclick="_cldEditor.editorActions('toggleFullscreen')">
+        <span width="50" class="glyphicon glyphicon-fullscreen cldFullscreenBtn"></span>
+        <span width="50" class="glyphicon glyphicon-resize-small cldFullscreenBtn hidden"></span>
+    </button>
+</div>
