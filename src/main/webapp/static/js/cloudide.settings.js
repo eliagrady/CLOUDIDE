@@ -18,7 +18,9 @@ var _cldSettings = (function() {
             var projectId = e.data.projectId;
             console.log("Select pressed for projectId:"+projectId);
             publishProject(projectId);
+            _cldSettings.selectedProjectId = projectId;
             //Wix.Settings.refreshAppByCompIds([compId],queryParams);
+            loadProjects();
         };
         var editFunc = function(e) {
             var projectId = e.data.projectId;
@@ -134,9 +136,13 @@ var _cldSettings = (function() {
         else {
             var project;
             for(var i = 0 ; i < projects.length ; i++ ) {
-                //Prepare appContainer
-                var appContainer = $('<div></div>').addClass("appContainer").addClass('box').addClass('fullWidth');
                 project = projects[i];
+                //Prepare appContainer
+                var appContainer = $('<div></div>').addClass("appContainer").addClass('box').addClass('fullWidth').click({projectId: project.id}, selectFunc);
+                console.log("project.id ,_cldSettings.selectedProjectId",project.id,_cldSettings.selectedProjectId,project.id == _cldSettings.selectedProjectId)
+                if(project.id == _cldSettings.selectedProjectId) {
+                    appContainer.addClass('appContainerSelected');
+                }
                 // part a: application logo
                 var appProjectLogoDiv = $('<div></div>').addClass("appProjectLogo");
                 var appProjectLogo = $('<div></div>').addClass("logo");
@@ -171,20 +177,20 @@ var _cldSettings = (function() {
 //                //Adds functionality
 
                 var appCtrlDiv = $('<div></div>').addClass("appCtrl");
-                var appCtrlEdit = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintTan");
-                var appCtrlEdit_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-pencil').click({projectId: project.id}, editFunc).addClass("floatRight");
+                var appCtrlEdit = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintDarkBlue");
+                var appCtrlEdit_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-2x").addClass('glyphicon-edit').click({projectId: project.id}, editFunc).addClass("floatRight");
                 appCtrlEdit.append(appCtrlEdit_icon);
 
-                var appCtrlSelect = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintGreen");
-                var appCtrlSelect_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-ok').click({projectId: project.id}, selectFunc).addClass("floatRight");
-                appCtrlSelect.append(appCtrlSelect_icon);
+//                var appCtrlSelect = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintGreen");
+//                var appCtrlSelect_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-ok').click({projectId: project.id}, selectFunc).addClass("floatRight");
+//                appCtrlSelect.append(appCtrlSelect_icon);
 
                 //appCtrlEdit.text("Edit");
                 //appCtrlSelect.text("Select");
                 //Adds functionality
 
                 appCtrlDiv.append(appCtrlEdit);
-                appCtrlDiv.append(appCtrlSelect);
+                //appCtrlDiv.append(appCtrlSelect);
 
 //                if(project.id == currentlySelectedProjectId) {
 //                    li = $('<li></li>').attr('projectId', project.id).attr('selectedProject', 'true').addClass('row-fluid');
@@ -309,6 +315,52 @@ var _cldSettings = (function() {
                 instanceId: instanceId,
                 compId: compId,
                 projectId: projectId,
+                settings : null,
+                project: null,
+                mode: _cldSettings.mode
+            }),
+            'cache': false,
+            'success': onSuccessCallback,
+            'error': function (res) {
+                if (_cldSettings.mode === "debug") {
+                    console.log('error publishing project with message ' + res.responseText + 'Status Code: ' +res.statusCode);
+                }
+                else {
+                    console.log('error publishing project with message ' + res.responseText);
+                }
+            }
+        });
+    }
+    function projectLookup(onSuccessCallback) {
+        var compId ,instanceId, userId;
+        try {
+            userId = Wix.Utils.getUid() || "";
+            instanceId = Wix.Utils.getInstanceId() || "";
+            compId = Wix.Utils.getOrigCompId() || "";
+        }
+        catch (err) {
+            console.log("Not in Wix editor"); //TODO check if in Wix editor
+        }
+
+        if(_cldSettings.mode == 'debug') {
+            console.log("about to send window.debugMode = " + _cldSettings.mode);
+            compId = 'null';
+            instanceId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+            userId = Utils.getCookie('instance');
+            console.log("set userId to: "+userId);
+            console.log("set compId to: "+compId);
+        }
+        //Saving the appSettings JSON to the server
+        $.ajax({
+            'type': 'post',
+            'url': "/app/projectlookup",
+            'dataType': "json",
+            'contentType': 'application/json; chatset=UTF-8',
+            'data': JSON.stringify({
+                userId: userId,
+                instanceId: instanceId,
+                compId: compId,
+                projectId: null,
                 settings : null,
                 project: null,
                 mode: _cldSettings.mode
@@ -458,6 +510,14 @@ var _cldSettings = (function() {
             }
             fetchSettings(useFetchedSettings);
         },
+        loadSelectedProject: function() {
+            //And finally, update the server with the new settings
+            var onSuccess = function(res) {
+                _cldSettings.selectedProjectId = res.retData;
+                console.log("_cldSettings.selectedProjectId selected is",_cldSettings.selectedProjectId);
+            };
+            projectLookup(onSuccess);
+        },
         /**
          * Bind events
          * Listen to changes of the elements
@@ -586,6 +646,7 @@ var _cldSettings = (function() {
             var async = initPhases.asyncLoader();
 
             async.executePhase("setMode",initPhases.setMode);
+            async.executePhase("loadSelectedProject",initPhases.loadSelectedProject);
             async.executePhase("loadSettingsFromServer",initPhases.loadSettingsFromServer);
             //async.executePhase("bindEditButton",initPhases.bindRefresh);
             //async.executePhase("loadTimeFormatter",initPhases.loadTimeFormatter);

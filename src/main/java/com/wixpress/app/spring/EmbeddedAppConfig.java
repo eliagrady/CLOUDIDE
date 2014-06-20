@@ -24,8 +24,9 @@ import org.springframework.context.annotation.Import;
 public class EmbeddedAppConfig {
     //ObjectMapper objectMapper;
     @Bean
-    public ObjectMapper objectMapper() { //TODO remove FAIL_ON_UNKNOWN_PROPERTIES feature
+    public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
+        // FAIL_ON_UNKNOWN_PROPERTIES feature disabled by default!
         //configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         //return new ObjectMapper();
@@ -57,5 +58,5 @@ public class EmbeddedAppConfig {
         return new AuthenticationResolver(objectMapper());
     }
 
-    //TODO add path resolver as a bean
+    //Can add path resolver controller helper here, as a bean
 }

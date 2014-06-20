@@ -70,6 +70,16 @@ public interface AppDao {
      */
     public Boolean publishProject(String userId, String instanceId, String compId, String projectId);
 
+    /**
+     * Returns a correlation between a given app instance and a projectId
+     *
+     * @param userId - The Wix user id of the app.
+     * @param instanceId - Instance id of the app, It is shared by multiple Widgets of the same app within the same site
+     * @param compId     - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
+     * @return the project id if the user has published to the instanceId.compId instance
+     */
+    public String lookupProject(String userId, String instanceId, String compId);
+
 
     //public List<AppProject> getRevisions(String userId);
     //public Boolean restoreToRevisionNumber(String userId, int revisionNumber);

@@ -14,10 +14,7 @@ import java.util.Date;
  * It implements methods for getting and setting appProject in the DB as specified in the AppDao interface
  */
 
-/*
- * TODO Add support for fetching from cache, utilizing the GAE memcache option:
- * https://developers.google.com/appengine/docs/java/memcache/
- */
+//TODO Add support for fetching from cache, utilizing the GAE memcache option: https://developers.google.com/appengine/docs/java/memcache/
 
 public class AppGaeDao implements AppDao {
 
@@ -123,6 +120,12 @@ public class AppGaeDao implements AppDao {
     public Boolean publishProject(String userId, String instanceId, String compId, String projectId) {
         return saveProjectCorrelationToDataStore(userId, instanceId, compId, projectId);
     }
+
+    @Override
+    public String lookupProject(String userId, String instanceId, String compId) {
+        return getProjectCorrelationFromDataStore(userId, instanceId, compId);
+    }
+
 
 
     /**
@@ -281,7 +284,6 @@ public class AppGaeDao implements AppDao {
      */
     private Boolean saveProjectCorrelationToDataStore(String userId, String instanceId, String compId, String projectId) {
         Boolean isSuccessful = false;
-        //TODO make revision support here and more logic
         //TODO use the USERID to verify write permissions
         Entity entity;
         try {
@@ -303,6 +305,28 @@ public class AppGaeDao implements AppDao {
             }
         }
         return isSuccessful;
+    }
+
+
+
+    /**
+     * Save a correlation between an app instance and a projectId to the datastore
+     *
+     * @param userId
+     * @param instanceId - - Instance id of the app, It is shared by multiple Widgets of the same app within the same sitecurrent projectId
+     * @param compId - - The ID of the Wix component which is the host of the iFrame, it is used to distinguish between multiple instances of the same Widget in a site
+     * @return true if the save action has been successfully performed
+     */
+    private String getProjectCorrelationFromDataStore(String userId, String instanceId, String compId) {
+        //TODO use the USERID to verify write permissions
+        Entity entity;
+        try {
+            entity = dataStore.get(KeyFactory.createKey(APP_INSTANCE, key(instanceId, compId)));
+            return String.valueOf(entity.getProperty(PROJECT_ID));
+        }
+        catch (EntityNotFoundException e){
+            return null;
+        }
     }
 }
 

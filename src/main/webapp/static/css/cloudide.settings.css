@@ -11,6 +11,17 @@
     min-height:100px;
     align-self: center;
 }
+.appContainer:hover {
+    background-color: rgba(0, 153, 255, 0.20);
+}
+
+.appContainer:active {
+    background-color: rgba(0, 153, 255, 0.60);
+}
+.appContainerSelected {
+    background-color: rgba(0, 153, 255, 0.60)!important;
+    border-color: darkblue!important;;
+}
 
 .appLogo {
     -webkit-text-shadow:0 5px 10px rgba(0, 0, 0, 0.3);
@@ -96,6 +107,11 @@
 .paintGreen {
     color: green;
 }
+
+.paintDarkBlue {
+    color: darkblue;
+}
+
 .paintTan {
     color: tan;
 }

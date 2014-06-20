@@ -3,7 +3,8 @@ package com.wixpress.app.controller;
 import com.wixpress.app.dao.AppSettings;
 
 /**
- * A container class for the request body
+ * A container class for the request body of a settings request
+ * Will be deprecated in following versions
  */
 public class SettingsUpdate {
 

@@ -28,7 +28,7 @@ import java.util.UUID;
  * The controller of the Wix API sample application.
  * The controller implements the widget and settings endpoints of a Wix application.
  * In addition, it implements two versions of the endpoints for stand-alone testing.
- * Elia: Adding endpoint for the editor as a separate mapping endpoint, also with
+ * Adding endpoint for the editor as a separate mapping endpoint, also with
  * testing and live environments mapping
  */
 
@@ -169,7 +169,7 @@ public class AppController {
                            @RequestParam(required = false) String locale,
                            @RequestParam(required = false) String origCompId,
                            @RequestParam String compId) throws IOException {
-        //TODO make due with no security here
+        //TODO Create a special endpoint for creating rich apps with backend
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         response.addCookie(new Cookie("instance", instance));
         model.addAttribute("appInstance",appInstance);
@@ -200,6 +200,60 @@ public class AppController {
             return AjaxResult.internalServerError(e);
         }
     }
+
+    /**
+     * Saves changes from the settings dialog
+     *
+     * @param instance       - the appUpdate instance, read from a cookie placed by the settings controller view operations
+     * @param projectUpdate - the new settings selected by the user and the widgetId
+     * @return AjaxResult written directly to the response stream
+     */
+    @RequestMapping(value = "/projectlookup", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<AjaxResult> projectLookup(@CookieValue() String instance,
+                                                     @RequestBody ProjectUpdate projectUpdate) {
+        try {
+            //TODO remove debugMode from production code
+            String mode = projectUpdate.getMode();
+            AppInstance appInstance;
+            if (mode != null && mode.equals(DEBUG.MODE)) {
+                String userId; //CloudIde userId
+                if(instance != null && instance != "") {
+                    userId = instance;
+                }
+                else {
+                    userId = DEBUG.userId;
+                }
+                appInstance = createTestSignedInstance(DEBUG.instanceId, userId, DEBUG.permissions);
+            }
+            else {
+                appInstance = authenticationResolver.unsignInstance(instance);
+            }
+            return executeReverseLookup(appInstance, projectUpdate);
+        }
+        catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+    /**
+     * Helper function for saving
+     */
+    private ResponseEntity<AjaxResult> executeReverseLookup(AppInstance appInstance, ProjectUpdate projectUpdate) {
+        try {
+            String instanceId = projectUpdate.getInstanceId();
+            String compId = projectUpdate.getCompId();
+            String userId = appInstance.getUid().toString();
+            String result = appDao.lookupProject(userId, instanceId, compId);
+            return AjaxResult.res(result);
+        } catch (NullPointerException npe) {
+            return AjaxResult.internalServerError(npe);
+        } catch (Exception e) {
+            return AjaxResult.internalServerError(e);
+        }
+    }
+
+
+
     /**
      * Saves changes from the settings dialog
      *
@@ -411,7 +465,7 @@ public class AppController {
      */
     private ResponseEntity<AjaxResult> executeUpdate(AppInstance appInstance,SettingsUpdate settingsUpdate) {
         try {
-            //TODO REMOVE
+            //TODO Check for the necessity of this operation
             //AppSettings appData = settingsUpdate.getAppData();
             AppSettings fetched;
             fetched = appDao.getAppSettings(appInstance.getUid().toString());
@@ -676,7 +730,6 @@ public class AppController {
 
     // Set widget.vm
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
-        //TODO test base64 decoding on server (can impact performance)
         //AppProject appProject = getAppProject(instanceId, compId);
         JsonNode appProject = getAppProjectCode(instanceId, compId);
         model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
@@ -685,7 +738,7 @@ public class AppController {
 
     // Set widget2.vm
     private String viewWidget2(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
-        //TODO test base64 decoding on server (can impact performance)
+        //TODO test another widget viewing scheme: base64 decoding on server (can impact performance), js and css as file imports
         //AppProject appProject = getAppProject(instanceId, compId);
         JsonNode appProject = getAppProjectCode(instanceId, compId);
         model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
@@ -756,7 +809,7 @@ public class AppController {
                 userUuid = UUID.fromString(userId);
             return new AppInstance(instanceUuid, new DateTime(), userUuid, permissions);
         } catch (Exception original) {
-            throw new ContollerInputException("Failed parsing instanceId [%s] or userId [%s].\nValid values are GUIDs of the form [aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa] or nulls (for userId)",
+            throw new ControllerInputException("Failed parsing instanceId [%s] or userId [%s].\nValid values are GUIDs of the form [aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa] or nulls (for userId)",
                     original, instanceId, userId);
         }
     }

@@ -14,19 +14,16 @@ import java.util.Arrays;
  * This class implements the signed instance parse algorithm
  * for more details you can go to: http://dev.wix.com/docs/display/DRAF/Using+the+Signed+App+Instance
  */
-
 public class AuthenticationResolver {
     // Constants for app key and app secret key:
     // should be changed once you register your application with Wix Dev center (http://dev.wix.com/app/create-app)
 
     //App keys for the first app in Wix's dev dashboard
-    //TODO change it in the final version
     private final static String APPLICATION_KEY = "13469a7d-eba1-4005-0f59-f2ad9f0bdace";
     private final static String APPLICATION_SECRET_KEY = "e41683c4-1168-422c-83ef-31eeccc38869";
     private static final String SIGN_ALGORITHM = "HMACSHA256";
     private final Base64 base64;
     private final Mac mac;
-
     private final ObjectMapper objectMapper;
 
     /**
