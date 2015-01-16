@@ -238,7 +238,7 @@ var _cldEditor = (function() {
             },
             updateCurrentProject : function() {
 //                var htmlCode = project.code.html;
-//                var jsCode = project.code.js;
+//                var jsCode = project.code.views.js;
 //                var cssCode = project.code.css;
                 var htmlCode = CloudIde.cm.html.getDoc().getValue();
                 var jsCode = CloudIde.cm.js.getDoc().getValue();
@@ -384,11 +384,11 @@ var _cldEditor = (function() {
                     oldCurrentProjectId = settings.currentProject.id;
 
 //                    oldHtmlCode = settings.currentProject.code.html;
-//                    oldJsCode = settings.currentProject.code.js;
+//                    oldJsCode = settings.currentProject.code.views.js;
 //                    oldCssCode = settings.currentProject.code.css;
 //
 //                    oldHtmlDoc = CloudIde.cm.html.getDoc();
-//                    oldJsDoc = CloudIde.cm.js.getDoc();
+//                    oldJsDoc = CloudIde.cm.views.js.getDoc();
 //                    oldCssDoc = CloudIde.cm.css.getDoc();
 
                     validCurrentProject = true;
@@ -397,7 +397,7 @@ var _cldEditor = (function() {
                 catch (err) {
 //                    //No 'current project' set, fetch it from the project array, and try again:
 //                    newHtmlCode = CloudIde.getProject().currentProject.code.html;
-//                    newJsCode = CloudIde.getProject().currentProject.code.js;
+//                    newJsCode = CloudIde.getProject().currentProject.code.views.js;
 //                    newCssCode = CloudIde.getProject().currentProject.code.css;
                 }
                 //Cache object is present and valid
@@ -764,7 +764,7 @@ var _cldEditor = (function() {
                     getAnnotations: [""],
                     lint: false,
                     autoCloseBrackets: true,
-                    path: "js/",
+                    path: "views.js/",
                     autofocus : true
                 },
                 js : {
@@ -1194,7 +1194,7 @@ var _cldEditor = (function() {
             });
         },
         loadAllCodeMirrorAddons: function (list) {
-            //CloudIde.loadCodeMirrorAddon("fold/foldcode.js");
+            //CloudIde.loadCodeMirrorAddon("fold/foldcode.views.js");
             CloudIde.loadCodeMirrorAddon("edit/closebrackets.js");
             CloudIde.cm.setOption("autoCloseBrackets", true);
         },
@@ -1227,7 +1227,7 @@ var _cldEditor = (function() {
             }
         },
         replaceDoc: function () {
-            var text = "<script src=\"lib/codemirror.js\"></script>\n<link rel=\"stylesheet\" href=\"../lib/codemirror.css\">\n<script src=\"mode/javascript/javascript.js\"></script>\n";
+            var text = "<script src=\"lib/codemirror.views.js\"></script>\n<link rel=\"stylesheet\" href=\"../lib/codemirror.css\">\n<script src=\"mode/javascript/javascript.views.js\"></script>\n";
             return CloudIde.cm.swapDoc(CodeMirror.Doc(text, "javascript", 1));
         }
     };
@@ -1610,7 +1610,7 @@ var _cldEditor = (function() {
             async.executePhase("initIdGenerator",initPhases.initIdGenerator);
 
             //TERN support (currently does not work well)
-            //async.executePhase("initIdGenerator",initPhases.initCodeMirrorTernEngine, CloudIde.cm.js);
+            //async.executePhase("initIdGenerator",initPhases.initCodeMirrorTernEngine, CloudIde.cm.views.js);
 
             //Initialize menu segment
             //Initialize project explorer segment

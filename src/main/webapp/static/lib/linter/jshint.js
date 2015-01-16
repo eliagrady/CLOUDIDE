@@ -291,7 +291,7 @@ var JSHINT = (function () {
             newcap      : true, // if constructor names must be capitalized
             noarg       : true, // if arguments.caller and arguments.callee should be
                                 // disallowed
-            node        : true, // if the Node.js environment globals should be
+            node        : true, // if the Node.views.js environment globals should be
                                 // predefined
             noempty     : true, // if empty blocks should be disallowed
             nonew       : true, // if using `new` for side-effects should be disallowed

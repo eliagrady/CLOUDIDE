@@ -455,7 +455,7 @@ var _cldSettings = (function() {
                 }
                 else {
                     //instanceId = Wix.getInstanceId();
-                    //TODO move cookie fetcher from editor to 'common.js'
+                    //TODO move cookie fetcher from editor to 'common.views.js'
                     var cook = document.cookie.split(';')[0];
                     var fetchedCook = Utils.getCookie('instance');
                     console("cook and fetchedCook are",cook === fetchedCook ? "equal" : "different");

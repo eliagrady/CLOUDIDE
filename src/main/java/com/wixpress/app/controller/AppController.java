@@ -1,26 +1,36 @@
 package com.wixpress.app.controller;
 
+import com.google.appengine.api.images.ImagesServicePb;
 import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppProject;
 import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.mortbay.util.URI;
+import org.mortbay.util.ajax.JSON;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import javax.mail.internet.ContentType;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -161,7 +171,7 @@ public class AppController {
      * @link http://dev.wix.com/docs/display/DRAF/App+Endpoints#AppEndpoints-SettingsEndpoint
      */
     @RequestMapping(value = "/message", method = RequestMethod.GET)
-    public String message(Model model,
+    public JsonNode message(Model model,
                            HttpServletResponse response,
                            @RequestParam String encodedMessage,
                            @RequestParam String instance,
@@ -173,7 +183,8 @@ public class AppController {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         response.addCookie(new Cookie("instance", instance));
         model.addAttribute("appInstance",appInstance);
-        return viewMessage(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, encodedMessage);
+        return getAppProjectCode(encodedMessage,origCompId);
+        //return viewMessage(model, width, appInstance.getInstanceId().toString(), locale, origCompId, compId, encodedMessage);
     }
 
     /**
@@ -613,6 +624,8 @@ public class AppController {
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
     }
 
+
+
     /**
      * VIEW - Widget Endpoint for testing
      * This endpoint does not implement the Wix API. It can be used directly to test the application from any browser,
@@ -629,19 +642,19 @@ public class AppController {
      * @param viewMode    - An indication whether the user is currently in editor / site
      * @return the template widget.vm name
      */
-    @RequestMapping(value = "/widget2standalone", method = RequestMethod.GET)
-    public String widgetStandAlone2(Model model,
-                                   HttpServletResponse response,
-                                   @RequestParam String instanceId,
-                                   @RequestParam(required = false) String userId,
-                                   @RequestParam(required = false) String permissions,
-                                   @RequestParam(value = "section-url", required = false, defaultValue = "/") String sectionUrl,
-                                   @RequestParam(required = false, defaultValue = "_self") String target,
-                                   @RequestParam(required = false, defaultValue = "200") Integer width,
-                                   @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
-                                   @RequestParam(required = false, defaultValue = "site") String viewMode,
-                                   @RequestParam(required = false, defaultValue = "") String projectId,
-                                   @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+    @RequestMapping(value = "/widget2standalone/{instanceId}", method = RequestMethod.GET)
+    public void widgetStandAlone2(Model model,
+                                    HttpServletResponse response,
+                                    @PathVariable String instanceId,
+                                    @RequestParam(required = false) String userId,
+                                    @RequestParam(required = false) String permissions,
+                                    @RequestParam(value = "section-url", required = false, defaultValue = "/") String sectionUrl,
+                                    @RequestParam(required = false, defaultValue = "_self") String target,
+                                    @RequestParam(required = false, defaultValue = "200") Integer width,
+                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
+                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
+                                    @RequestParam(required = false, defaultValue = "") String projectId,
+                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         if(userId == null) {
             userId = DEBUG.userId;
         }
@@ -652,7 +665,67 @@ public class AppController {
         //Add 'Cookie' (not a real instance, just the userId is present):
         response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
         model.addAttribute("mode",mode);
-        return viewWidget2(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
+        AppProject project = new AppProject(objectMapper);
+        String json = "var app = angular.module('cld', [])\n" +
+                "    .factory('Service', function ($http) {\n" +
+                "        return {\n" +
+                "            saveCode: function (code, compId) {\n" +
+                "                $http.post('/app/save', {\n" +
+                "                    compId: compId,\n" +
+                "                    settings: {\n" +
+                "                        appSettings: {\n" +
+                "                            currentProject: {\n" +
+                "                                name: 'Test project',\n" +
+                "                                modified: new Date(),\n" +
+                "                                code: $.base64.encode(code)\n" +
+                "                            }\n" +
+                "                        }\n" +
+                "                    }\n" +
+                "                })\n" +
+                "            },\n" +
+                "            getProject:function(){\n" +
+                "                return currentProject;\n" +
+                "            }\n" +
+                "        }\n" +
+                "    })\n" +
+                "    .controller('testCtrl', function ($scope, Service) {\n" +
+                "\n" +
+                "        $scope.code= $.base64.decode(settings.appSettings.currentProject.code);\n" +
+                "        $scope.saveCode = function (code) {\n" +
+                "            Service.saveCode(code, '');\n" +
+                "        }\n" +
+                "    })\n" +
+                "    .controller('widgetCtrl', function ($scope, Service) {\n" +
+                "\n" +
+                "        $scope.model={\n" +
+                "            project:Service.getProject()\n" +
+                "        };\n" +
+                "\n" +
+                "        $scope.saveCode = function (code) {\n" +
+                "            Service.saveCode(code, '');\n" +
+                "        }\n" +
+                "    })\n" +
+                "\n" +
+                "\n" +
+                "\n" +
+                "    .directive('htmlContent', function () {\n" +
+                "        return {\n" +
+                "            scope: {\n" +
+                "                htmlContent: '='\n" +
+                "            },\n" +
+                "            link: function (scope, elem) {\n" +
+                "                scope.$watch('htmlContent', function (newValue) {\n" +
+                "                    elem.html(newValue);\n" +
+                "                });\n" +
+                "            }\n" +
+                "        }\n" +
+                "    });\n";
+        //objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        //project.setCode(objectMapper.readTree(new URL("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.15/require.js")));
+        model.addAttribute("data", json);
+        response.setContentType("application/javascript");
+        response.getWriter().write(json);
+        //return viewWidget2(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
     }
 
     /**
@@ -739,12 +812,12 @@ public class AppController {
         return "widget";
     }
 
-    // Set widget2.vm
+    // Set javascriptTemplate.vm
     private String viewWidget2(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
-        //TODO test another widget viewing scheme: base64 decoding on server (can impact performance), js and css as file imports
+        //TODO test another widget viewing scheme: base64 decoding on server (can impact performance), views.js and css as file imports
         //AppProject appProject = getAppProject(instanceId, compId);
-        JsonNode appProject = getAppProjectCode(instanceId, compId);
-        model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
+        //JsonNode appProject = getAppProjectCode(instanceId, compId);
+        //model.addAttribute("data",objectMapper.writeValueAsString(appProject));
         return "widget2";
     }
 

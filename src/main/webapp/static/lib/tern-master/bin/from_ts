@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var ts = require("../lib/typescript.js");
+var ts = require("../lib/typescript.views.js");
 var fs = require("fs"), path = require("path"), url = require("url");
 
 var arg = process.argv[2];

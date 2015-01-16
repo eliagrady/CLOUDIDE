@@ -1,0 +1,2 @@
+#* @vtlvariable name="data" type="org.codehaus.jackson.JsonNode" *#
+${data}

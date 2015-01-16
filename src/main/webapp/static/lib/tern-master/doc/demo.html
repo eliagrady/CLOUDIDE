@@ -100,10 +100,10 @@ baz.
 var randomStr = myMod.randomElt(myMod.strList);
 var randomInt = myMod.randomElt(myMod.intList);
 
-// A test of the requirejs plug-in. Check the 'test_dep.js' tab,
+// A test of the requirejs plug-in. Check the 'test_dep.views.js' tab,
 // notice that the test variable.
 
-requirejs(["test_dep.js"], function(test) {
+requirejs(["test_dep.views.js"], function(test) {
   var word = test.capitalize(test.garble("coconut"));
   console.log(word);
 });

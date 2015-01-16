@@ -3,6 +3,7 @@ package com.wixpress.app.spring;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.wixpress.app.controller.AppController;
+import com.wixpress.app.controller.FileController;
 import com.wixpress.app.controller.HelpController;
 import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppGaeDao;
@@ -36,6 +37,11 @@ public class EmbeddedAppConfig {
     @Bean
     public AppController appController() {
         return new AppController();
+    }
+
+    @Bean
+    public FileController fileController() {
+        return new FileController();
     }
 
     @Bean

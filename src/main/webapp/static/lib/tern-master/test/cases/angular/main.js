@@ -1,7 +1,7 @@
 // plugin=angular
 // environment=browser
 // environment=jquery
-// loadfiles=config.js, filters.js
+// loadfiles=config.views.js, filters.views.js
 
 angular.module('sample', ['ngResource', 'sample.config', 'sample.filters'])
 

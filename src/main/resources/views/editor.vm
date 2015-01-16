@@ -38,7 +38,7 @@
 </head>
 <body>
 <!--Header (Menu)-->
-<div class="navbar navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <div class="nav navbar-left">
@@ -80,7 +80,7 @@
             </ul>
         </div>
     </div>
-</div>
+</nav>
 <!--Main (sidebar and editor)-->
 #if($projectId.equals("") || $projectId.equals("null"))
         <!--sidebar and editor-->
@@ -125,7 +125,8 @@
 
 <script src="../static/lib/codemirror/codemirror-4.0/keymap/sublime.js"></script>
 
-<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
+<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.41.0/js/Wix.js"></script>
+<!--Wix minified <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.40.0/js/wix.min.js"></script> -->
 <script src="../static/js/cloudide.editor.js"></script>
 <script src="../static/js/common.js"></script>
 <script src="../static/lib/jquery/jquery.base64.min.js"></script>

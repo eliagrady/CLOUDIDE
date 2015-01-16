@@ -67,7 +67,7 @@ very top are the <a href="#editor">editor plugins</a>. These talk to a
 </li>
 <li>
 <p>
-<a href="#plugin_angular">Angular.js</a>
+<a href="#plugin_angular">Angular.views.js</a>
 </p>
 </li>
 <li>
@@ -165,7 +165,7 @@ very top are the <a href="#editor">editor plugins</a>. These talk to a
 </li>
 </ul></div>
 <h2> <a id="server"></a>The Tern server</h2>
-<p> The <code>bin/tern</code> <em>binary</em> (<a href="http://nodejs.org">node.js</a> script, really),
+<p> The <code>bin/tern</code> <em>binary</em> (<a href="http://nodejs.org">node.views.js</a> script, really),
 is used to start a Tern server. You will usually want to let an
 <a href="#plugins">editor plugin</a> start it for you, but it can be started
 manually, which can be useful for debugging.</p>
@@ -628,7 +628,7 @@ property holding an array of strings (the file names).</p>
 <dd>
 <p>
 Only available when the
-<a href="#plugin_node">node.js plugin</a> is loaded. Get the exported type of a
+<a href="#plugin_node">node.views.js plugin</a> is loaded. Get the exported type of a
 node module file.
 </p>
 <p> Takes a <code>file</code> field to indicate the file to query for. Returns an
@@ -679,7 +679,7 @@ an existing file, and an <code>offset</code> property, either an integer or a
 fragment in the file.</p>
 <h3> <a id="server_api"></a>Programming interface</h3>
 <p> <a id="tern.Server"></a> The base server (without HTTP or configuration-file
-reading) is implemented in <code>lib/tern.js</code>. That package exposes a
+reading) is implemented in <code>lib/tern.views.js</code>. That package exposes a
 <code>Server</code> constructor that can be used to create a server. It takes an
 object holding configuration options options as argument. These are
 recognized (all have a default):</p>
@@ -898,9 +898,9 @@ call), and a special property <code>!ret</code> (the return type of a function).
 <p> Plugins are JavaScript programs that add extra functionality to a
 server. The distribution currently comes plugins for parsing
 <a href="#plugin_doc_comment">doc comments</a>, and plugins for
-<a href="#plugin_node">node.js</a> and <a href="#plugin_requirejs">RequireJS</a>, which
+<a href="#plugin_node">node.views.js</a> and <a href="#plugin_requirejs">RequireJS</a>, which
 teach the Tern server about the dependency management mechanisms
-defined by those systems (as well as, for node.js, including types for
+defined by those systems (as well as, for node.views.js, including types for
 the built-in libraries).</p>
 <p> A plugin can use several hooks to add custom behavior.</p>
 <dl>
@@ -993,12 +993,12 @@ sentence of comment text as the docstring for the defined variable or
 property.</p>
 <p> To turn this plugin off, set <code>doc_comment: null</code> in your
 <a href="#option_plugins">plugin option</a>.</p>
-<h4> <a id="plugin_node"></a>Node.js plugin</h4>
-<p> The <a href="http://nodejs.org">node.js</a> plugin, called <code>"node"</code>, provides
+<h4> <a id="plugin_node"></a>Node.views.js plugin</h4>
+<p> The <a href="http://nodejs.org">node.views.js</a> plugin, called <code>"node"</code>, provides
 variables that are part of the node environment, such as <code>process</code> and
 <code>require</code>, and hooks up <code>require</code> to try and find the dependencies
 that are being loaded, and assign them the correct types. It also
-includes types for the built-in modules that node.js provides (<code>"fs"</code>,
+includes types for the built-in modules that node.views.js provides (<code>"fs"</code>,
 <code>"http"</code>, etc).</p>
 <p> The plugin understands the following configuration parameters:</p>
 <dl>
@@ -1061,7 +1061,7 @@ example <code>{"acorn": "lib/acorn/"}</code>.
 </p>
 </dd>
 </dl>
-<h4> <a id="plugin_angular"></a>Angular.js plugin</h4>
+<h4> <a id="plugin_angular"></a>Angular.views.js plugin</h4>
 <p> Adds the <code>angular</code> object to the top-level environment, and tries to
 wire up some of the bizarre dependency management scheme from this
 library, so that dependency injections get the right types. Enabled
@@ -1071,7 +1071,7 @@ with the name <code>"angular"</code>.</p>
 independently using <a href="https://www.npmjs.org">npm</a>. The plugin package name
 must match the pattern "tern-<em>name</em>" to indicate it is a Tern plugin. If
 a <em>name</em> attribute is specified in the <code>plugins</code> section of the project
-configuration, and <em><code>name</code></em><code>.js</code> is not present in the project directory or
+configuration, and <em><code>name</code></em><code>.views.js</code> is not present in the project directory or
 Tern&#8217;s own <code>plugin</code> directory, Tern will search for an installed package
 named "tern-<em>name</em>" to load as a plugin.</p>
 <p> Plugin packages should specify the Tern version required as a
@@ -1088,7 +1088,7 @@ like this:</p>
     <span class="cm-string">"jquery"</span>
   ],
   <span class="cm-string cm-property">"loadEagerly"</span>: [
-    <span class="cm-string">"importantfile.js"</span>
+    <span class="cm-string">"importantfile.views.js"</span>
   ],
   <span class="cm-string cm-property">"plugins"</span>: {
     <span class="cm-string cm-property">"requirejs"</span>: {
@@ -1105,7 +1105,7 @@ dir, and then in the <code>defs/</code> directory of the Tern distribution.</p>
 <p> By default, local files are loaded into the Tern server when they are
 opened by the editor. <code>loadEagerly</code> allows you to force some files to
 always be loaded, it may be an array of filenames or glob patterns
-(i.e. <code>foo/bar/*.js</code>). The <code>dontLoad</code> option can be used to prevent
+(i.e. <code>foo/bar/*.views.js</code>). The <code>dontLoad</code> option can be used to prevent
 Tern from loading certain files. It also takes an array of file names
 or glob patterns.</p>
 <p> The <code>plugins</code> field may hold object used to load and configure Tern
@@ -1157,7 +1157,7 @@ Tern-style <a href="#typedef">JSON definition</a> file.
 </dd>
 </dl>
 <h2> <a id="infer"></a>Inference engine</h2>
-<p> The inference engine module (<code>lib/infer.js</code>) implements a system that,
+<p> The inference engine module (<code>lib/infer.views.js</code>) implements a system that,
 given a context and an abstract syntax tree (parsed representation of
 the code), tries to infer the types of the variables and properties in
 the code.</p>
@@ -1690,7 +1690,7 @@ relied on to be precise.
 </p>
 </dd>
 </dl>
-<p> Whenever the code in <code>lib/infer.js</code> guesses a type through fuzzy
+<p> Whenever the code in <code>lib/infer.views.js</code> guesses a type through fuzzy
 heuristics (through <a href="#infer.AVal.getType"><code>getType</code></a> or
 <a href="#infer.expressionType"><code>expressionType</code></a>), it sets a flag. The
 following two function allow access to this flag:</p>
@@ -1719,7 +1719,7 @@ guessing flag.
 try and port one of the existing plugins to it. When figuring out how
 things work, the code powering the demo, in <code>doc/demo/demo.js</code>, might
 also come in useful.</p>
-<p> All these plugins use the <a href="http://nodejs.org">node.js</a>-based server, and
+<p> All these plugins use the <a href="http://nodejs.org">node.views.js</a>-based server, and
 thus require that (as well as <a href="http://npmjs.org">npm</a>) to be installed.</p>
 <h3> <a id="emacs"></a>Emacs</h3>
 <p> The Emacs mode is part of the main tern
@@ -1749,9 +1749,9 @@ Make Emacs aware of <code>emacs/tern.el</code>. For example by adding this to
 <li>
 <p>
 Optionally set <code>tern-mode</code> to be automatically enabled for your
-  JavaScript mode of choice. Here&#8217;s the snippet for <code>js-mode</code>:
+  JavaScript mode of choice. Here&#8217;s the snippet for <code>views.js-mode</code>:
 </p>
-<pre data-language="commonlisp" class="cm-s-default"><span class="cm-bracket">(</span><span class="cm-variable">add-hook</span> '<span class="cm-variable">js-mode-hook</span> <span class="cm-bracket">(</span><span class="cm-variable">lambda</span> <span class="cm-bracket">()</span> <span class="cm-bracket">(</span><span class="cm-variable">tern-mode</span> <span class="cm-atom">t</span><span class="cm-bracket">)))</span></pre>
+<pre data-language="commonlisp" class="cm-s-default"><span class="cm-bracket">(</span><span class="cm-variable">add-hook</span> '<span class="cm-variable">views.js-mode-hook</span> <span class="cm-bracket">(</span><span class="cm-variable">lambda</span> <span class="cm-bracket">()</span> <span class="cm-bracket">(</span><span class="cm-variable">tern-mode</span> <span class="cm-atom">t</span><span class="cm-bracket">)))</span></pre>
 </li>
 </ol></div>
 <p> The Emacs mode uses the <code>bin/tern</code> server, and project configuration
@@ -1820,7 +1820,7 @@ see its README for details.</p>
 <h3> <a id="sublime_text"></a>Sublime Text</h3>
 <p> There are two implementations of Sublime Text modules for Tern. One
 written by me, at <a href="https://github.com/marijnh/tern_for_sublime">https://github.com/marijnh/tern_for_sublime</a>. This
-one uses the node.js-based server. The other is written by Sergey
+one uses the node.views.js-based server. The other is written by Sergey
 Chikuyonok, and can be found at
 <a href="https://github.com/emmetio/sublime-tern">https://github.com/emmetio/sublime-tern</a>. It uses a Python V8 bridge
 to run the server.</p>

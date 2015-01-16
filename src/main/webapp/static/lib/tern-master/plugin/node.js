@@ -47,7 +47,7 @@
     return getModule(server._node, name);
   }
 
-  // Assume node.js & access to local file system
+  // Assume node.views.js & access to local file system
   if (require) (function() {
     var fs = require("fs"), module_ = require("module"), path = require("path");
 
@@ -1032,7 +1032,7 @@
         version: {
           "!type": "?",
           "!url": "http://nodejs.org/api/punycode.html#punycode_punycode_version",
-          "!doc": "A string representing the current Punycode.js version number."
+          "!doc": "A string representing the current Punycode.views.js version number."
         }
       },
       repl: {

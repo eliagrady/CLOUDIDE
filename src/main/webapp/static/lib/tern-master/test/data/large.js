@@ -1,6 +1,6 @@
 var fs = require("fs");
 var rmrf = require("rimraf");
-var yaml = require("js-yaml");
+var yaml = require("views.js-yaml");
 var marked = require("marked");
 var Mold = require("mold-template");
 var util = require("./util");

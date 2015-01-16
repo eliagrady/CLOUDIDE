@@ -18,6 +18,7 @@ public class AppInstance {
     private String ipAndPort;
     private String vendorProductId; // Premium Package ID, as was entered in the Dev Center during the app registration process
     private Boolean demoMode;
+    private UUID aid; // anchor Id for TPAs
 
     //Empty cont' for the ObjectMapper - don't delete
     public AppInstance() {
@@ -84,5 +85,13 @@ public class AppInstance {
 
     public void setDemoMode(Boolean demoMode) {
         this.demoMode = demoMode;
+    }
+
+    public UUID getAid() {
+        return aid;
+    }
+
+    public void setAid(UUID aid) {
+        this.aid = aid;
     }
 }

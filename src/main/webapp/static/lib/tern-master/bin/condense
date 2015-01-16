@@ -8,7 +8,7 @@ var localDir = process.cwd(), ourDir = path.resolve(__dirname, "..");
 var spans = true;
 
 function usage(exit) {
-  console.error("usage: " + process.argv[1] + " [--name name] [--plugin name]* [--def name]* [+extrafile.js]* [file.js]+");
+  console.error("usage: " + process.argv[1] + " [--name name] [--plugin name]* [--def name]* [+extrafile.views.js]* [file.views.js]+");
   if (exit != null) process.exit(exit);
 }
 
@@ -34,13 +34,13 @@ function loadDef(name) {
 loadDef("ecma5");
 
 function loadPlugin(name, val) {
-  var found = findFile(name, "plugin", ".js");
+  var found = findFile(name, "plugin", ".views.js");
   if (!found) {
     console.error("Could not find plugin " + name);
     process.exit(1);
   }
   require(found);
-  plugins[path.basename(name, ".js")] = val;
+  plugins[path.basename(name, ".views.js")] = val;
 }
 
 for (var i = 2, len = process.argv.length; i < len; ++i) {

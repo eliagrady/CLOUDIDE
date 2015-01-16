@@ -87,7 +87,7 @@ function loadPlugins(projectDir, plugins) {
   for (var plugin in plugins) {
     var val = plugins[plugin];
     if (!val) continue;
-    var found = findFile(plugin + ".js", projectDir, path.resolve(distDir, "plugin"));
+    var found = findFile(plugin + ".views.js", projectDir, path.resolve(distDir, "plugin"));
     if (!found) {
       try {
         found = require.resolve("tern-" + plugin);

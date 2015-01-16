@@ -815,7 +815,7 @@ pif
 vb
 cgi
 css
-js
+views.js
 php
 xhtml
 html

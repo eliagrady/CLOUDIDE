@@ -1,3 +1,3 @@
 // plugin=node
 
-require('./node_exports').b; //origin: node_exports.js
+require('./node_exports').b; //origin: node_exports.views.js

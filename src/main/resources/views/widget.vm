@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
     <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.29.0/js/Wix.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.41.0/js/Wix.js"></script>
 
     <script src="../static/js/cloudide.widget.js"></script>
     <script src="../static/lib/jquery/jquery.base64.min.js"></script>

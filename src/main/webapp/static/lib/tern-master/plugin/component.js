@@ -54,7 +54,7 @@
     return scope;
   }
 
-  // Assume node.js & access to local file system
+  // Assume node.views.js & access to local file system
   if (require) (function() {
     var fs = require("fs");
     var path = require("path");

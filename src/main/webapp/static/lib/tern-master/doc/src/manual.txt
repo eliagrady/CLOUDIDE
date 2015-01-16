@@ -18,7 +18,7 @@ engine>> to do the actual type inference.
 *** <<plugin_doc_comment,Doc comments>>
 *** <<plugin_node,node>>
 *** <<plugin_requirejs,RequireJS>>
-*** <<plugin_angular,Angular.js>>
+*** <<plugin_angular,Angular.views.js>>
 *** <<plugin_third_party,Third-party plugins>>
 ** <<configuration,Project configuration>>
 ** <<utils,Utilities>>
@@ -40,7 +40,7 @@ engine>> to do the actual type inference.
 [[server]]
 == The Tern server ==
 
-The `bin/tern` 'binary' (http://nodejs.org[node.js] script, really),
+The `bin/tern` 'binary' (http://nodejs.org[node.views.js] script, really),
 is used to start a Tern server. You will usually want to let an
 <<plugins,editor plugin>> start it for you, but it can be started
 manually, which can be useful for debugging.
@@ -280,7 +280,7 @@ Does not take any parameters. Returns an object with a `files`
 property holding an array of strings (the file names).
 
 [[req_node_exports]]`node_exports`:: Only available when the
-<<plugin_node,node.js plugin>> is loaded. Get the exported type of a
+<<plugin_node,node.views.js plugin>> is loaded. Get the exported type of a
 node module file.
 +
 Takes a `file` field to indicate the file to query for. Returns an
@@ -337,7 +337,7 @@ fragment in the file.
 === Programming interface ===
 
 [[tern.Server]] The base server (without HTTP or configuration-file
-reading) is implemented in `lib/tern.js`. That package exposes a
+reading) is implemented in `lib/tern.views.js`. That package exposes a
 `Server` constructor that can be used to create a server. It takes an
 object holding configuration options options as argument. These are
 recognized (all have a default):
@@ -489,9 +489,9 @@ call), and a special property `!ret` (the return type of a function).
 Plugins are JavaScript programs that add extra functionality to a
 server. The distribution currently comes plugins for parsing
 <<plugin_doc_comment,doc comments>>, and plugins for
-<<plugin_node,node.js>> and <<plugin_requirejs,RequireJS>>, which
+<<plugin_node,node.views.js>> and <<plugin_requirejs,RequireJS>>, which
 teach the Tern server about the dependency management mechanisms
-defined by those systems (as well as, for node.js, including types for
+defined by those systems (as well as, for node.views.js, including types for
 the built-in libraries).
 
 A plugin can use several hooks to add custom behavior.
@@ -556,13 +556,13 @@ To turn this plugin off, set `doc_comment: null` in your
 <<option_plugins,plugin option>>.
 
 [[plugin_node]]
-==== Node.js plugin ====
+==== Node.views.js plugin ====
 
-The http://nodejs.org[node.js] plugin, called `"node"`, provides
+The http://nodejs.org[node.views.js] plugin, called `"node"`, provides
 variables that are part of the node environment, such as `process` and
 `require`, and hooks up `require` to try and find the dependencies
 that are being loaded, and assign them the correct types. It also
-includes types for the built-in modules that node.js provides (`"fs"`,
+includes types for the built-in modules that node.views.js provides (`"fs"`,
 `"http"`, etc).
 
 The plugin understands the following configuration parameters:
@@ -598,7 +598,7 @@ These options are understood:
 example `{"acorn": "lib/acorn/"}`.
 
 [[plugin_angular]]
-==== Angular.js plugin ====
+==== Angular.views.js plugin ====
 
 Adds the `angular` object to the top-level environment, and tries to
 wire up some of the bizarre dependency management scheme from this
@@ -612,7 +612,7 @@ It is possible to write third-party plugins and distribute them
 independently using https://www.npmjs.org[npm]. The plugin package name
 must match the pattern "tern-'name'" to indicate it is a Tern plugin. If
 a 'name' attribute is specified in the `plugins` section of the project
-configuration, and '`name`'`.js` is not present in the project directory or
+configuration, and '`name`'`.views.js` is not present in the project directory or
 Tern's own `plugin` directory, Tern will search for an installed package
 named "tern-'name'" to load as a plugin.
 
@@ -636,7 +636,7 @@ like this:
     "jquery"
   ],
   "loadEagerly": [
-    "importantfile.js"
+    "importantfile.views.js"
   ],
   "plugins": {
     "requirejs": {
@@ -656,7 +656,7 @@ dir, and then in the `defs/` directory of the Tern distribution.
 By default, local files are loaded into the Tern server when they are
 opened by the editor. `loadEagerly` allows you to force some files to
 always be loaded, it may be an array of filenames or glob patterns
-(i.e. `foo/bar/*.js`). The `dontLoad` option can be used to prevent
+(i.e. `foo/bar/*.views.js`). The `dontLoad` option can be used to prevent
 Tern from loading certain files. It also takes an array of file names
 or glob patterns.
 
@@ -704,7 +704,7 @@ Tern-style <<typedef,JSON definition>> file.
 [[infer]]
 == Inference engine ==
 
-The inference engine module (`lib/infer.js`) implements a system that,
+The inference engine module (`lib/infer.views.js`) implements a system that,
 given a context and an abstract syntax tree (parsed representation of
 the code), tries to infer the types of the variables and properties in
 the code.
@@ -1008,7 +1008,7 @@ references to a specific property instead. Whereas `findRefs` is
 precise, this is dependent on type inference, and thus can not be
 relied on to be precise.
 
-Whenever the code in `lib/infer.js` guesses a type through fuzzy
+Whenever the code in `lib/infer.views.js` guesses a type through fuzzy
 heuristics (through <<infer.AVal.getType,`getType`>> or
 <<infer.expressionType,`expressionType`>>), it sets a flag. The
 following two function allow access to this flag:
@@ -1024,10 +1024,10 @@ guessing flag.
 
 If your editor of choice is not yet supported, you are encouraged to
 try and port one of the existing plugins to it. When figuring out how
-things work, the code powering the demo, in `doc/demo/demo.js`, might
+things work, the code powering the demo, in `doc/demo/demo.views.js`, might
 also come in useful.
 
-All these plugins use the http://nodejs.org[node.js]-based server, and
+All these plugins use the http://nodejs.org[node.views.js]-based server, and
 thus require that (as well as http://npmjs.org[npm]) to be installed.
 
 [[emacs]]
@@ -1053,11 +1053,11 @@ follows:
 ----
 
 . Optionally set `tern-mode` to be automatically enabled for your
-  JavaScript mode of choice. Here's the snippet for `js-mode`:
+  JavaScript mode of choice. Here's the snippet for `views.js-mode`:
 +
 [source,commonlisp]
 ----
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+(add-hook 'views.js-mode-hook (lambda () (tern-mode t)))
 ----
 
 The Emacs mode uses the `bin/tern` server, and project configuration
@@ -1110,7 +1110,7 @@ see its README for details.
 
 There are two implementations of Sublime Text modules for Tern. One
 written by me, at <https://github.com/marijnh/tern_for_sublime>. This
-one uses the node.js-based server. The other is written by Sergey
+one uses the node.views.js-based server. The other is written by Sergey
 Chikuyonok, and can be found at
 <https://github.com/emmetio/sublime-tern>. It uses a Python V8 bridge
 to run the server.
