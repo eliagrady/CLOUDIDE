@@ -1,5 +1,8 @@
 package com.wixpress.app.spring;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.wixpress.app.controller.AppController;
@@ -8,9 +11,6 @@ import com.wixpress.app.controller.HelpController;
 import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppGaeDao;
 import com.wixpress.app.domain.AuthenticationResolver;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonMethod;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -29,7 +29,7 @@ public class EmbeddedAppConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         // FAIL_ON_UNKNOWN_PROPERTIES feature disabled by default!
         //configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         //return new ObjectMapper();
         return objectMapper;
     }

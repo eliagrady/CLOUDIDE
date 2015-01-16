@@ -1,7 +1,7 @@
 package com.wixpress.app.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

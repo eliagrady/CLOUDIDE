@@ -1,36 +1,27 @@
 package com.wixpress.app.controller;
 
-import com.google.appengine.api.images.ImagesServicePb;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wixpress.app.dao.AppDao;
 import com.wixpress.app.dao.AppProject;
 import com.wixpress.app.dao.AppSettings;
 import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+
 import org.joda.time.DateTime;
 import org.mortbay.util.URI;
-import org.mortbay.util.ajax.JSON;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
-import javax.mail.internet.ContentType;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -422,7 +413,7 @@ public class AppController {
                 //Save all projects
                 JsonNode projectsData = projectUpdate.getProjects();
                 int projectCount = projectsData.size();
-                Iterator<String> iter = projectsData.getFieldNames();
+                Iterator<String> iter = projectsData.fieldNames();
                 AppProject[] appProjects = new AppProject[projectCount];
 
                 int idx = 0;

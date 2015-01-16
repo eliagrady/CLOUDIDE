@@ -1,7 +1,7 @@
 package com.wixpress.app.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wixpress.app.dao.AppDao;
-import org.codehaus.jackson.JsonNode;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

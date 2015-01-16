@@ -1,9 +1,10 @@
 package com.wixpress.app.dao;
 
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.Nullable;
 
@@ -16,7 +17,8 @@ import javax.annotation.Nullable;
 
 @JsonTypeName("AppSettings")
 public class AppSettings implements DataContainer {
-    private @Nullable JsonNode appSettings;
+    private @Nullable
+    JsonNode appSettings;
 
     public AppSettings() {}
 

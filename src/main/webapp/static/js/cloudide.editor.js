@@ -330,7 +330,7 @@ var _cldEditor = (function() {
                     }
                 }
                 console.log("Updating "+updated+" projects");
-
+                return updated; //Returns the number of updated projects
             },
             /**
              * Sets the current project, by it's given id.
@@ -460,6 +460,10 @@ var _cldEditor = (function() {
                 }
                 return projectName;
             },
+            /**
+             * A really nasty way of generating project explorer view programmatically.
+             * Should be replaced in version 2.0 by an MVC architechure and templating
+             */
             loadProjectsToExplorer : function() {
                 var currentlySelectedProjectId = CloudIde.projectHandler.getCurrentProjectId();
                 var projects = CloudIde.projectHandler.getProjects();
@@ -486,12 +490,12 @@ var _cldEditor = (function() {
                             .attr('data-toggle','collapse').attr('data-parent','#projectsPanel').attr('href','#'+project.id)
                             .attr('projectId',project.id).attr('onclick',a_projectName_fn);
                         var div_panelTitle = $('<h4></h4>').addClass('panel-title');
-                        var a_projectName = $('<label></label>').text(project.name).addClass('projectName');
+                        var a_projectName = $('<label></label>').attr('projectId',project.id).text(project.name).addClass('projectName');
                         div_panelTitle.append(a_projectName);
                         div_panelHeading.append(div_panelTitle);
 
                         //Project Settings panel
-                        var div_settingsPanel = $('<div></div>').attr('id',project.id).addClass('panel-collapse').addClass('collapse');
+                        var div_settingsPanel = $('<div></div>').attr('projectId',project.id).addClass('panel-collapse').addClass('collapse');
                         if(project.id == currentlySelectedProjectId) {
                             div_settingsPanel.attr('projectId', project.id).attr('selectedProject', 'true');
                             var div_projectMainPanel = $('<div></div>').addClass('panel').addClass('panel-primary');
@@ -719,13 +723,22 @@ var _cldEditor = (function() {
                 console.log("options object is:",options);
                 var projectId = options.projectId;
                 var newName = options.name;
-                var cssSelector = 'label[projectId="'+projectId+'"]';
-                var oldName = $(cssSelector).get(0).innerText;
-                //Sets the new name visually:
-                $(cssSelector).get(0).innerText = newName;
-                //Sets the new name programmatically
+                //Sets the new name programmatically (first)
                 CloudIde.projectHandler.editProjectById(projectId,options);
-            },
+
+                //Sets the new name visually (to save time):
+                try {
+                    var cssSelector = 'label[projectId="'+projectId+'"]';
+                    var oldName = $(cssSelector).get(0).innerText;
+                    $(cssSelector).get(0).innerText = newName;
+                }
+                catch (err) {
+                    console.log(err);
+                    console.log("Fallback: reloadingProjects to project exploerer");
+                    CloudIde.editor.loadProjectsToExplorer();
+                }
+
+            }
         },
         /**
          * Returns a CodeMirror configuration object, in JSON notation (json string)
@@ -835,8 +848,8 @@ var _cldEditor = (function() {
          * Saves the current project
          */
         save: function () {
-            CloudIde.projectHandler.updateAllProjects();
-            CloudIde.saveAllProjects();
+            var numOfUpdatedProjects = CloudIde.projectHandler.updateAllProjects();
+            CloudIde.saveAllProjects(numOfUpdatedProjects);
         },
         saveOld: function () {
             //Update the current project (active project)
@@ -974,7 +987,7 @@ var _cldEditor = (function() {
                 }
             });
         },
-        saveAllProjects: function () {
+        saveAllProjects: function (numOfUpdatedProjects) {
             var compId ,instanceId, userId;
             try {
                 userId = Wix.Utils.getUid() || "";
@@ -997,6 +1010,7 @@ var _cldEditor = (function() {
                     instanceId: instanceId,
                     compId: compId,
                     projectId: null,
+                    aid: null,
                     settings : CloudIde.settings,
                     project: null,
                     projects: CloudIde.projectsData,
@@ -1015,6 +1029,7 @@ var _cldEditor = (function() {
                     instanceId: instanceId,
                     compId: compId,
                     projectId: null,
+                    aid: null,
                     settings : CloudIde.settings,
                     project: null,
                     projects: CloudIde.projectsData,
@@ -1024,7 +1039,7 @@ var _cldEditor = (function() {
                 'success': function (res) {
                     console.log("save completed");
                     if (_cldEditor.mode === "debug") {
-                        CloudIde.editor.updateStatusBar("Saved "+ CloudIde.projectsData.length + " projects successfully", 5000, undefined);
+                        CloudIde.editor.updateStatusBar("Saved "+ numOfUpdatedProjects+ " projects successfully", 5000, undefined);
                     }
                     else {
                         CloudIde.editor.updateStatusBar("Saved successfully", 5000, undefined);

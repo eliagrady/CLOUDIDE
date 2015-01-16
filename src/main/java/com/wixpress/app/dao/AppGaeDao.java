@@ -1,8 +1,8 @@
 package com.wixpress.app.dao;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.*;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;

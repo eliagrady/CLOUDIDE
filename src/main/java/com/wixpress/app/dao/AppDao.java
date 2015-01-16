@@ -1,6 +1,6 @@
 package com.wixpress.app.dao;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Data store wrapper

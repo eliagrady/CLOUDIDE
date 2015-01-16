@@ -1,8 +1,8 @@
 package com.wixpress.app.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wixpress.app.dao.AppProject;
 import com.wixpress.app.dao.AppSettings;
-import org.codehaus.jackson.JsonNode;
 
 import javax.annotation.Nullable;
 
