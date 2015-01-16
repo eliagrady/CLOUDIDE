@@ -27,7 +27,8 @@ var _cldSettings = (function() {
             console.log("Edit pressed for projectId:"+projectId);
             var compId;
             var onClose = function() {
-                //Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
+                Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
+                loadProjects();
                 console.log("onClose captured");
             };
             if(_cldSettings.mode !== "debug"){
@@ -50,7 +51,7 @@ var _cldSettings = (function() {
             }
             else {
                 url = 'http://wixcloudide.appspot.com/app/editor?';
-                url += "instance=" + Utils.getCookie('instance');
+                //url += "instance=" + Utils.getCookie('instance');
                 url += "&instanceId=" + Wix.Utils.getInstanceId();
                 url += "&compId=" + Wix.Utils.getOrigCompId();
                 if(projectId !== null && projectId !== undefined && projectId !== "") {
@@ -61,8 +62,6 @@ var _cldSettings = (function() {
             //var url = 'http://wixcloudide.appspot.com/app/editor' + ?projectId=+projectId;
             console.log("opening editor should be done now");
             //TODO open editor in a quick edit mode (just one project)
-            //Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
-            var title = "CloudIde Editor";
             var w = window.screen.width*0.8;
             var h = window.screen.height*0.6;
             if(h < 720) {
@@ -71,6 +70,11 @@ var _cldSettings = (function() {
             if(w < 1000) {
                 w = 980;
             }
+
+            Wix.Settings.openModal(url,w,h,onClose);
+            /*
+            var title = "CloudIde Editor";
+
             var windowObjectReference = PopupCenter(url,title,w,h);
 
             //http://stackoverflow.com/questions/4068373/center-a-popup-window-on-screen
@@ -92,6 +96,8 @@ var _cldSettings = (function() {
                 }
                 return newWindow;
             }
+            */
+
         };
         console.log("loading projects to explorer...");
 
@@ -451,16 +457,17 @@ var _cldSettings = (function() {
                 };
                 if(_cldSettings.mode === "debug") {
                     var localUrl = 'http://localhost:8080/app/editorstandalone';
-                    Wix.openModal(localUrl,window.screen.width*0.8, window.screen.height*0.6,onClose);
+                    Wix.openModal(localUrl,window.screen.width*0.9, window.screen.height*0.8,onClose);
                 }
                 else {
                     //instanceId = Wix.getInstanceId();
-                    //TODO move cookie fetcher from editor to 'common.views.js'
+                    //TODO move cookie fetcher from editor to 'common.js'
                     var cook = document.cookie.split(';')[0];
                     var fetchedCook = Utils.getCookie('instance');
                     console("cook and fetchedCook are",cook === fetchedCook ? "equal" : "different");
-                    window.open('http://wixcloudide.appspot.com/app/editor?instance='+cook);
-                    //Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
+                    //window.open('http://wixcloudide.appspot.com/app/editor?instance='+cook);
+                    var url = 'http://wixcloudide.appspot.com/app/editor?instance='+cook;
+                    Wix.Settings.openModal(url,window.screen.width*0.9, window.screen.height*0.8,onClose);
                 }
             }
         );
