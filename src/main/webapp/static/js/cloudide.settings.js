@@ -107,7 +107,7 @@ var _cldSettings = (function() {
         }
         //Prepare main div
         var topDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('appTop');
-        var mainDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth');
+        var mainDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('nano-content').attr('wix-scroll','{height:450}');
 
 
         //Regardless of whether there are or aren't any projects, display the 'CloudIde' MultiProjectEditor link:
@@ -213,9 +213,12 @@ var _cldSettings = (function() {
                 mainDiv.append(appContainer);
             }
         }
+        var nanoDiv = $('<div></div>').addClass("nano");
+        nanoDiv.append(mainDiv);
+
         $('#cldProjectExplorer').find('.projects').remove();
         $('#cldProjectExplorer').append(topDiv);
-        $('#cldProjectExplorer').append(mainDiv);
+        $('#cldProjectExplorer').append(nanoDiv);
 
 
         //Mark selected project:
@@ -543,6 +546,7 @@ var _cldSettings = (function() {
             });
         },
         initWixUI : function() {
+            //$(".nano").nanoScroller();
             Wix.UI.initialize();
 
         },
@@ -665,6 +669,7 @@ var _cldSettings = (function() {
             async.executePhase("loadSettingsFromServer",initPhases.loadSettingsFromServer);
             //async.executePhase("bindEditButton",initPhases.bindRefresh);
             //async.executePhase("loadTimeFormatter",initPhases.loadTimeFormatter);
+            async.executePhase("initWixUI",initPhases.initWixUI);
             async.executePhase("dissolveSpinner",initPhases.dissolveSpinner);
 
             var finishLoading = Date.now();

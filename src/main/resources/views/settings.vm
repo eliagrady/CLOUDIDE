@@ -7,6 +7,7 @@
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
     <!-- TODO move to async loading -->
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
+    <link type="text/css" rel="stylesheet" href="../static/lib/nanoscroll/nanoscroller.css"/>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 </head>
@@ -34,5 +35,6 @@
     <script type="text/javascript" src="../static/lib/ui-lib/ui-lib.min.js"></script>
     <!-- Settings View Logic -->
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
+    <script type="text/javascript" src="../static/lib/nanoscroll/jquery.nanoscroller.min.js"></script>
 </body>
 </html>
