@@ -55,7 +55,7 @@
 }
 
 /** secondary setup **/
-.nano { background: transparent; width: 600px; height: 600px; }
+.nano { background: transparent; width: auto; height: 620px; }
 .nano > .nano-content { padding: 10px; }
 .nano > .nano-pane   { background: #888; }
 .nano > .nano-pane > .nano-slider { background: #111; }
