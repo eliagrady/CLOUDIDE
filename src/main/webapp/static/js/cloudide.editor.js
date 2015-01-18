@@ -1280,6 +1280,32 @@ var _cldEditor = (function() {
 
     };
     var initPhases = {
+        dissolveSpinner : function() {
+            //function browserSupportsCSSProperty(propertyName) {
+            //    var elm = document.createElement('div');
+            //    propertyName = propertyName.toLowerCase();
+            //
+            //    if (elm.style[propertyName] != undefined)
+            //        return true;
+            //
+            //    var propertyNameCapital = propertyName.charAt(0).toUpperCase() + propertyName.substr(1),
+            //        domPrefixes = 'Webkit Moz ms O'.split(' ');
+            //
+            //    for (var i = 0; i < domPrefixes.length; i++) {
+            //        if (elm.style[domPrefixes[i] + propertyNameCapital] != undefined)
+            //            return true;
+            //    }
+            //    return false;
+            //}
+            //if (!browserSupportsCSSProperty('animation')) {
+            //    //TODO gif anim fallback here
+            //}
+            $('.spinnerOverlay').fadeOut('slow',function() {
+                $('.spinnerOverlay').destroy();
+            });
+
+
+        },
         asyncLoader : function() {
             var queue = [], paused = false;
             this.executePhase = function(phaseDescription, phase, args) {
@@ -1623,6 +1649,7 @@ var _cldEditor = (function() {
             async.executePhase("bindCodeMirrorTabsListeners",initPhases.bindCodeMirrorTabsListeners);
             async.executePhase("loadModalsPhase",initPhases.loadModalsPhase);
             async.executePhase("initIdGenerator",initPhases.initIdGenerator);
+            async.executePhase("dissolveSpinner",initPhases.dissolveSpinner);
 
             //TERN support (currently does not work well)
             //async.executePhase("initIdGenerator",initPhases.initCodeMirrorTernEngine, CloudIde.cm.views.js);

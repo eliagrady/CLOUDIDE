@@ -3,19 +3,16 @@
 <html>
 <head>
     <title>Cloud IDE Settings</title>
+    <link rel="stylesheet" href="../static/css/spinner.css"/>
     <link type="text/css" rel="stylesheet" href="../static/css/cloudide.settings.css"/>
     <!-- TODO move to async loading -->
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-
-    <script type="text/javascript" href="../static/lib/ui-lib/ui-lib.min.js" ></script>
-    <script type="text/javascript">
-
-    </script>
 </head>
 
 <body wix-ui>
+    #include("views/spinner.vm")
 <div class="settingsHero container" id="cldProjectExplorer">
     #if(false) {
         #include("views/settings/project.vm")

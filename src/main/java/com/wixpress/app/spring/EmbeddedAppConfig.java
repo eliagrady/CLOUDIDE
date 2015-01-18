@@ -3,6 +3,7 @@ package com.wixpress.app.spring;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.wixpress.app.controller.AppController;
@@ -30,6 +31,7 @@ public class EmbeddedAppConfig {
         // FAIL_ON_UNKNOWN_PROPERTIES feature disabled by default!
         //configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        objectMapper.registerModule(new JodaModule());
         //return new ObjectMapper();
         return objectMapper;
     }
