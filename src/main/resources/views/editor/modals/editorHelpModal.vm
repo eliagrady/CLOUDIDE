@@ -8,7 +8,15 @@
             <div class="modal-body">
                 <div class="input-group fullWidth">
                     <!-- Display discriptive text-->
-                    Some help...
+                        <p>
+                            Add code to your Wix site using the power of Wix's SDK!
+                        </p>
+                        <p>
+                            Code added to the HTML editor will be added to the &lt;body&gt; tag.<br>
+                        </p>
+                        <p>
+                            Code added to the JavaScript and CSS editors will be included in the scope of your document.
+                        </p>
                 </div>
             </div>
             <div class="modal-footer">

@@ -24,7 +24,7 @@
 
 
         <!-- Wix SDK -->
-    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.41.0/js/Wix.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.42.0/js/Wix.js"></script>
     <!--Wix minified <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.40.0/js/wix.min.js"></script> -->
     <!-- jQuery dependency-->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

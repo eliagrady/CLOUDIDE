@@ -131,7 +131,7 @@
 
 <script src="../static/lib/codemirror/codemirror-4.0/keymap/sublime.js"></script>
 
-<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.41.0/js/Wix.js"></script>
+<script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.42.0/js/Wix.js"></script>
 <!--Wix minified <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.40.0/js/wix.min.js"></script> -->
 <script src="../static/js/cloudide.editor.js"></script>
 <script src="../static/js/common.js"></script>
