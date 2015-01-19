@@ -444,9 +444,10 @@ var _cldEditor = (function() {
                 jQuery.event.trigger({ type : 'keypress', which : character.charCodeAt(0) });
             },
             getCurrentProjectName : function() {
+                //Only works in multi project environment
                 var selectedProjectSelector = '[selectedProject=true]';
                 var projectName = $(selectedProjectSelector).val();
-                if(projectName === '') {
+                if(projectName === undefined || projectName === '') {
                     projectName = CloudIde.getSettings().currentProject.name;
                 }
                 return projectName;
@@ -1303,7 +1304,7 @@ var _cldEditor = (function() {
             //    //TODO gif anim fallback here
             //}
             $('.spinnerOverlay').fadeOut('slow',function() {
-                $('.spinnerOverlay').destroy();
+                $('.spinnerOverlay').remove();
             });
 
 
