@@ -47,7 +47,13 @@
     padding-left: 0;
     padding-bottom: 0;
     padding-right: 0;
+    padding-top: 0;
 }
+.nav-tabs > li {
+    z-index: 1030;
+}
+
+
 .noPadding {
     padding: 0px;
 }
@@ -256,3 +262,10 @@
     box-shadow:inset 1px 2px rgba(0,0,0,.16);
 }
 
+/*
+shows the bug on re-creating the explorer window
+
+.collapsing {*/
+    /*-webkit-transition: none;*/
+    /*transition: none;*/
+/*}*/

@@ -445,7 +445,7 @@ var _cldEditor = (function() {
             },
             getCurrentProjectName : function() {
                 var selectedProjectSelector = '[selectedProject=true]';
-                var projectName = $(selectedProjectSelector).text();
+                var projectName = $(selectedProjectSelector).val();
                 if(projectName === '') {
                     projectName = CloudIde.getSettings().currentProject.name;
                 }
@@ -505,7 +505,7 @@ var _cldEditor = (function() {
                             var div_projectMainPanel = $('<div></div>').addClass('panel').addClass('panel-default');
                         }
 
-                        var div_settingsPanelBody = $('<div></div>').addClass('panel-body').addClass('container-fluid').addClass('fullWidth');
+                        var div_settingsPanelBody = $('<div></div>').addClass('panel-body').addClass('fullWidth');
                         var a_projectDel_fn = '_cldEditor.editorActions("deleteProjectById","'+project.id+'")';
                         var a_projectDel_icon = $('<span></span>').addClass('glyphicon').addClass('glyphicon-trash').addClass('paintRed');
                         var a_projectDel = $('<button></button>').attr('type','button').attr('onclick',a_projectDel_fn).addClass('btn').addClass('btn-default')
@@ -536,7 +536,7 @@ var _cldEditor = (function() {
                         var a_projectSettingsBtnGrpWrapper = $('<div></div>').addClass('btn-group');
 
 
-                        var a_projectActionsRow = $('<div></div>').addClass('row-fluid').addClass('btn-group').addClass('btn-group-justified');
+                        var a_projectActionsRow = $('<div></div>').addClass('btn-group').addClass('btn-group-justified');
 
                         a_projectDelBtnGrpWrapper.append(a_projectDel);
                         a_projectDuplicateBtnGrpWrapper.append(a_projectDuplicate);
@@ -683,15 +683,16 @@ var _cldEditor = (function() {
                 //Adds the project to the projects array, as well as it's data.
                 CloudIde.projectHandler.addProject(newProject);
                 CloudIde.projectsData[newProject.id] = newProjectData;
-                if(CloudIde.projectHandler.getProjects().length === 1) {
-                    //First project, set it to be the current project, then select it!
-                    CloudIde.projectHandler.setCurrentProjectById(newProject.id);
-                    //selectProject loads projects to explorer as a side-effect
-                    CloudIde.editor.selectProject(newProject.id);
-                }
-                else {
-                    CloudIde.editor.loadProjectsToExplorer();
-                }
+                //if(CloudIde.projectHandler.getProjects().length === 1) {
+                //    //First project, set it to be the current project, then select it!
+                //    CloudIde.projectHandler.setCurrentProjectById(newProject.id);
+                //    //selectProject loads projects to explorer as a side-effect
+                //    CloudIde.editor.selectProject(newProject.id);
+                //}
+                //else {
+                //    CloudIde.editor.loadProjectsToExplorer();
+                //}
+                CloudIde.editor.selectProject(newProject.id);
             },
             duplicateProject : function(options) {
                 console.log("options object is:",options);
@@ -705,15 +706,16 @@ var _cldEditor = (function() {
                 CloudIde.projectHandler.addProject(newProject);
                 CloudIde.projectsData[newProject.id] = newProjectData;
                 //TODO remove, as in this stage, it is an infeasible condition
-                if(CloudIde.projectHandler.getProjects().length === 1) {
-                    //First project, set it to be the current project, then select it!
-                    CloudIde.projectHandler.setCurrentProjectById(newProject.id);
-                    //selectProject loads projects to explorer as a side-effect
-                    CloudIde.editor.selectProject(newProject.id);
-                }
-                else {
-                    CloudIde.editor.loadProjectsToExplorer();
-                }
+                //if(CloudIde.projectHandler.getProjects().length === 1) {
+                //    //First project, set it to be the current project, then select it!
+                //    CloudIde.projectHandler.setCurrentProjectById(newProject.id);
+                //    //selectProject loads projects to explorer as a side-effect
+                //    CloudIde.editor.selectProject(newProject.id);
+                //}
+                //else {
+                //    CloudIde.editor.loadProjectsToExplorer();
+                //}
+                CloudIde.editor.selectProject(newProject.id);
             },
             /**
              * Edits a project's settings
