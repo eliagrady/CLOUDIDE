@@ -213,9 +213,18 @@ var _cldSettings = (function() {
                 mainDiv.append(appContainer);
             }
         }
-        var nanoDiv = $('<div></div>').addClass("nano");
-        nanoDiv.append(mainDiv);
-
+        var nanoDiv = $('.nano');
+        if(nanoDiv === undefined) {
+            //console.log('creating div');
+            nanoDiv = $('<div></div>').addClass("nano");
+            nanoDiv.append(mainDiv);
+        }
+        else {
+            //console.log('emptying div');
+            nanoDiv.remove();
+            nanoDiv = $('<div></div>').addClass("nano");
+            nanoDiv.append(mainDiv);
+        }
         $('#cldProjectExplorer').find('.projects').remove();
         $('#cldProjectExplorer').append(topDiv);
         $('#cldProjectExplorer').append(nanoDiv);
@@ -479,7 +488,7 @@ var _cldSettings = (function() {
     var initPhases = {
         dissolveSpinner : function() {
             $('.spinnerOverlay').fadeOut('slow',function() {
-                $('.spinnerOverlay').destroy();
+                $('.spinnerOverlay').remove();
             });
         },
         asyncLoader : function() {

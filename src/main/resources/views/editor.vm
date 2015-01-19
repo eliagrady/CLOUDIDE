@@ -37,6 +37,9 @@
     <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/display/fullscreen.css">
     <link rel="stylesheet" href="../static/lib/ui-lib/ui-lib.min.css"/>
 
+    <!-- Hints  -->
+
+
 </head>
 <body>
 #include("views/spinner.vm")

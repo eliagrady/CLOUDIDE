@@ -185,6 +185,32 @@
             <artifactId>jackson-datatype-joda</artifactId>
             <version>2.5.0</version>
         </dependency>
+
+
+        <!--Adding dep for deployment speedup-->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-labs</artifactId>
+            <version>1.4.3</version>
+        </dependency>
+        <!-- Caching -->
+        <dependency>
+            <groupId>net.sf.jsr107cache</groupId>
+            <artifactId>jsr107cache</artifactId>
+            <version>1.1</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-jsr107cache</artifactId>
+            <version>${gae.version}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+
     </dependencies>
 
 </project>
