@@ -1,10 +1,10 @@
 <div class="container-fluid">
     <div class="row">
         <!--Editor main -->
-        <div class="noLeftPadding col-sm-12 col-md-12 main">
+        <div class="editorPadding col-sm-12 col-md-12 main">
             <!-- CodeEditors Nav tabs -->
             <!-- code editors links will be initiated here -->
-            <ul id="cldEditorTabs" class="nav nav-tabs tabs col-sm-offset-1 col-md-offset-1">
+            <ul id="cldEditorTabs" class="nav nav-tabs tabs col-sm-offset-1 col-md-offset-2">
                 <li class="active"><a href="#cldEditorHtml" data-toggle="tab">HTML</a></li>
                 <li><a href="#cldEditorJs" data-toggle="tab">JavaScript</a></li>
                 <li><a href="#cldEditorCss" data-toggle="tab">CSS</a></li>
