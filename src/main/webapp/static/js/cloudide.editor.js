@@ -1478,8 +1478,8 @@ var _cldEditor = (function() {
             //Set height:
             var innerHeight = window.innerHeight;
             var headerHeight = 50;
-            var footerHeight = 0;
-            var tabsHeight = 42;
+            var footerHeight = 20;
+            var tabsHeight = 0;
             //42:  Answer to the Ultimate Question of Life, The Universe, and Everything
             var newHeight = innerHeight - headerHeight - footerHeight - tabsHeight;
             window.addEventListener('resize', function(event){
@@ -1487,8 +1487,8 @@ var _cldEditor = (function() {
                 //Set height:
                 var innerHeight = window.innerHeight;
                 var headerHeight = 50;
-                var footerHeight = 0;
-                var tabsHeight = 42;
+                var footerHeight = 20;
+                var tabsHeight = 0;
                 //42:  Answer to the Ultimate Question of Life, The Universe, and Everything
                 var newHeight = innerHeight - headerHeight - footerHeight - tabsHeight;
                 CloudIde.cm.html.setSize(null,newHeight);

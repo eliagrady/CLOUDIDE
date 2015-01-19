@@ -28,7 +28,7 @@ var _cldSettings = (function() {
             var compId;
             var onClose = function() {
                 Wix.Settings.refreshAppByCompIds(Wix.Utils.getOrigCompId());
-                loadProjects();
+                initPhases.loadSettingsFromServer();
                 console.log("onClose captured");
             };
             if(_cldSettings.mode !== "debug"){
@@ -242,11 +242,9 @@ var _cldSettings = (function() {
             //console.log(nowActive);
         }
     }
-
     function getSettings() {
         return this.settings;
     }
-
     function publishProject(projectId) {
 
         //And finally, update the server with the new settings
@@ -261,7 +259,6 @@ var _cldSettings = (function() {
         };
         updateProject(projectId, onSuccess);
     }
-
     function updateSettings(newSettings, onSuccessCallback) {
         var compId ,instanceId, userId;
         try {
@@ -305,7 +302,6 @@ var _cldSettings = (function() {
             }
         });
     }
-
     function updateProject(projectId, onSuccessCallback) {
         var compId ,instanceId, userId;
         try {
@@ -398,7 +394,6 @@ var _cldSettings = (function() {
             }
         });
     }
-
     function getProjects() {
 //        console.log("_cldSettings",_cldSettings);
 //        console.log("_cldSettings.init.settings",_cldSettings.init.settings);
@@ -413,7 +408,6 @@ var _cldSettings = (function() {
             return null;
         }
     }
-
     /**
      * Updating the settings object in the DB by posting an ajax request
      * @param settingsJson
@@ -459,7 +453,6 @@ var _cldSettings = (function() {
             }
         });
     }
-
     function bindEdit() {
         $('#cldEditorOpenBtn').click(
             function () {
