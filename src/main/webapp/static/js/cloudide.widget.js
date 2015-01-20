@@ -157,7 +157,7 @@ var _cldWidget = (function() {
         //$('#cldCss').html(codeCss);
         //$('#cldHtml').html(codeHtml);
         var $body = $('body');
-        var $text = $('<div></div>').addClass('addNewProjectTextStyling').text('Create a new project, and assign it in order to start using this Widget!');
+        var $text = $('<div></div>').addClass('addNewProjectTextStyling').text('Double click me, and assign a project to start using this Widget!');
         $body.append($text);
     }
 
