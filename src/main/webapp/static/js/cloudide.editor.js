@@ -572,6 +572,7 @@ var _cldEditor = (function() {
                     toggle: 'show'
                 });
 
+                //data-toggle="modal" data-target="#testsModal"
                 $('#cldProjectName').text(CloudIde.editor.getCurrentProjectName());
 
                 //console.log(nowActive);
@@ -650,7 +651,9 @@ var _cldEditor = (function() {
                 //Bring to scope:
                 CloudIde.projectHandler.assertData(projectId);
                 CloudIde.projectHandler.setCurrentProjectById(projectId);
-                CloudIde.editor.loadProjectsToExplorer();
+                $('#cldProjectName').text(CloudIde.editor.getCurrentProjectName())
+                    .attr('data-toggle','modal').attr('data-target','#projectRenameModal'); // Single editor mode
+                //CloudIde.editor.loadProjectsToExplorer();
             },
             updateStatusBar: function (text, timeout, callback) {
                 $('#cldStatusbar').text(text);
@@ -774,6 +777,9 @@ var _cldEditor = (function() {
                         },
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        },
+                        "Ctrl-s" : function() {
+                            CloudIde.save();
                         }
                     },
                     gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
@@ -804,6 +810,9 @@ var _cldEditor = (function() {
                         },
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        },
+                        "Ctrl-s" : function() {
+                            CloudIde.save();
                         }
                     },
                     gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
@@ -832,6 +841,9 @@ var _cldEditor = (function() {
                         },
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                        },
+                        "Ctrl-s" : function() {
+                            CloudIde.save();
                         }
                     },
                     gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
@@ -1250,6 +1262,10 @@ var _cldEditor = (function() {
         }
     };
     var Utils = {
+        isUUID : function(string) {
+          var regex = new RegExp('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i');
+            return regex.test(string);
+        },
         getCookie : function(cname) {
             var name = cname + "=";
             var ca = document.cookie.split(';');
@@ -1313,7 +1329,7 @@ var _cldEditor = (function() {
             var queue = [], paused = false;
             this.executePhase = function(phaseDescription, phase, args) {
                 queue.push(function() {
-                    console.log(phaseDescription);
+                    console.log("Async executor: ",phaseDescription);
                     phase(args);
                 });
                 runPhase(this);
@@ -1344,6 +1360,85 @@ var _cldEditor = (function() {
                     return string + this;
             };
             //On run, these bindings will fire:
+
+
+            $('#projectDeleteModal').on('shown.bs.modal', function (e) {
+                // Bind Save button
+                var captured = e.relatedTarget;
+                console.log("captured shown:",captured);
+                $('#projectDeleteBtt').get(0).onclick = function() {
+                    var currentProject = CloudIde.projectHandler.getCurrentProject();
+                    var currentlyEditedProjectId = currentProject.id;
+                    if(CloudIde.mode == 'debug') {
+                        CloudIde.projectHandler.deleteProject(currentlyEditedProjectId);
+                        console.log('should close editor now on production');
+                    }
+                    else {
+                        CloudIde.projectHandler.deleteProject(currentlyEditedProjectId);
+                        CloudIde.save();
+                        Wix.closeWindow();
+                    }
+                    CloudIde.projectHandler.editProjectById(currentlyEditedProjectId,{name: newName, modified : new Date() });
+                    $('#projectDeleteModal').modal('hide');
+
+                };
+            });
+            $('#projectDeleteModal').on('hidden.bs.modal', function (e) {
+                // Unbind Save button
+                var captured = e.relatedTarget;
+                console.log("captured removed:",captured);
+                console.log("Delete dismissed");
+            });
+
+
+            //Project Rename Modal
+            $('#projectRenameModal').on('shown.bs.modal', function (e) {
+                // Bind Save button
+                var captured = e.relatedTarget;
+                console.log("captured shown:",captured);
+                //TODO more general css selector
+                //var currentlyEditedProjectId = $(captured).attr('projectId');
+                //var cssSelector = 'label[projectId='+currentlyEditedProjectId+']';
+                //var currentlyEditedProjectName = $(cssSelector).text();
+                var currentProject = CloudIde.projectHandler.getCurrentProject();
+                var currentlyEditedProjectName = currentProject.name;
+                var currentlyEditedProjectId = currentProject.id;
+                console.log("currentlyEditedProjectName:",currentlyEditedProjectName);
+                $('#projectRenameInputField').attr('placeholder',currentlyEditedProjectName);
+                $('#projectRenameSaveBtt').get(0).onclick = function() {
+                    var currentProject = CloudIde.projectHandler.getCurrentProject();
+                    var currentlyEditedProjectName = currentProject.name;
+                    var currentlyEditedProjectId = currentProject.id;
+
+                    //_cldEditor.editorActions("editProjectSettingsById","b8d19db7-a153-415f-bf7c-b21ef50f224a")
+                    //We're going to add another parameter (3rd parameter) as the optional 'options' parameter
+                    //TODO input validation
+                    var newName = $('#projectRenameInputField').val() || currentlyEditedProjectName; //Failsafe, keep original name
+//                    console.log("func is:",func);
+//                    //Hack to convert the 'args' to an argument object //TODO change the way args are passed and constructed!
+//                    func = func.insert(51,"{projectId:");
+////                    for(var i=0 ; i < func.length ; i++ ) {
+////                        console.log(i,func.insert(i,"INJECTION"));
+////                    }
+//                    func = func.insert(func.length-1,', name: "'+newName+'"}');
+//                    //Now, function looks like this:
+//                    console.log("now, function is",func, "and it's type: ",typeof func);
+                    //setTimeout(func,0);
+                    CloudIde.projectHandler.editProjectById(currentlyEditedProjectId,{name: newName, modified : new Date() });
+                    $('#projectRenameModal').modal('hide');
+                    $('#projectRenameInputField').val("");
+
+                };
+            });
+            $('#projectRenameModal').on('hidden.bs.modal', function (e) {
+                // Unbind Save button
+                var captured = e.relatedTarget;
+                console.log("captured removed:",captured);
+                //It's better practice to actually use the captured instead
+                $('#cldProjectName').text(CloudIde.editor.getCurrentProjectName());
+            });
+
+
             //Project Settings Modal
             $('#projectSettingsModal').on('shown.bs.modal', function (e) {
                 // Bind Save button
@@ -1562,7 +1657,19 @@ var _cldEditor = (function() {
         },
         loadSettingsFromServer : function() {
             //Callback to the ajax request
+            function assignFetchedSettings(res){
+                console.log('res is:', res);
+                if(res.retData) {
+                    CloudIde.settings = JSON.parse(res.retData);
+                    CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
+                }
+                CloudIde.editor.updateStatusBar("Unable to load settings from server", 5000, undefined);
+                CloudIde.editor.createNewProject({name: 'new project'});
+            }
+
+            //Callback to the ajax request
             function useFetchedSettings(res){
+                console.log('res is:', res);
                 if(res.retData) {
                     CloudIde.settings = JSON.parse(res.retData);
                     var projId = Utils.getURLParameter('projectId');
@@ -1580,8 +1687,10 @@ var _cldEditor = (function() {
                 }
                 else {//No settings loaded, init a new editor instance
                     //Initialize template project if the fetched settings aren't proper
-                    //CloudIde.editor.createNewProject({name: undefined});
-                    CloudIde.editor.loadProjectsToExplorer();
+                    //FALLBACK behavior: creating a newProject on malformed requests (should change?)
+                    //CloudIde.editor.createNewProject({name: 'new project'});
+                    console.log("No settings loaded from server!");
+                    throw new Error("Couldn't load settings from server");
                 }
 
                 //Finally, notify:
@@ -1593,7 +1702,16 @@ var _cldEditor = (function() {
                     CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
                 }
             }
-            CloudIde.fetchSettings(useFetchedSettings);
+
+            //2 possibilities: either passed 'newProject', or the projectId to load.
+            var projId = Utils.getURLParameter('projectId');
+            if(projId === 'newProject') {
+                console.log("creating new project");
+                CloudIde.fetchSettings(assignFetchedSettings); // just bring the settings to scope
+            }
+            else {
+                CloudIde.fetchSettings(useFetchedSettings); //bring the settings to scope, and use it (to fetch the correct project)
+            }
         },
         initCodeMirrorTernEngine : function(editor) {
             function getURL(urls, c, retrievedContent) {
@@ -1646,12 +1764,12 @@ var _cldEditor = (function() {
             var startLoading = Date.now();
             var async = initPhases.asyncLoader();
             async.executePhase("setMode",initPhases.setMode);
-            initPhases.loadCodeMirrorToTextAreasPhase();
+            async.executePhase("loadCodeMirrorToTextAreasPhase",initPhases.loadCodeMirrorToTextAreasPhase);
+            async.executePhase("initIdGenerator",initPhases.initIdGenerator);
             async.executePhase("loadSettingsFromServer",initPhases.loadSettingsFromServer);
             async.executePhase("bindCodeMirrorTabs",initPhases.bindCodeMirrorTabs);
             async.executePhase("bindCodeMirrorTabsListeners",initPhases.bindCodeMirrorTabsListeners);
             async.executePhase("loadModalsPhase",initPhases.loadModalsPhase);
-            async.executePhase("initIdGenerator",initPhases.initIdGenerator);
             async.executePhase("dissolveSpinner",initPhases.dissolveSpinner);
 
             //TERN support (currently does not work well)

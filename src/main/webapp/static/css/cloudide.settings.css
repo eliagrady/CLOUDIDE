@@ -136,3 +136,113 @@
     border-width: 50px;
     margin-top: -50px;
 }
+
+#mainDiv {
+    margin : 20px;
+    padding : 20px;
+}
+.project-info {
+    margin : 20px;
+    padding : 0px;
+    display: table-cell;
+    vertical-align: middle;
+    padding : 20px;
+}
+.edit-btn {
+    font-size: 16px!important;
+    padding: 6px 27px!important;
+    max-width: 83px!important;
+}
+.glyphicon-plus {
+    font-size:16px;
+    min-width: 25px;
+}
+.edit-btn:hover {
+    transition: background-color 0.5s!important;
+    background-color : rgba(26%, 55%, 79%,0.5)!important;
+    cursor: pointer!important;
+}
+
+.bs-callout {
+    padding: 0px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 5px;
+}
+.project:hover {
+    background-color : #F9F9FF!important;
+    cursor: pointer!important;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    border-radius: 3px;
+}
+.bs-callout+.bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-default {
+    border-left-color: #777;
+}
+.bs-callout-default h4 {
+    color: #777;
+}
+.bs-callout-primary {
+    border-left-color: #428bca;
+}
+.bs-callout-primary h4 {
+    color: #428bca;
+}
+.bs-callout-success {
+    border-left-color: #5cb85c;
+}
+.bs-callout-success h4 {
+    color: #5cb85c;
+}
+.bs-callout-danger {
+    border-left-color: #d9534f;
+}
+.bs-callout-danger h4 {
+    color: #d9534f;
+}
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
+}
+.bs-callout-warning h4 {
+    color: #f0ad4e;
+}
+.bs-callout-info {
+    border-left-color: #5bc0de;
+}
+.bs-callout-info h4 {
+    color: #5bc0de;
+}
+.dashed {
+    border-width:5px;
+    border-style:dashed;
+}
+.fixed-height {
+    height:94px;
+}
+.noSelect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+.nano > nano-content {
+    padding: 0px;
+}
+.nano {
+    margin-top: 5px;
+}

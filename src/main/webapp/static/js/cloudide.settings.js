@@ -99,120 +99,51 @@ var _cldSettings = (function() {
             */
 
         };
-        console.log("loading projects to explorer...");
+        console.log("loading projects to settings window...");
 
-        var projects = getProjects();
+        var projects = getProjects() || [];
         if(projects) {
             var currentlySelectedProjectId = projects[0];
         }
         //Prepare main div
-        var topDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('appTop');
+        //var topDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('appTop');
         var mainDiv = $('<div></div>').addClass('projects').addClass('row-fluid').addClass('fullWidth').addClass('nano-content').attr('wix-scroll','{height:450}');
 
-
-        //Regardless of whether there are or aren't any projects, display the 'CloudIde' MultiProjectEditor link:
-        //var openMultiProjectEditorBtnIcon = $('<span></span>').addClass('glyphicon').addClass('glyphicon-3x').addClass('glyphicon-cloud').addClass('appLogo');
-        var openMultiProjectEditorBtnText = $('<span></span>').text("Create new projects!").addClass('appLogoText');
-        //var openMultiProjectEditorBtnIconContainer = $('<div></div>').addClass('col-xs-10').addClass('col-xs-offset-1');
-        var openMultiProjectEditorBtnIconContainer = $('<div></div>').addClass('fullWidth');
-        //openMultiProjectEditorBtnIconContainer.append(openMultiProjectEditorBtnIcon);
-        var openMultiProjectEditorBtn = $('<div></div>').attr('id','openMultiProjectEditorBtn')
-            .addClass('submit').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
-            .click({projectId: null}, editFunc);
-        var controlRow = $('<div></div>').addClass('row');
-        openMultiProjectEditorBtn.prepend(openMultiProjectEditorBtnText);
-        //openMultiProjectEditorBtn.prepend(openMultiProjectEditorBtnIconContainer);
-        controlRow.append(openMultiProjectEditorBtn);
-        topDiv.append(controlRow);
+        var project;
+        for(var i = 0 ; i < projects.length ; i++ ) {
+            project = projects[i];
+            //Prepare appContainer
+            var appContainer = $('<div></div>').addClass("project").addClass('bs-callout').addClass('input-group').addClass('input-group-lg');
+            //TODO add date formatter
+            var prjDescModifiedTime = $('<time></time>').addClass('timeago').attr('datetime',project.modified).text((new Date(project.modified)).toLocaleString());
+            var prjDescModified = $('<span></span>').html("<strong>Modified: </strong>").append(prjDescModifiedTime);
+            var prjName = $('<h4></h4>').text(project.name);
+            var projectInfo = $('<div></div>').addClass("project-info").click({projectId: project.id}, selectFunc);
+            var prjEditBtn = $('<div></div>').addClass("edit-btn").addClass('input-group-addon').addClass('input-group-btn').click({projectId: project.id}, editFunc).text('Edit');
 
 
-
-        //Case no projects are found   //TODO change to display message or, open new editor
-        if(!projects || projects.length === 0) {
-//            var createNewProjectBtn = $('<div></div>').text("Create new project").attr('id','createNewProjectBtn')
-//                .addClass('submit').addClass('btn-large').addClass('uilib-btn').addClass('connect').addClass('appCtrl-btn').addClass('col-xs-8').addClass('col-xs-offset-2')
-//                .click({projectId: null}, editFunc);
-            var span_no_projects = $('<div></div>').text("Project list is empty!").addClass('col-xs-8').addClass('col-xs-offset-2').addClass("uilib-inline").addClass("uilib-text");
-            var noProjectsRow = $('<div></div>').addClass('row');
-            noProjectsRow.append(span_no_projects);
-            mainDiv.removeClass("box").addClass("uilib-inline").addClass("uilib-text");
-            mainDiv.append(noProjectsRow);
-            //    <div class="row-fluid">
-            // <div id="createNewProjectBtn" class="submit btn-large uilib-btn connect appCtrl-btn col-xs-6 col-xs-offset-3">Create new project</div></div>
-
-        }
-        //Case there are some projects listed
-        else {
-            var project;
-            for(var i = 0 ; i < projects.length ; i++ ) {
-                project = projects[i];
-                //Prepare appContainer
-                var appContainer = $('<div></div>').addClass("appContainer").addClass('box').addClass('fullWidth').click({projectId: project.id}, selectFunc);
-                console.log("project.id ,_cldSettings.selectedProjectId",project.id,_cldSettings.selectedProjectId,project.id == _cldSettings.selectedProjectId)
-                if(project.id == _cldSettings.selectedProjectId) {
-                    appContainer.addClass('appContainerSelected');
-                }
-                // part a: application logo
-                var appProjectLogoDiv = $('<div></div>').addClass("appProjectLogo");
-                var appProjectLogo = $('<div></div>').addClass("logo");
-                var imgSrc = "../static/lib/ui-lib/images/wix_icon.png"; //TODO change to custom image
-                var appImg = $('<img/>').addClass("appSettings-padding").attr("width",86).attr("src",imgSrc).attr('alt',"cloudide");
-                appProjectLogo.append(appImg);
-                appProjectLogoDiv.append(appProjectLogo);
-                // part b: application description
-                var appInfoDiv = $('<div></div>').addClass("appInfo");
-                var prjName = $('<strong></strong>').text(project.name);
-                var prjNameDiv = $('<div></div>').addClass("uilib-text").addClass('projectName');
-                prjNameDiv.append(prjName);
-                //TODO add date formatter
-                var prjDescModified = $('<div></div>').html("<strong>Modified: </strong>"+project.modified);
-                var prjDescCreated = $('<div></div>').html("<strong>Created: </strong>"+project.created);
-                var prjDescDiv = $('<div></div>').addClass("uilib-text").addClass("appDescription");
-                prjDescDiv.append(prjNameDiv);
-                prjDescDiv.append(prjDescModified);
-                prjDescDiv.append(prjDescCreated);
-                appInfoDiv.append(prjDescDiv);
-
-                //part c: application control
-//                var appCtrlDiv = $('<div></div>').addClass("appCtrl");
-//                var appCtrlEdit = $('<div></div>')
-//                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
-//                    .click({projectId: project.id}, editFunc);
-//                var appCtrlSelect = $('<div></div>')
-//                    .addClass("submit").addClass("uilib-btn").addClass("connect").addClass("appCtrl-btn").addClass('fullWidth')
-//                    .click({projectId: project.id}, selectFunc);
-//                appCtrlEdit.text("Edit");
-//                appCtrlSelect.text("Select");
-//                //Adds functionality
-
-                var appCtrlDiv = $('<div></div>').addClass("appCtrl");
-                var appCtrlEdit = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintDarkBlue");
-                var appCtrlEdit_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-2x").addClass('glyphicon-edit').click({projectId: project.id}, editFunc).addClass("floatRight");
-                appCtrlEdit.append(appCtrlEdit_icon);
-
-//                var appCtrlSelect = $('<div></div>').addClass("appCtrl-btn").addClass('fullWidth').addClass("paintGreen");
-//                var appCtrlSelect_icon = $('<span></span>').addClass("glyphicon").addClass("glyphicon-1x").addClass('glyphicon-ok').click({projectId: project.id}, selectFunc).addClass("floatRight");
-//                appCtrlSelect.append(appCtrlSelect_icon);
-
-                //appCtrlEdit.text("Edit");
-                //appCtrlSelect.text("Select");
-                //Adds functionality
-
-                appCtrlDiv.append(appCtrlEdit);
-                //appCtrlDiv.append(appCtrlSelect);
-
-//                if(project.id == currentlySelectedProjectId) {
-//                    li = $('<li></li>').attr('projectId', project.id).attr('selectedProject', 'true').addClass('row-fluid');
-//                }
-//                else {
-//                    li = $('<li></li>').attr('projectId',project.id).attr('selectedProject','false').addClass('row-fluid');
-//                }
-                appContainer.append(appProjectLogoDiv);
-                appContainer.append(appInfoDiv);
-                appContainer.append(appCtrlDiv);
-                mainDiv.append(appContainer);
+            console.log("project.id ,_cldSettings.selectedProjectId",project.id,_cldSettings.selectedProjectId,project.id == _cldSettings.selectedProjectId)
+            if(project.id == _cldSettings.selectedProjectId) {
+                appContainer.addClass('bs-callout-primary');
             }
+            projectInfo.append(prjName).append(prjDescModified);
+            appContainer.append(projectInfo).append(prjEditBtn);
+            mainDiv.append(appContainer);
         }
+        //Finally, add the dashed project container
+        //Prepare appContainer
+        var appContainer = $('<div></div>').addClass("dashed").addClass('fixed-height').addClass('bs-callout').addClass('input-group').addClass('input-group-lg');
+        var prjName = $('<h4></h4>').text('Add new project');
+        var projectInfo = $('<div></div>').addClass("project-info").addClass('noSelect');
+        var prjEditBtnGlyph = $('<span></span>').addClass("glyphicon").addClass('glyphicon-plus');
+        var prjEditBtn = $('<div></div>').addClass("edit-btn").addClass('input-group-addon').addClass('input-group-btn').click({projectId: 'newProject'}, editFunc);
+
+        prjEditBtn.append(prjEditBtnGlyph);
+        projectInfo.append(prjName);
+        appContainer.append(projectInfo).append(prjEditBtn);
+        mainDiv.append(appContainer);
+
+
         var nanoDiv = $('.nano');
         if(nanoDiv === undefined) {
             //console.log('creating div');
@@ -226,21 +157,21 @@ var _cldSettings = (function() {
             nanoDiv.append(mainDiv);
         }
         $('#cldProjectExplorer').find('.projects').remove();
-        $('#cldProjectExplorer').append(topDiv);
         $('#cldProjectExplorer').append(nanoDiv);
 
 
         //Mark selected project:
         //Deactivate last 'current project'
         var lastActiveSelector = '[selectedProject=true]';
-        var lastActive = $(lastActiveSelector).attr('selectedProject','false').removeClass("active");
+        var lastActive = $(lastActiveSelector).attr('selectedProject','false').removeClass("bs-callout-primary");
         //console.log(lastActive);
         //Activate 'current project'
         if(currentlySelectedProjectId) {
             var cssSelector = '[projectId='+currentlySelectedProjectId.id+']';
-            var nowActive = $(cssSelector).attr('selectedProject','true').addClass("active");
+            var nowActive = $(cssSelector).attr('selectedProject','true').addClass("bs-callout-primary");
             //console.log(nowActive);
         }
+        jQuery("time.timeago").timeago();
     }
     function getSettings() {
         return this.settings;
@@ -453,6 +384,22 @@ var _cldSettings = (function() {
             }
         });
     }
+
+
+    /**
+     * Deletes a given project (can either be the actual object, or it's id)
+     * @param projectId the projectId of the project to delete
+     */
+    function deleteProject(projectId) {
+        var settings = _cldSettings.settings;
+        if(typeof  projectId === 'string') {
+            var index = settings.appSettings.projects.indexOf(projectId);
+            if(index > -1) {
+                settings.projects.splice(index,1);
+
+            }
+        }
+    }
     function bindEdit() {
         $('#cldEditorOpenBtn').click(
             function () {
@@ -553,10 +500,10 @@ var _cldSettings = (function() {
 
         },
         loadTimeFormatter : function() {
-            var url = "../static/lib/date.format.js";
+            //var url = "../static/lib/date.format.js";
+            var url = "../static/lib/timeago/jquery.timeago.js";
             $.getScript(url);
             console.log("loaded time formatter");
-
         },
         setMode : function() {
             var mode = Utils.getURLParameter('mode') || "";
@@ -670,8 +617,8 @@ var _cldSettings = (function() {
             async.executePhase("loadSelectedProject",initPhases.loadSelectedProject);
             async.executePhase("loadSettingsFromServer",initPhases.loadSettingsFromServer);
             //async.executePhase("bindEditButton",initPhases.bindRefresh);
-            //async.executePhase("loadTimeFormatter",initPhases.loadTimeFormatter);
             async.executePhase("initWixUI",initPhases.initWixUI);
+            async.executePhase("loadTimeFormatter",initPhases.loadTimeFormatter);
             async.executePhase("dissolveSpinner",initPhases.dissolveSpinner);
 
             var finishLoading = Date.now();

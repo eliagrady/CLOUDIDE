@@ -36,5 +36,6 @@
     <!-- Settings View Logic -->
     <script type="text/javascript" src="../static/js/cloudide.settings.js"></script>
     <script type="text/javascript" src="../static/lib/nanoscroll/jquery.nanoscroller.min.js"></script>
+    <script type="text/javascript" src="../static/lib/timeago/jquery.timeago.js"></script>
 </body>
 </html>
