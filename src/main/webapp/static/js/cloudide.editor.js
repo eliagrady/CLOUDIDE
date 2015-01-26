@@ -661,7 +661,7 @@ var _cldEditor = (function() {
                 if (timeout !== undefined) {
                     //clears the status bar
                     setTimeout(function() {
-                        CloudIde.editor.updateStatusBar("Idle", undefined, undefined);
+                        CloudIde.editor.updateStatusBar("", undefined, undefined);
                     }, timeout);
                 }
                 if(typeof callback === 'function') {
@@ -778,7 +778,7 @@ var _cldEditor = (function() {
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
                         },
-                        "Ctrl-s" : function() {
+                        "Ctrl-S" : function() {
                             CloudIde.save();
                         }
                     },
@@ -811,7 +811,7 @@ var _cldEditor = (function() {
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
                         },
-                        "Ctrl-s" : function() {
+                        "Ctrl-S" : function() {
                             CloudIde.save();
                         }
                     },
@@ -842,7 +842,7 @@ var _cldEditor = (function() {
                         "Esc": function(cm) {
                             if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
                         },
-                        "Ctrl-s" : function() {
+                        "Ctrl-S" : function() {
                             CloudIde.save();
                         }
                     },
@@ -1378,7 +1378,6 @@ var _cldEditor = (function() {
                         CloudIde.save();
                         Wix.closeWindow();
                     }
-                    CloudIde.projectHandler.editProjectById(currentlyEditedProjectId,{name: newName, modified : new Date() });
                     $('#projectDeleteModal').modal('hide');
 
                 };
@@ -1573,29 +1572,33 @@ var _cldEditor = (function() {
             CloudIde.cm.html = CodeMirror.fromTextArea(cldTextAreaHtml, CloudIde.getCodeMirrorDefaultConfig("html"));
             //Set height:
             var innerHeight = window.innerHeight;
+            var innerWidth = window.innerWidth;
             var headerHeight = 50;
             var footerHeight = 20;
             var tabsHeight = 50;
-            //42:  Answer to the Ultimate Question of Life, The Universe, and Everything
+            //Defensible boarders!
             var newHeight = innerHeight - headerHeight - footerHeight - tabsHeight;
+            var newWidth = innerWidth - headerHeight;
             window.addEventListener('resize', function(event){
                 // do stuff here
                 //Set height:
                 var innerHeight = window.innerHeight;
+                var innerWidth = window.innerWidth;
                 var headerHeight = 50;
                 var footerHeight = 20;
                 var tabsHeight = 50;
-                //42:  Answer to the Ultimate Question of Life, The Universe, and Everything
+                //Defensible boarders!
                 var newHeight = innerHeight - headerHeight - footerHeight - tabsHeight;
-                CloudIde.cm.html.setSize(null,newHeight);
-                CloudIde.cm.js.setSize(null,newHeight);
-                CloudIde.cm.css.setSize(null,newHeight);
+                var newWidth = innerWidth - headerHeight;
+                CloudIde.cm.html.setSize(newWidth,newHeight);
+                CloudIde.cm.js.setSize(newWidth,newHeight);
+                CloudIde.cm.css.setSize(newWidth,newHeight);
 
             });
 
-            CloudIde.cm.html.setSize(null,newHeight);
-            CloudIde.cm.js.setSize(null,newHeight);
-            CloudIde.cm.css.setSize(null,newHeight);
+            CloudIde.cm.html.setSize(newWidth,newHeight);
+            CloudIde.cm.js.setSize(newWidth,newHeight);
+            CloudIde.cm.css.setSize(newWidth,newHeight);
         },
         bindCodeMirrorTabs : function() {
             //Initialize Editor tab buttons
@@ -1663,8 +1666,10 @@ var _cldEditor = (function() {
                     CloudIde.settings = JSON.parse(res.retData);
                     CloudIde.editor.updateStatusBar("Loaded settings successfully", 5000, undefined);
                 }
-                CloudIde.editor.updateStatusBar("Unable to load settings from server", 5000, undefined);
-                CloudIde.editor.createNewProject({name: 'new project'});
+                else {
+                    CloudIde.editor.updateStatusBar("Unable to load settings from server", 5000, undefined);
+                }
+                CloudIde.editor.createNewProject({name: 'Change the project name!'});
             }
 
             //Callback to the ajax request

@@ -269,3 +269,10 @@ shows the bug on re-creating the explorer window
     /*-webkit-transition: none;*/
     /*transition: none;*/
 /*}*/
+
+.clickable {
+    cursor: hand;
+}
+#cldEditorTabs {
+    border-bottom: none;
+}

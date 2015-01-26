@@ -2,10 +2,14 @@
 #* @vtlvariable name="dataString" type="java.lang.String" *#
 #* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
 #* @vtlvariable name="currentProject" type="org.codehaus.jackson.JsonNode" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
 <!DOCTYPE html>
 <html>
 <head>
     <title>CloudIde</title>
+    #if(true)
+        <link rel="stylesheet" href="${}"/>
+    #end
     <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
     <!-- Imports -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

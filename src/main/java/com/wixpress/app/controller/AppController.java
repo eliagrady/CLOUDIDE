@@ -9,6 +9,8 @@ import com.wixpress.app.domain.AppInstance;
 import com.wixpress.app.domain.AuthenticationResolver;
 import com.wixpress.app.domain.InvalidSignatureException;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.joda.time.DateTime;
 import org.mortbay.util.URI;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +82,7 @@ public class AppController {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         model.addAttribute("appInstance",appInstance);
         model.addAttribute("mode",mode);
-        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance, projectId);
+        return viewWidgetWithProject(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance, projectId);
 
     }
 
@@ -612,110 +614,48 @@ public class AppController {
         //Add 'Cookie' (not a real instance, just the userId is present):
         response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
         model.addAttribute("mode",mode);
+        if(mode.equalsIgnoreCase("debug")) {
+            return viewWidgetWithProject(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
+        }
         return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
     }
 
 
 
     /**
-     * VIEW - Widget Endpoint for testing
-     * This endpoint does not implement the Wix API. It can be used directly to test the application from any browser,
-     * substituting the signed instance parameter with explicit values given as URL parameters
-     *
-     * @param model       - model used by the view template widget.vm
-     * @param instanceId  - the instanceId member of the signed instance
-     * @param userId      - the uid member of the signed instance
-     * @param permissions - the permissions member of the signed instance
-     * @param sectionUrl  - The base URL of the application section, if present
-     * @param target      - The target attribute that must be added to all href anchors within the application frame
-     * @param width       - The width of the frame to render in pixels
-     * @param compId      - The id of the Wix component which is the host of the IFrame
-     * @param viewMode    - An indication whether the user is currently in editor / site
-     * @return the template widget.vm name
+     * VIEW - A 'RESTful' resource loader for project data
      */
-    @RequestMapping(value = "/widget2standalone/{instanceId}", method = RequestMethod.GET)
-    public void widgetStandAlone2(Model model,
-                                    HttpServletResponse response,
-                                    @PathVariable String instanceId,
-                                    @RequestParam(required = false) String userId,
-                                    @RequestParam(required = false) String permissions,
-                                    @RequestParam(value = "section-url", required = false, defaultValue = "/") String sectionUrl,
-                                    @RequestParam(required = false, defaultValue = "_self") String target,
-                                    @RequestParam(required = false, defaultValue = "200") Integer width,
-                                    @RequestParam(required = false, defaultValue = "widgetCompId") String compId,
-                                    @RequestParam(required = false, defaultValue = "site") String viewMode,
-                                    @RequestParam(required = false, defaultValue = "") String projectId,
-                                    @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
-        if(userId == null) {
-            userId = DEBUG.userId;
-        }
-        if(permissions == null) {
-            permissions = DEBUG.permissions;
-        }
-        AppInstance appInstance = createTestSignedInstance(instanceId, userId, permissions);
-        //Add 'Cookie' (not a real instance, just the userId is present):
-        response.addCookie(new Cookie("instance", appInstance.getUid().toString()));
+    @RequestMapping(value = "/js/{instanceId}/{compId}", method = RequestMethod.GET)
+    public void resourceLoaderJs(Model model,
+                                 HttpServletResponse response,
+                                 @PathVariable String instanceId,
+                                 @PathVariable String compId,
+                                 @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
         model.addAttribute("mode",mode);
-        AppProject project = new AppProject(objectMapper);
-        String json = "var app = angular.module('cld', [])\n" +
-                "    .factory('Service', function ($http) {\n" +
-                "        return {\n" +
-                "            saveCode: function (code, compId) {\n" +
-                "                $http.post('/app/save', {\n" +
-                "                    compId: compId,\n" +
-                "                    settings: {\n" +
-                "                        appSettings: {\n" +
-                "                            currentProject: {\n" +
-                "                                name: 'Test project',\n" +
-                "                                modified: new Date(),\n" +
-                "                                code: $.base64.encode(code)\n" +
-                "                            }\n" +
-                "                        }\n" +
-                "                    }\n" +
-                "                })\n" +
-                "            },\n" +
-                "            getProject:function(){\n" +
-                "                return currentProject;\n" +
-                "            }\n" +
-                "        }\n" +
-                "    })\n" +
-                "    .controller('testCtrl', function ($scope, Service) {\n" +
-                "\n" +
-                "        $scope.code= $.base64.decode(settings.appSettings.currentProject.code);\n" +
-                "        $scope.saveCode = function (code) {\n" +
-                "            Service.saveCode(code, '');\n" +
-                "        }\n" +
-                "    })\n" +
-                "    .controller('widgetCtrl', function ($scope, Service) {\n" +
-                "\n" +
-                "        $scope.model={\n" +
-                "            project:Service.getProject()\n" +
-                "        };\n" +
-                "\n" +
-                "        $scope.saveCode = function (code) {\n" +
-                "            Service.saveCode(code, '');\n" +
-                "        }\n" +
-                "    })\n" +
-                "\n" +
-                "\n" +
-                "\n" +
-                "    .directive('htmlContent', function () {\n" +
-                "        return {\n" +
-                "            scope: {\n" +
-                "                htmlContent: '='\n" +
-                "            },\n" +
-                "            link: function (scope, elem) {\n" +
-                "                scope.$watch('htmlContent', function (newValue) {\n" +
-                "                    elem.html(newValue);\n" +
-                "                });\n" +
-                "            }\n" +
-                "        }\n" +
-                "    });\n";
-        //objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        //project.setCode(objectMapper.readTree(new URL("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.15/require.js")));
-        model.addAttribute("data", json);
+        //AppProject project = new AppProject(objectMapper);
+        JsonNode projectCodeJson = getAppProjectCode(instanceId, compId);
+        String jsBase64 = projectCodeJson.get("code").get("js").asText();
+        String parsedJavascript = decodeBase64(jsBase64);
         response.setContentType("application/javascript");
-        response.getWriter().write(json);
+        response.getWriter().write(parsedJavascript);
+        //return viewWidget2(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
+    }
+
+    /**
+     * VIEW - A 'RESTful' resource loader for project data
+     */
+    @RequestMapping(value = "/css/{instanceId}/{compId}", method = RequestMethod.GET)
+    public void resourceLoaderCss(Model model,
+                                 HttpServletResponse response,
+                                 @PathVariable String instanceId,
+                                 @PathVariable String compId,
+                                 @RequestParam(required = false, defaultValue = "") String mode) throws IOException {
+        model.addAttribute("mode",mode);
+        JsonNode projectCodeJson = getAppProjectCode(instanceId, compId);
+        String cssBase64 = projectCodeJson.get("code").get("css").asText();
+        String parsedCss = decodeBase64(cssBase64);
+        response.setContentType("text/css");
+        response.getWriter().write(parsedCss);
         //return viewWidget2(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
     }
 
@@ -799,8 +739,32 @@ public class AppController {
     private String viewWidget(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
         //AppProject appProject = getAppProject(instanceId, compId);
         JsonNode appProject = getAppProjectCode(instanceId, compId);
+        //TODO check if there is a project to load, or an empty widget should load
+
+        model.addAttribute("instanceId",appInstance.getInstanceId().toString());
+        model.addAttribute("compId",compId);
         model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
         return "widget";
+    }
+    // Set widgetWithProject.vm
+    private String viewWidgetWithProject(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, AppInstance appInstance, String projectId) throws IOException {
+        //AppProject appProject = getAppProject(instanceId, compId);
+        JsonNode appProject = getAppProjectCode(instanceId, compId);
+        //TODO check if there is a project to load, or an empty widget should load
+        try {
+            String htmlBase64 = appProject.get("code").get("html").asText();
+            String parsedHtml = decodeBase64(htmlBase64);
+            model.addAttribute("html",parsedHtml);
+            model.addAttribute("instanceId",appInstance.getInstanceId().toString());
+            model.addAttribute("compId",compId);
+        }
+        catch (Exception e) {
+            //No project loaded
+            return "widgetWithoutProject";
+        }
+
+        //model.addAttribute("currentProject",objectMapper.writeValueAsString(appProject));
+        return "widgetWithProject";
     }
 
     // Set javascriptTemplate.vm
@@ -879,5 +843,13 @@ public class AppController {
             throw new ControllerInputException("Failed parsing instanceId [%s] or userId [%s].\nValid values are GUIDs of the form [aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa] or nulls (for userId)",
                     original, instanceId, userId);
         }
+    }
+
+
+    public String decodeBase64(String s) {
+        return StringUtils.newStringUtf8(Base64.decodeBase64(s));
+    }
+    public String encodeBase64(String s) {
+        return Base64.encodeBase64String(StringUtils.getBytesUtf8(s));
     }
 }

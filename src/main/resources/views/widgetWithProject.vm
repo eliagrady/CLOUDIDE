@@ -1,0 +1,27 @@
+#* @vtlvariable name="instanceId" type="java.lang.String" *#
+#* @vtlvariable name="compId" type="java.lang.String" *#
+#* @vtlvariable name="html" type="java.lang.String" *#
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CloudIde</title>
+    #if(true)
+        <link rel="stylesheet" href="css/${instanceId}/${compId}"/>
+    #end
+    <!-- Imports Wix and jQuery libs-->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.42.0/js/Wix.js"></script>
+        <!-- Imports your javascripts and css-->
+    #if(true)
+        <script src="js/${instanceId}/${compId}"></script>
+    #end
+</head>
+
+<body>
+<!-- HTML goes here -->
+    #if(true)
+        ${html}
+    #end
+</body>
+</html>

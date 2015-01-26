@@ -1,0 +1,19 @@
+#* @vtlvariable name="data" type="org.codehaus.jackson.JsonNode" *#
+#* @vtlvariable name="dataString" type="java.lang.String" *#
+#* @vtlvariable name="cldAppSettings" type="com.wixpress.app.dao.AppSettings" *#
+#* @vtlvariable name="appInstance" type="com.wixpress.app.domain.AppInstance" *#
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CloudIde</title>
+    <link rel="stylesheet" href="../static/css/cloudide.widget.css"/>
+    <!-- Imports -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//sslstatic.wix.com/services/js-sdk/1.42.0/js/Wix.js"></script>
+</head>
+
+<body id="body">
+<!-- Insert HTML here -->
+<div class="addNewProjectTextStyling">Double click me, and assign a project to start using this Widget!</div>
+</body>
+</html>
