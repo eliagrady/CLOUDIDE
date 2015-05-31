@@ -1619,6 +1619,11 @@ var _cldEditor = (function() {
             var mode = Utils.getURLParameter('mode') || "";
             console.log("Mode set to: "+ (mode === 'debug'?mode:"mode not set"));
             _cldEditor.mode = mode;
+            if(mode == 'demo') {
+                CloudIde.save = function(e) {
+                    e.preventDefault();
+                };
+            }
         },
         bindCodeMirrorTabsListeners : function() {
             //Initialize Editor tab event listeners
@@ -1670,6 +1675,11 @@ var _cldEditor = (function() {
                     CloudIde.editor.updateStatusBar("Unable to load settings from server", 5000, undefined);
                 }
                 CloudIde.editor.createNewProject({name: 'Change the project name!'});
+                //Call the rename modal in 'forced' mode
+                $('#projectRenameModal').modal({
+                    keyboard: false,
+                    backdrop: 'static'
+                });
             }
 
             //Callback to the ajax request
@@ -1708,9 +1718,18 @@ var _cldEditor = (function() {
                 }
             }
 
-            //2 possibilities: either passed 'newProject', or the projectId to load.
+            //3 possibilities: either passed 'newProject', or the projectId to load, or demo mode
             var projId = Utils.getURLParameter('projectId');
-            if(projId === 'newProject') {
+            var demoModePath = window.location.pathname;
+            if(CloudIde.mode === 'demo' || demoModePath === '/app/editordemo') {
+                console.log("creating demo project");
+                CloudIde.editor.createNewProject({name: 'Your project name here!'});
+                $('#cldProjectName').text(CloudIde.editor.getCurrentProjectName());
+                var newHtmlDoc = CodeMirror.Doc("just like jsFiddle... write your code here!","htmlmixed");
+                CloudIde.cm.html.swapDoc(newHtmlDoc);
+
+            }
+            else if(projId === 'newProject') {
                 console.log("creating new project");
                 CloudIde.fetchSettings(assignFetchedSettings); // just bring the settings to scope
             }

@@ -78,8 +78,13 @@
                 #if($mode.equals("debug"))
                     #include("views/editor/modals/editorPreviewModalButton.vm")
                 #end
-                <li><a id="cldMenubarBttSave" onclick="_cldEditor.save()" href="#"> Save </a></li>
-                <li><a id="cldMenubarBttDelete" data-toggle="modal" href="#projectDeleteModal" href="#"> Delete </a></li>
+                #if($mode.equals("demo"))
+                    <li><a id="cldMenubarBttSave" onclick="" href="#"> Save </a></li>
+                    <li><a id="cldMenubarBttDelete" data-toggle="modal" href="" href="#"> Delete </a></li>
+                #else
+                    <li><a id="cldMenubarBttSave" onclick="_cldEditor.save()" href="#"> Save </a></li>
+                    <li><a id="cldMenubarBttDelete" data-toggle="modal" href="#projectDeleteModal" href="#"> Delete </a></li>
+                #end
                 <!-- Button trigger modal -->
                 #if($mode.equals("debug"))
                     #include("views/tests/editor/editorTestsModalButton.vm")
@@ -88,14 +93,18 @@
         </div>
     </div>
 </nav>
-<!--Main (sidebar and editor)-->
-#if($projectId.equals("") || $projectId.equals("null"))
-        <!--sidebar and editor-->
-        #include("views/editor/editorMultiProject.vm")
-    #else
-        <!--editor only-->
-        #include("views/editor/editorSingleProject.vm")
-#end
+
+<!--editor only-->
+    #include("views/editor/editorSingleProject.vm")
+## MULTIPROJECT MODE not supported
+##<!--Main (sidebar and editor)-->
+###if($projectId.equals("") || $projectId.equals("null"))
+##        <!--sidebar and editor-->
+##        #include("views/editor/editorMultiProject.vm")
+##    #else
+##        <!--editor only-->
+##        #include("views/editor/editorSingleProject.vm")
+###end
 <!--Footer (Statusbar)-->
 <div class="navbar-fixed-bottom" role="status">
     <div class="container-fluid">
@@ -202,30 +211,33 @@
 <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/dialog/dialog.css">
 <script src="../static/lib/codemirror/codemirror-4.0/addon/dialog/dialog.js"></script>
 
-
+#if($mode.equals("debug"))
 <!-- CodeMirror Tern -->
-<link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.css">
-<script src="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.js"></script>
+    <link rel="stylesheet" href="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.css">
+    <script src="../static/lib/codemirror/codemirror-4.0/addon/tern/tern.js"></script>
 
-<script src="http://marijnhaverbeke.nl/acorn/acorn.js"></script>
-<script src="http://marijnhaverbeke.nl/acorn/acorn_loose.js"></script>
-<script src="http://marijnhaverbeke.nl/acorn/util/walk.js"></script>
-<script src="http://ternjs.net/doc/demo/polyfill.js"></script>
-<script src="http://ternjs.net/lib/signal.js"></script>
-<script src="http://ternjs.net/lib/tern.js"></script>
-<script src="http://ternjs.net/lib/def.js"></script>
-<script src="http://ternjs.net/lib/comment.js"></script>
-<script src="http://ternjs.net/lib/infer.js"></script>
-<script src="http://ternjs.net/plugin/doc_comment.js"></script>
+    <script src="http://marijnhaverbeke.nl/acorn/acorn.js"></script>
+    <script src="http://marijnhaverbeke.nl/acorn/acorn_loose.js"></script>
+    <script src="http://marijnhaverbeke.nl/acorn/util/walk.js"></script>
+    <script src="http://ternjs.net/doc/demo/polyfill.js"></script>
+    <script src="http://ternjs.net/lib/signal.js"></script>
+    <script src="http://ternjs.net/lib/tern.js"></script>
+    <script src="http://ternjs.net/lib/def.js"></script>
+    <script src="http://ternjs.net/lib/comment.js"></script>
+    <script src="http://ternjs.net/lib/infer.js"></script>
+    <script src="http://ternjs.net/plugin/doc_comment.js"></script>
+#end
+
 
 <!-- Modals loading (partially) on demand and by configuration-->
     #if($mode.equals("debug"))
         #include("views/tests/editor/editorTestsModal.vm")
     #end
     #if($projectId.equals(""))
-        #include("views/editor/modals/editorCreateNewProjectModal.vm")
-        #include("views/editor/modals/editorProjectSettingsModal.vm")
-        #include("views/editor/modals/editorDuplicateProjectModal.vm")
+##        MULTIPROJECT MODE NO LONGER SUPPORTED
+##        #include("views/editor/modals/editorCreateNewProjectModal.vm")
+##        #include("views/editor/modals/editorProjectSettingsModal.vm")
+##        #include("views/editor/modals/editorDuplicateProjectModal.vm")
     #end
     #include("views/editor/modals/editorProjectRenameModal.vm")
     #include("views/editor/modals/editorProjectDeleteModal.vm")

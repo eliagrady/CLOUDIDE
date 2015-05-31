@@ -19,8 +19,17 @@ public class AuthenticationResolver {
     // should be changed once you register your application with Wix Dev center (http://dev.wix.com/app/create-app)
 
     //App keys for the first app in Wix's dev dashboard
-    private final static String APPLICATION_KEY = "13469a7d-eba1-4005-0f59-f2ad9f0bdace";
-    private final static String APPLICATION_SECRET_KEY = "e41683c4-1168-422c-83ef-31eeccc38869";
+    /*
+     * For security reasons, the AppKeys class has been omitted. Here is it's basic structure:
+     * package com.wixpress.app.domain;
+     * public class AppKeys {
+     * public final static String APPLICATION_KEY = "YOUR_KEY";
+     * public final static String APPLICATION_SECRET_KEY = YOUR_SECRET_KEY";
+    }
+
+    */
+    private final static String APPLICATION_KEY = AppKeys.APPLICATION_KEY;
+    private final static String APPLICATION_SECRET_KEY = AppKeys.APPLICATION_SECRET_KEY;
     private static final String SIGN_ALGORITHM = "HMACSHA256";
     private final Base64 base64;
     private final Mac mac;

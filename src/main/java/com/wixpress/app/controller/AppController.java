@@ -82,7 +82,11 @@ public class AppController {
         AppInstance appInstance = authenticationResolver.unsignInstance(instance);
         model.addAttribute("appInstance",appInstance);
         model.addAttribute("mode",mode);
-        return viewWidgetWithProject(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance, projectId);
+
+        //RESTful
+        //return viewWidgetWithProject(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode , appInstance, projectId);
+        //Regular embedding
+        return viewWidget(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, appInstance, projectId);
 
     }
 
@@ -119,6 +123,40 @@ public class AppController {
         }
         model.addAttribute("mode",mode);
         return viewEditor(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, projectId, appInstance);
+
+    }
+
+
+    /**
+     * VIEW - Widget Endpoint
+     *
+     * @param model      - Spring MVC model used by the view template widget.vm
+     * @param instance   - The signed instance {@see http://dev.wix.com/display/wixdevelopersapi/The+Signed+Instance}
+     * @param sectionUrl - The base URL of the application section, if present
+     * @param target     - The target attribute that must be added to all href anchors within the application frame
+     * @param width      - The width of the frame to render in pixels
+     * @param compId     - The id of the Wix component which is the host of the IFrame
+     * @param viewMode   - An indication whether the user is currently in editor / site
+     * @return the template editor.vm name
+     * @link http://dev.wix.com/docs/display/DRAF/App+Endpoints#AppEndpoints-WidgetEndpoint
+     */
+    @RequestMapping(value = "/editordemo", method = RequestMethod.GET)
+    public String editorDemo(Model model,
+                         HttpServletResponse response,
+                         @RequestParam(value = "section-url", required = false) String sectionUrl,
+                         @RequestParam(required = false) String target,
+                         @RequestParam(required = false)Integer width,
+                         @RequestParam(required = false) String compId,
+                         @RequestParam(required = false) String viewMode,
+                         @RequestParam(required = false, defaultValue= "") String projectId,
+                         @RequestParam(required = false, defaultValue = "demo") String mode) throws IOException {
+        AppInstance appInstance = createTestSignedInstance(DEBUG.instanceId,DEBUG.userId,DEBUG.permissions);
+        //fallback to default width
+        if(width == null) {
+            width = 500;
+        }
+        model.addAttribute("mode",mode);
+        return viewEditorDemo(model, sectionUrl, target, width, appInstance.getInstanceId().toString(), compId, viewMode, projectId, appInstance);
 
     }
 
@@ -728,6 +766,14 @@ public class AppController {
     private String viewEditor(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, String projectId, AppInstance appInstance) throws IOException {
         AppSettings appSettings = getSettings(appInstance.getUid().toString());
         model.addAttribute("cldAppSettings", objectMapper.writeValueAsString(appSettings));
+        model.addAttribute("appInstance", objectMapper.writeValueAsString(appInstance.getUid().toString()));
+        //Editor 'project specific' mode:
+        model.addAttribute("projectId",projectId);
+        return "editor";
+    }
+    // Set editordemo.vm
+    private String viewEditorDemo(Model model, String sectionUrl, String target, Integer width, String instanceId, String compId, String viewMode, String projectId, AppInstance appInstance) throws IOException {
+        AppSettings appSettings = getSettings(appInstance.getUid().toString());
         model.addAttribute("appInstance", objectMapper.writeValueAsString(appInstance.getUid().toString()));
         //Editor 'project specific' mode:
         model.addAttribute("projectId",projectId);
