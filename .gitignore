@@ -2,4 +2,4 @@
 /.idea
 /target
 *.iml
-*/domain/AppKeys.java
+src/main/java/com/wixpress/app/domain/AppKeys.java
