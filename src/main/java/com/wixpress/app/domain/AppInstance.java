@@ -18,7 +18,9 @@ public class AppInstance {
     private String ipAndPort;
     private String vendorProductId; // Premium Package ID, as was entered in the Dev Center during the app registration process
     private Boolean demoMode;
-    private UUID aid; // anchor Id for TPAs
+    private UUID aid; // The ID of an anonymous site visitor
+    private UUID siteOwnerId; // the site owner unique ID
+
 
     //Empty cont' for the ObjectMapper - don't delete
     public AppInstance() {
@@ -93,5 +95,13 @@ public class AppInstance {
 
     public void setAid(UUID aid) {
         this.aid = aid;
+    }
+
+    public UUID getSiteOwnerId() {
+        return siteOwnerId;
+    }
+
+    public void setSiteOwnerId(UUID siteOwnerId) {
+        this.siteOwnerId = siteOwnerId;
     }
 }
