@@ -19,7 +19,9 @@ public class AppInstance {
     private String vendorProductId; // Premium Package ID, as was entered in the Dev Center during the app registration process
     private Boolean demoMode;
     private UUID aid; // The ID of an anonymous site visitor
+    private UUID appDefId; // App Definition Id
     private UUID siteOwnerId; // the site owner unique ID
+    private UUID siteMemberId; // the site member Id
 
 
     //Empty cont' for the ObjectMapper - don't delete
@@ -104,4 +106,22 @@ public class AppInstance {
     public void setSiteOwnerId(UUID siteOwnerId) {
         this.siteOwnerId = siteOwnerId;
     }
+
+    public UUID getAppDefId() {
+        return appDefId;
+    }
+
+    public void setAppDefId(UUID appDefId) {
+        this.appDefId = appDefId;
+    }
+
+    public UUID getSiteMemberId() {
+        return siteMemberId;
+    }
+
+    public void setSiteMemberId(UUID siteMemberId) {
+        this.siteMemberId = siteMemberId;
+    }
+
+
 }

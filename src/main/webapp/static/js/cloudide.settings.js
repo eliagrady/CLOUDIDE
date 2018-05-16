@@ -50,7 +50,7 @@ var _cldSettings = (function() {
                 url += "&projectId=" + projectId;
             }
             else {
-                url = 'http://wixcloudide.appspot.com/app/editor?';
+                url = 'http://cloudidewix.appspot.com/app/editor?';
                 //url += "instance=" + Utils.getCookie('instance');
                 url += "&instanceId=" + Wix.Utils.getInstanceId();
                 url += "&compId=" + Wix.Utils.getOrigCompId();
@@ -59,7 +59,7 @@ var _cldSettings = (function() {
                 }
             }
 
-            //var url = 'http://wixcloudide.appspot.com/app/editor' + ?projectId=+projectId;
+            //var url = 'http://cloudidewix.appspot.com/app/editor' + ?projectId=+projectId;
             console.log("opening editor should be done now");
             //TODO open editor in a quick edit mode (just one project)
             var w = window.screen.width*0.8;
@@ -417,8 +417,8 @@ var _cldSettings = (function() {
                     var cook = document.cookie.split(';')[0];
                     var fetchedCook = Utils.getCookie('instance');
                     console("cook and fetchedCook are",cook === fetchedCook ? "equal" : "different");
-                    //window.open('http://wixcloudide.appspot.com/app/editor?instance='+cook);
-                    var url = 'http://wixcloudide.appspot.com/app/editor?instance='+cook;
+                    //window.open('http://cloudidewix.appspot.com/app/editor?instance='+cook);
+                    var url = 'http://cloudidewix.appspot.com/app/editor?instance='+cook;
                     Wix.Settings.openModal(url,window.screen.width*0.9, window.screen.height*0.8,onClose);
                 }
             }

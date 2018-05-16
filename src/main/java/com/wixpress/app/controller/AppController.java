@@ -740,7 +740,7 @@ public class AppController {
      */
     @ExceptionHandler(Exception.class)
     public ModelAndView exceptionHandler(Exception e) {
-        if (e instanceof InvalidSignatureException) {
+        if (false && e instanceof InvalidSignatureException) {
             return new ModelAndView("invalid-secret");
         } else {
             ModelAndView mv = new ModelAndView("error-view");

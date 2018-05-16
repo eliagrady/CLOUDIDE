@@ -129,10 +129,10 @@ var _cldWidget = (function() {
                     //TODO change compId logic?
                     var compId = Wix.Utils.getCompId();
                     var instanceId = Wix.Utils.getInstanceId();
-                    //var url = 'http://wixcloudide.appspot.com/app/editor?instanceId='+instanceId+"&compId="+compId;
-                    var url = 'http://wixcloudide.appspot.com/app/editor';
+                    //var url = 'http://cloudidewix.appspot.com/app/editor?instanceId='+instanceId+"&compId="+compId;
+                    var url = 'http://cloudidewix.appspot.com/app/editor';
                     Wix.openModal(url,window.screen.width*0.8, window.screen.height*0.6,onClose);
-                    //http://wixcloudide.appspot.com/app/editor?instanceId=134915a5-1abd-e7ef-b605-6ed8061489f5&cacheKiller=140106326518122&compId=TPMdl7-bpi&deviceType=desktop&instance=ZtHW253uXw_R4tdcQU0gnu0kgoaugDg89fcnRrkuE6A.eyJpbnN0YW5jZUlkIjoiMTM0OTE1YTUtMWFiZC1lN2VmLWI2MDUtNmVkODA2MTQ4OWY1Iiwic2lnbkRhdGUiOiIyMDE0LTA1LTI1VDE4OjMwOjMyLjI0Mi0wNTowMCIsInVpZCI6ImMwYTNkN2IzLThjOTAtNGIzYy1iZmZhLTUwOTI2NDljY2MzYSIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJpcEFuZFBvcnQiOiIxMDkuNjUuMzguMTg1LzYzOTc2IiwiZGVtb01vZGUiOmZhbHNlfQ&locale=en&viewMode=preview&origCompId=TPWdgt4-5aq
+                    //http://cloudidewix.appspot.com/app/editor?instanceId=134915a5-1abd-e7ef-b605-6ed8061489f5&cacheKiller=140106326518122&compId=TPMdl7-bpi&deviceType=desktop&instance=ZtHW253uXw_R4tdcQU0gnu0kgoaugDg89fcnRrkuE6A.eyJpbnN0YW5jZUlkIjoiMTM0OTE1YTUtMWFiZC1lN2VmLWI2MDUtNmVkODA2MTQ4OWY1Iiwic2lnbkRhdGUiOiIyMDE0LTA1LTI1VDE4OjMwOjMyLjI0Mi0wNTowMCIsInVpZCI6ImMwYTNkN2IzLThjOTAtNGIzYy1iZmZhLTUwOTI2NDljY2MzYSIsInBlcm1pc3Npb25zIjoiT1dORVIiLCJpcEFuZFBvcnQiOiIxMDkuNjUuMzguMTg1LzYzOTc2IiwiZGVtb01vZGUiOmZhbHNlfQ&locale=en&viewMode=preview&origCompId=TPWdgt4-5aq
                 }
             }
         );
